@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* GITY Kinetic Theme Colors */
+  --primary: #4F46E5; /* Override per instructions */
+  --primary-dim: #3d30d4;
+  --primary-container: #9795ff;
+  
+  --secondary: #FF6D00;
+  --tertiary: #00C853;
+  
+  --background: #faf4ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f5eeff;
+  --surface-container: #ede4ff;
+  --surface-container-high: #e8deff;
+  
+  --on-background: #32294f;
+  --on-surface: #32294f;
+  --on-surface-variant: #5f557f;
+  
+  --outline-variant: rgba(178, 166, 213, 0.15); /* Ghost Border */
+  
+  /* Radii & Shadows */
+  --radius-md: 0.75rem;
+  --radius-xl: 1.5rem; /* 24px */
+  
+  --shadow-ambient: 0 12px 32px rgba(50, 41, 79, 0.06);
+  --shadow-lift: 0 4px 12px rgba(50, 41, 79, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background);
+  color: var(--on-background);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--on-surface);
+}
+
+/* Base Editorial Button */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 14px 24px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;
+  box-shadow: var(--shadow-ambient);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(50, 41, 79, 0.1);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

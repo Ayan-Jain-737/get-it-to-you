@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GITY - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "inverse-on-surface": "#f2f0ed",
+                "surface-container-high": "#eae8e4",
+                "primary-container": "#ff7b54",
+                "surface-tint": "#a63a19",
+                "primary": "#a63a19",
+                "on-background": "#1b1c1a",
+                "primary-fixed-dim": "#ffb5a0",
+                "on-primary-fixed-variant": "#862302",
+                "tertiary": "#4f5f79",
+                "on-primary-container": "#6d1a00",
+                "on-tertiary": "#ffffff",
+                "secondary-fixed-dim": "#a7c8ff",
+                "secondary-fixed": "#d5e3ff",
+                "on-primary": "#ffffff",
+                "error": "#ba1a1a",
+                "error-container": "#ffdad6",
+                "on-tertiary-container": "#293951",
+                "on-error": "#ffffff",
+                "on-surface-variant": "#58423c",
+                "surface-container-lowest": "#ffffff",
+                "inverse-primary": "#ffb5a0",
+                "surface-container-highest": "#e4e2de",
+                "secondary": "#395f94",
+                "on-tertiary-fixed-variant": "#384760",
+                "on-secondary": "#ffffff",
+                "tertiary-fixed-dim": "#b7c7e5",
+                "secondary-container": "#9ec2fe",
+                "on-tertiary-fixed": "#0b1c32",
+                "surface-container-low": "#f5f3ef",
+                "inverse-surface": "#30312e",
+                "on-error-container": "#93000a",
+                "on-secondary-fixed-variant": "#1e477b",
+                "surface": "#fbf9f5",
+                "primary-fixed": "#ffdbd1",
+                "surface-dim": "#dbdad6",
+                "outline-variant": "#dfc0b7",
+                "surface-container": "#efeeea",
+                "surface-bright": "#fbf9f5",
+                "on-secondary-container": "#284f83",
+                "surface-variant": "#e4e2de",
+                "on-secondary-fixed": "#001c3b",
+                "tertiary-fixed": "#d5e3ff",
+                "on-primary-fixed": "#3b0a00",
+                "background": "#fbf9f5",
+                "outline": "#8b716a",
+                "on-surface": "#1b1c1a",
+                "tertiary-container": "#93a3bf"
+            },
+            "borderRadius": {
+                "DEFAULT": "1rem",
+                "lg": "2rem",
+                "xl": "3rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Be Vietnam Pro"],
+                "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .puffy-shadow {
+            box-shadow: 0 20px 40px -15px rgba(166, 58, 25, 0.08);
+        }
+        .squishy:active {
+            transform: scale(0.96);
+            transition: transform 0.1s ease;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<div class="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+<div class="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-primary-container/10 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-secondary-container/10 rounded-full blur-[120px]"></div>
+<div class="mb-12 text-center relative z-10">
+<h1 class="font-headline text-5xl font-extrabold text-primary tracking-tighter mb-3">GITY</h1>
+<p class="font-headline text-on-surface-variant font-medium text-lg italic opacity-80">Connecting Campus Scholars</p>
+</div>
+<div class="flex flex-col lg:flex-row gap-12 max-w-6xl w-full items-stretch relative z-10">
+<div class="flex-1 bg-surface-container-lowest puffy-shadow rounded-lg p-10 flex flex-col items-center text-center transition-all duration-300">
+<div class="w-16 h-16 bg-primary-container/20 rounded-full flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="alternate_email">alternate_email</span>
+</div>
+<h2 class="font-headline text-2xl font-bold text-on-surface mb-2">Step 1: Identity</h2>
+<p class="text-on-surface-variant mb-10 leading-relaxed">Please use your official university credentials to access the GITY scholar network.</p>
+<div class="w-full space-y-6">
+<div class="relative group">
+<label class="absolute left-6 -top-3 px-2 bg-surface-container-lowest text-primary text-xs font-bold tracking-widest uppercase">University Email</label>
+<input class="w-full h-16 px-6 pt-2 bg-surface-container-low border-none rounded-xl text-on-surface placeholder:text-outline/50 focus:ring-2 focus:ring-primary/20 transition-all outline-none" placeholder="scholar@university.edu" type="email"/>
+</div>
+<button class="w-full h-16 bg-gradient-to-br from-primary-container to-primary text-on-primary font-headline font-bold text-lg rounded-full shadow-lg shadow-primary/20 flex items-center justify-center gap-3 squishy">
+                        Get Secure OTP
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="mt-8 pt-8 border-t border-surface-container-high w-full flex justify-center gap-6">
+<div class="flex items-center gap-2 text-xs font-medium text-on-surface-variant/60">
+<span class="material-symbols-outlined text-sm" data-icon="verified_user">verified_user</span>
+                        Secure Auth
+                    </div>
+<div class="flex items-center gap-2 text-xs font-medium text-on-surface-variant/60">
+<span class="material-symbols-outlined text-sm" data-icon="encrypted">encrypted</span>
+                        Data Privacy
+                    </div>
+</div>
+</div>
+<div class="hidden lg:flex items-center justify-center text-primary-container/40">
+<span class="material-symbols-outlined text-4xl" data-icon="double_arrow">double_arrow</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest puffy-shadow rounded-lg p-10 flex flex-col items-center text-center opacity-60 grayscale-[0.5] pointer-events-none border-2 border-dashed border-primary/10">
+<div class="w-16 h-16 bg-secondary-container/20 rounded-full flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="key">key</span>
+</div>
+<h2 class="font-headline text-2xl font-bold text-on-surface mb-2">Step 2: Verification</h2>
+<p class="text-on-surface-variant mb-10 leading-relaxed">Enter the 4-digit code sent to your academic inbox to finalize the secure connection.</p>
+<div class="w-full space-y-8">
+<div class="flex justify-between gap-4">
+<input class="w-16 h-16 text-center text-2xl font-bold bg-surface-container-low border-none rounded-xl text-on-surface focus:ring-2 focus:ring-secondary/20" maxlength="1" type="text"/>
+<input class="w-16 h-16 text-center text-2xl font-bold bg-surface-container-low border-none rounded-xl text-on-surface focus:ring-2 focus:ring-secondary/20" maxlength="1" type="text"/>
+<input class="w-16 h-16 text-center text-2xl font-bold bg-surface-container-low border-none rounded-xl text-on-surface focus:ring-2 focus:ring-secondary/20" maxlength="1" type="text"/>
+<input class="w-16 h-16 text-center text-2xl font-bold bg-surface-container-low border-none rounded-xl text-on-surface focus:ring-2 focus:ring-secondary/20" maxlength="1" type="text"/>
+</div>
+<button class="w-full h-16 bg-secondary text-on-secondary font-headline font-bold text-lg rounded-full flex items-center justify-center gap-3">
+                        Verify &amp; Sign In
+                        <span class="material-symbols-outlined" data-icon="login">login</span>
+</button>
+<button class="text-secondary font-bold text-sm hover:underline">
+                        Didn't receive code? Resend
+                    </button>
+</div>
+</div>
+</div>
+<div class="mt-16 text-center max-w-xl">
+<div class="inline-flex items-center gap-4 bg-surface-container-low p-2 pr-6 rounded-full mb-6">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Group of diverse university students laughing and studying together in a bright modern library lounge" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCT4bZIBogYlTUB5kNGWvmr-RPVljBszFBQif7NuwcM0Ef_HQAGExkNSGyrYprpT_3PW44KbBW7kF7V1kBVUdXisl17Ah2gkt77FOwgkK-y90szwIr-p8qL1HDascdtgqj_TB42rIRKNnY5oKZySEHg7jZU5A9MOFNPXw8bmKTdXy4grv_AKXksXkVWqZk4szgaQXSN_e7mpoPLazJZInxO8afVMN27y7MTuNIOAFpTVNGTvGcBvERUzBipHIblVvlGdB4sLyM3w5g"/>
+<span class="text-sm font-semibold text-on-surface-variant">Join 5,000+ scholars on campus today</span>
+</div>
+</div>
+<footer class="mt-auto py-8 text-on-surface-variant/50 text-xs font-medium uppercase tracking-[0.2em] flex items-center gap-2">
+            Built by Students <span class="w-1 h-1 rounded-full bg-primary/30"></span> 2024 GITY Network
+        </footer>
+</div>
+</body></html>

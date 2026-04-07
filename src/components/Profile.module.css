@@ -1,0 +1,134 @@
+.mainContainer {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+}
+
+.box {
+  width: 100%;
+  max-width: 420px;
+  animation: fadeSlideUp 0.7s ease-out;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.brandIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+  box-shadow: 0 12px 32px rgba(74, 64, 224, 0.15);
+  margin-bottom: 0.5rem;
+}
+
+.brandIcon span {
+  color: white;
+  font-size: 2.25rem;
+  font-variation-settings: 'FILL' 1;
+}
+
+.header h1 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: -0.025em;
+  margin-bottom: 0.25rem;
+}
+
+.header p {
+  color: var(--on-surface-variant);
+  font-weight: 500;
+}
+
+.card {
+  background-color: var(--surface-container-lowest);
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(50, 41, 79, 0.04);
+}
+
+.card h2 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin-bottom: 1.5rem;
+}
+
+.inputGroup {
+  margin-bottom: 1rem;
+}
+
+.inputGroup label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  margin-bottom: 0.5rem;
+  padding-left: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+.inputGroup input,
+.inputGroup select {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background-color: var(--surface-container-low);
+  border-radius: 0.75rem;
+  border: none;
+  color: var(--on-surface);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus {
+  box-shadow: 0 0 0 2px rgba(74, 64, 224, 0.2);
+}
+
+.saveBtn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.saveBtn:active {
+  transform: scale(0.95);
+}
+
+.successMsg {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  color: #059669; /* Green */
+  font-weight: 600;
+  font-size: 0.875rem;
+}

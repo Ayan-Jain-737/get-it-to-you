@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GITY - Journey Tracker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary-fixed": "#9795ff",
+                "on-surface-variant": "#5f557f",
+                "surface-bright": "#faf4ff",
+                "on-secondary-fixed": "#5c2300",
+                "on-primary-fixed-variant": "#1a0099",
+                "error": "#b41340",
+                "tertiary-fixed": "#5cfd80",
+                "inverse-surface": "#10062d",
+                "primary": "#4a40e0",
+                "on-secondary-fixed-variant": "#893700",
+                "surface-container": "#ede4ff",
+                "on-primary": "#f4f1ff",
+                "on-secondary-container": "#7b3100",
+                "surface-variant": "#e2d7ff",
+                "inverse-on-surface": "#a296c4",
+                "on-surface": "#32294f",
+                "surface-container-lowest": "#ffffff",
+                "surface-container-highest": "#e2d7ff",
+                "on-primary-fixed": "#000000",
+                "on-tertiary-container": "#005d22",
+                "on-tertiary": "#cfffce",
+                "on-tertiary-fixed": "#004819",
+                "secondary-fixed": "#ffc5aa",
+                "secondary-fixed-dim": "#ffb28c",
+                "inverse-primary": "#8582ff",
+                "on-error-container": "#510017",
+                "on-primary-container": "#14007e",
+                "tertiary-dim": "#005d22",
+                "tertiary-fixed-dim": "#4bee74",
+                "surface-tint": "#4a40e0",
+                "outline-variant": "#b2a6d5",
+                "error-dim": "#a70138",
+                "on-background": "#32294f",
+                "secondary-dim": "#883700",
+                "outline": "#7b719c",
+                "on-error": "#ffefef",
+                "surface": "#faf4ff",
+                "error-container": "#f74b6d",
+                "tertiary-container": "#5cfd80",
+                "on-tertiary-fixed-variant": "#006827",
+                "primary-fixed-dim": "#8885ff",
+                "tertiary": "#006a28",
+                "secondary": "#9b3f00",
+                "background": "#faf4ff",
+                "on-secondary": "#fff0ea",
+                "surface-container-low": "#f5eeff",
+                "surface-dim": "#dacdff",
+                "surface-container-high": "#e8deff",
+                "secondary-container": "#ffc5aa",
+                "primary-container": "#9795ff",
+                "primary-dim": "#3d30d4"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#faf4ff]/70 backdrop-blur-3xl shadow-[0_12px_32px_rgba(50,41,79,0.06)]">
+<div class="flex justify-between items-center px-6 py-4 w-full">
+<div class="text-2xl font-bold tracking-tight text-[#4a40e0] uppercase">GITY</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#32294f] p-2 hover:bg-[#e8deff] rounded-full transition-colors cursor-pointer" data-icon="account_circle">account_circle</span>
+<span class="material-symbols-outlined text-[#32294f] p-2 hover:bg-[#e8deff] rounded-full transition-colors cursor-pointer" data-icon="logout">logout</span>
+</div>
+</div>
+<div class="bg-[#ede4ff] h-[1px] w-full absolute bottom-0"></div>
+</nav>
+<main class="pt-24 px-6 max-w-2xl mx-auto space-y-8">
+<!-- Journey Title & Status -->
+<header class="space-y-2">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest inline-block">Active Run</span>
+<h1 class="text-4xl font-bold tracking-tight text-on-surface">Track Journey</h1>
+<p class="text-on-surface-variant font-medium">Head to Main Gate to pick up the parcel.</p>
+</header>
+<!-- Dynamic Map Section -->
+<section class="relative h-[280px] w-full rounded-[2rem] overflow-hidden bg-surface-container shadow-sm">
+<img class="w-full h-full object-cover opacity-80" data-alt="Abstract aerial view of a university campus map with highlighted paths in purple and glowing pins indicating logistics locations" data-location="University Campus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzAN0-r9xjYrfYHTaYxuQEQnuTv1qlc-0wkrpYiT1S0Mwh0P8D06uM7OPwaai-8giK1f01kv3FRG2q5jk2hIHIucxv6GjwmReW3lm7c-62FGdfSZLo6wtufIbQ_fpggWySDFnohZUjxWDsmeUDF-VUHMkEvttfLGNEJDkG1drkC8jmi6tBhQX0Wb3oYP_MSUwIMDDr3pLo2DCezCL8ycDaJFNi-Eaxi6k6Xc0mIx-UJ_Mi0z_B1hRrXnCQEkovhYjhFUfCkvi62dA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+<!-- Navigation Overlay Pips -->
+<div class="absolute top-6 left-6 right-6 flex justify-between items-start pointer-events-none">
+<div class="bg-surface-container-lowest/90 backdrop-blur-md p-4 rounded-2xl shadow-lg flex items-center gap-3">
+<div class="bg-primary text-on-primary w-10 h-10 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="navigation">navigation</span>
+</div>
+<div>
+<p class="text-[10px] font-bold uppercase tracking-wider text-primary opacity-70">Next Step</p>
+<p class="text-sm font-bold text-on-surface">Turn Right at Block D</p>
+</div>
+</div>
+<div class="bg-primary p-3 rounded-full text-on-primary shadow-xl">
+<span class="material-symbols-outlined" data-icon="my_location" style="font-variation-settings: 'FILL' 1;">my_location</span>
+</div>
+</div>
+</section>
+<!-- Status Pulse Trail (Non-linear tracker) -->
+<section class="bg-surface-container-low p-6 rounded-[2rem] space-y-6">
+<h2 class="text-headline-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="route">route</span>
+                Delivery Progress
+            </h2>
+<div class="relative flex justify-between px-2">
+<!-- Progress Line -->
+<div class="absolute top-4 left-4 right-4 h-[2px] bg-outline-variant/30 -z-10"></div>
+<!-- Step 1: Active -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white ring-4 ring-primary/20">
+<span class="material-symbols-outlined text-sm" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-[10px] font-bold text-primary uppercase">At Gate</span>
+</div>
+<!-- Step 2: Current -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary ring-4 ring-primary/10">
+<span class="material-symbols-outlined text-sm animate-pulse" data-icon="package_2">package_2</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface uppercase">Pick-up</span>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Arrival</span>
+</div>
+<!-- Step 4: Final -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="verified">verified</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Complete</span>
+</div>
+</div>
+</section>
+<!-- Delivery Bento Grid Details -->
+<section class="grid grid-cols-2 gap-4">
+<!-- Requester Card -->
+<div class="col-span-1 bg-surface-container-lowest p-6 rounded-[2rem] shadow-sm flex flex-col items-center text-center space-y-3">
+<div class="relative">
+<img class="w-16 h-16 rounded-2xl object-cover" data-alt="Professional studio portrait of a young Indian woman smiling warmly with soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjId2J0omjXwrm5Vn8xRE80itj1eb0fEQgLgIxAXj8cskMN1DYH8036Q9BQvRHQpQXpEeOSqOFydeg_D4KHDeMpGY0-n6q8vvoHS1_ckiTmdR4xOyC738Sbv2404mSRm-MOdiNtCcXAMFQMDpBL0p9ozFEeyQJTk4wG99HQLD7yKBwpPR-H-7QQdyPKaeszTffWMKsNf6xeql_xuNn2zp1ZgUVSEI3nuPyMIBY9ZIHCNVP851ybtonA5U7Lmo6RXFX_D-YCLso8kE"/>
+<div class="absolute -bottom-1 -right-1 bg-tertiary-container w-6 h-6 rounded-full border-4 border-surface-container-lowest flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-on-tertiary-container" data-icon="chat">chat</span>
+</div>
+</div>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Requester</p>
+<p class="text-lg font-bold text-on-surface">Anjali</p>
+</div>
+</div>
+<!-- Location Card -->
+<div class="col-span-1 bg-surface-container p-6 rounded-[2rem] flex flex-col justify-between">
+<div>
+<p class="text-[10px] font-bold text-primary uppercase tracking-widest">Destination</p>
+<p class="text-lg font-bold text-on-surface leading-tight mt-1">Ladies' Hostel Block Q</p>
+</div>
+<div class="bg-surface-variant/50 self-start px-3 py-1 rounded-lg mt-4">
+<p class="text-[11px] font-bold text-on-surface-variant uppercase">Room 402</p>
+</div>
+</div>
+<!-- Item Card -->
+<div class="col-span-2 bg-surface-container-low p-6 rounded-[2.5rem] flex items-center gap-6">
+<div class="bg-surface-container-lowest p-4 rounded-3xl">
+<span class="material-symbols-outlined text-3xl text-primary" data-icon="inventory_2">inventory_2</span>
+</div>
+<div class="flex-1">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Item Description</p>
+<p class="text-xl font-bold text-on-surface">Amazon Parcel</p>
+<p class="text-sm text-on-surface-variant">Medium box • Approx 1.2kg</p>
+</div>
+<div class="bg-secondary-container/30 px-4 py-2 rounded-2xl">
+<p class="text-secondary font-bold text-lg">₹45</p>
+<p class="text-[10px] font-bold text-secondary uppercase">Earning</p>
+</div>
+</div>
+</section>
+<!-- State Machine Actions -->
+<section class="space-y-3">
+<button class="w-full bg-surface-container-highest text-on-surface font-bold py-5 rounded-[1.5rem] flex items-center justify-center gap-3 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="where_to_vote">where_to_vote</span>
+                I'm at the Gate
+            </button>
+<button class="w-full bg-surface-container-highest text-on-surface font-bold py-5 rounded-[1.5rem] flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
+<span class="material-symbols-outlined" data-icon="front_loader">front_loader</span>
+                I've Picked Up the Package
+            </button>
+<button class="w-full bg-surface-container-highest text-on-surface font-bold py-5 rounded-[1.5rem] flex items-center justify-center gap-3 opacity-50 cursor-not-allowed">
+<span class="material-symbols-outlined" data-icon="location_away">location_away</span>
+                I've Arrived
+            </button>
+</section>
+<!-- Primary Call to Action -->
+<footer class="pt-4 pb-8">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold py-6 rounded-[2rem] shadow-[0_12px_32px_rgba(74,64,224,0.25)] flex items-center justify-center gap-3 active:scale-95 transition-all text-lg tracking-tight">
+                Complete Delivery
+                <span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+</button>
+</footer>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-[#faf4ff]/70 backdrop-blur-3xl rounded-t-[1.5rem] shadow-[0_-8px_24px_rgba(50,41,79,0.04)]">
+<div class="bg-[#ede4ff] h-[1px] w-full absolute top-0"></div>
+<div class="flex justify-around items-center px-4 pt-3 pb-6">
+<div class="flex flex-col items-center justify-center text-[#32294f] px-5 py-2 hover:opacity-80 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="storefront">storefront</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Marketplace</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-[#4a40e0] text-white rounded-2xl px-5 py-2 scale-90 duration-200 cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="local_shipping" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">My Runs</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#32294f] px-5 py-2 hover:opacity-80 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Profile</span>
+</div>
+</div>
+</nav>
+</body></html>

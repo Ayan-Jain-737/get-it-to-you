@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GITY - Get it to you.</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf4ff;
+        }
+        h1, h2, h3, .headline {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(250, 244, 255, 0.7);
+            backdrop-filter: blur(24px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #4a40e0 0%, #9795ff 100%);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed": "#9795ff",
+                      "on-surface-variant": "#5f557f",
+                      "surface-bright": "#faf4ff",
+                      "on-secondary-fixed": "#5c2300",
+                      "on-primary-fixed-variant": "#1a0099",
+                      "error": "#b41340",
+                      "tertiary-fixed": "#5cfd80",
+                      "inverse-surface": "#10062d",
+                      "primary": "#4a40e0",
+                      "on-secondary-fixed-variant": "#893700",
+                      "surface-container": "#ede4ff",
+                      "on-primary": "#f4f1ff",
+                      "on-secondary-container": "#7b3100",
+                      "surface-variant": "#e2d7ff",
+                      "inverse-on-surface": "#a296c4",
+                      "on-surface": "#32294f",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-highest": "#e2d7ff",
+                      "on-primary-fixed": "#000000",
+                      "on-tertiary-container": "#005d22",
+                      "on-tertiary": "#cfffce",
+                      "on-tertiary-fixed": "#004819",
+                      "secondary-fixed": "#ffc5aa",
+                      "secondary-fixed-dim": "#ffb28c",
+                      "inverse-primary": "#8582ff",
+                      "on-error-container": "#510017",
+                      "on-primary-container": "#14007e",
+                      "tertiary-dim": "#005d22",
+                      "tertiary-fixed-dim": "#4bee74",
+                      "surface-tint": "#4a40e0",
+                      "outline-variant": "#b2a6d5",
+                      "error-dim": "#a70138",
+                      "on-background": "#32294f",
+                      "secondary-dim": "#883700",
+                      "outline": "#7b719c",
+                      "on-error": "#ffefef",
+                      "surface": "#faf4ff",
+                      "error-container": "#f74b6d",
+                      "tertiary-container": "#5cfd80",
+                      "on-tertiary-fixed-variant": "#006827",
+                      "primary-fixed-dim": "#8885ff",
+                      "tertiary": "#006a28",
+                      "secondary": "#9b3f00",
+                      "background": "#faf4ff",
+                      "on-secondary": "#fff0ea",
+                      "surface-container-low": "#f5eeff",
+                      "surface-dim": "#dacdff",
+                      "surface-container-high": "#e8deff",
+                      "secondary-container": "#ffc5aa",
+                      "primary-container": "#9795ff",
+                      "primary-dim": "#3d30d4"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "1.5rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Plus Jakarta Sans"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex items-center justify-center p-4">
+<!-- Auth Container: Centered, Mobile-First Constrained -->
+<main class="w-full max-w-[420px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+<!-- Brand Identity Section -->
+<header class="text-center space-y-4">
+<div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl primary-gradient shadow-[0_12px_32px_rgba(74,64,224,0.15)] mb-2">
+<span class="material-symbols-outlined text-white text-4xl" data-icon="local_shipping" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<div class="space-y-1">
+<h1 class="text-4xl font-extrabold tracking-tight text-primary uppercase">GITY</h1>
+<p class="text-on-surface-variant font-medium">Get it to you.</p>
+</div>
+</header>
+<!-- Dynamic Entry Card -->
+<section class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_8px_24px_rgba(50,41,79,0.04)] space-y-6">
+<!-- Step 1: Phone Entry & Social -->
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="block text-[11px] font-bold uppercase tracking-wider text-on-surface-variant px-1">Phone Number</label>
+<div class="relative flex items-center">
+<span class="absolute left-4 text-on-surface-variant font-medium border-r border-outline-variant/20 pr-3">+234</span>
+<input class="w-full pl-16 pr-4 py-4 bg-surface-container rounded-xl border-none focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline transition-all" placeholder="800 000 0000" type="tel"/>
+</div>
+</div>
+<button class="w-full primary-gradient text-on-primary font-bold py-4 rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all">
+                    Send Code
+                </button>
+<div class="relative flex items-center py-2">
+<div class="flex-grow border-t border-surface-container-high"></div>
+<span class="flex-shrink mx-4 text-label-sm text-outline uppercase">or</span>
+<div class="flex-grow border-t border-surface-container-high"></div>
+</div>
+<button class="w-full bg-surface-container-high text-on-surface font-semibold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-surface-variant transition-colors active:scale-95">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAejU2oJYP2dclpQTRzVpfnyWY8635jPN9UNTC6RC_OG_ZIHYLpxNFErsl_Dh3CLjRi_uVCTbm1ShsxQreMQQoQcmibOrwq5g68URiK7iqhoEO2SrMLypqAwR7gEzqGic5TYgqXBMTt5yu8vPMloMWuRJWpvCftPl2AUah9CMwZOtb9yhx5c4Qk1ZTEmE1lGpgjuEqzcRu6HV4KxwWOMxBZ_z84steBmVLvn-0U27bHCQmLkIXas3Vj4-GNkt8U6Vn6EGd5Lu7VBus"/>
+                    Login with Google
+                </button>
+</div>
+<!-- Kinetic Divider -->
+<div class="h-[2px] w-full bg-surface-container rounded-full"></div>
+<!-- Profile Setup (Quick Entry) -->
+<div class="space-y-4 pt-2">
+<h2 class="headline text-headline-sm text-on-surface">Finish Setup</h2>
+<div class="grid grid-cols-1 gap-4">
+<div class="space-y-2">
+<label class="block text-label-sm text-on-surface-variant px-1">Full Name</label>
+<input class="w-full px-4 py-3 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-primary/20 text-on-surface" placeholder="Alex Johnson" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-label-sm text-on-surface-variant px-1">Location / Dorm</label>
+<div class="relative">
+<select class="w-full appearance-none px-4 py-3 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-primary/20 text-on-surface pr-10 cursor-pointer">
+<option disabled="" selected="" value="">Select Dorm Block</option>
+<optgroup label="Dorm Blocks">
+<option>Block A</option>
+<option>Block B</option>
+<option>Block C</option>
+<option>Block D</option>
+<option>Block E</option>
+<option>Block F</option>
+<option>Block G</option>
+<option>Block H</option>
+<option>Block J</option>
+<option>Block K</option>
+<option>Block L</option>
+<option>Block M</option>
+<option>Block N</option>
+<option>Block P</option>
+<option>Block Q</option>
+</optgroup>
+<optgroup label="Ladies' Hostels">
+<option>Emerald Hall</option>
+<option>Sapphire Court</option>
+<option>Ruby Terrace</option>
+</optgroup>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footnote / Social Proof -->
+<footer class="text-center space-y-6">
+<p class="text-body-md text-on-surface-variant px-8">
+                By continuing, you agree to our 
+                <span class="text-primary font-semibold">Terms</span> and 
+                <span class="text-primary font-semibold">Privacy Policy</span>.
+            </p>
+<div class="flex justify-center gap-2 overflow-hidden px-4">
+<div class="flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-surface" data-alt="portrait of a young college student smiling outdoors on campus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDj9KB-M2A4pUFqtZvussSQhHUHDoe3pfROVQD_ooPEx-cgFz8RivYN8OeEQN4NmL-ZAuKcJyy6EQS6V_9JVehntFWnHtngBx1WD_95DpMT6dPiUSionyCW9wn9pt_fkMku7xEfPkQR98BwBD8kncoY7-qTNiLDalzWq9vmqJ6Aljvpj2gBxCJZ3ATWzKJWL8ax1dTIgJ7KuLyQYUe8uAZwgsfD__DEh_-jfXFVfdHkUyga8Kxc_Dlje-kz6_O6YdWpAe0hd_Jh20"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface" data-alt="portrait of a confident male university student wearing glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_nb6ydn2FEN9kw409bkC_PtDgaIx3EM0QvTnteS3dwMauwmLw07lrP3VEACC99yF0oy2o8HOSXKIdWXnzEEWaR_AD6M-L9P7z-gOdWP7Aee7hzjbuZYfxWNKVRkdTzx31HidSEsDchVHMrx4HkyJ0yjJrsfLGh9oQbuBB8eiatZE8fP2bUc-_E6Xry9Ttssmvasmp3PU7ud_UKKKsVbnoQZA8jnfK2V5KBq_5IuesaHuYy_sctAWtv0Go-71GlP-JopwzFNNJZx8"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface" data-alt="headshot of a happy female student with colorful accessories" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEPUzFLd0J_Q5Ne7SEf9jjX-S-AuTtXEaTYRX_DmnOTw06YzVIg9M2wKxqP4rT84xGJHVpJ6LHfn3C95lsH1ZP93CBmk3CuyghoYkVqpssOJwUxv-EFBSJaKahgqTh3dpCgiTTzkrnfUUqULRNEuUsswg_fUchUk9-sXp1uPKcvH9ApuigLqOHeqDefx5nbiOykhtxS_L3-Ab8AIsFbf0iCiwMEJqyzxbb3iJDRr09O59hJUok_xZu-2tncacboklXbeC3B9qgaVM"/>
+</div>
+<div class="flex flex-col items-start justify-center text-[10px] leading-tight text-on-surface-variant font-medium">
+<span class="text-primary font-bold">500+ Runs today</span>
+<span>Join the campus network</span>
+</div>
+</div>
+</footer>
+</main>
+<!-- Visual Polish: Background Elements -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full -z-10"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 blur-[120px] rounded-full -z-10"></div>
+</body></html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GITY - Your Deliveries</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#9795ff",
+                    "on-secondary-fixed": "#5c2300",
+                    "outline": "#7b719c",
+                    "primary-fixed-dim": "#8885ff",
+                    "on-tertiary-container": "#005d22",
+                    "on-background": "#32294f",
+                    "on-tertiary-fixed-variant": "#006827",
+                    "tertiary-container": "#5cfd80",
+                    "surface-bright": "#faf4ff",
+                    "on-error-container": "#510017",
+                    "secondary-dim": "#883700",
+                    "on-secondary-fixed-variant": "#893700",
+                    "primary": "#4a40e0",
+                    "on-primary": "#f4f1ff",
+                    "secondary-fixed": "#ffc5aa",
+                    "on-primary-fixed": "#000000",
+                    "on-secondary": "#fff0ea",
+                    "tertiary-dim": "#005d22",
+                    "inverse-primary": "#8582ff",
+                    "background": "#faf4ff",
+                    "surface": "#faf4ff",
+                    "on-tertiary-fixed": "#004819",
+                    "on-tertiary": "#cfffce",
+                    "surface-container-high": "#e8deff",
+                    "secondary": "#9b3f00",
+                    "primary-dim": "#3d30d4",
+                    "surface-variant": "#e2d7ff",
+                    "surface-container": "#ede4ff",
+                    "primary-container": "#9795ff",
+                    "tertiary-fixed-dim": "#4bee74",
+                    "on-primary-fixed-variant": "#1a0099",
+                    "error": "#b41340",
+                    "error-container": "#f74b6d",
+                    "on-error": "#ffefef",
+                    "error-dim": "#a70138",
+                    "on-surface": "#32294f",
+                    "inverse-on-surface": "#a296c4",
+                    "inverse-surface": "#10062d",
+                    "secondary-fixed-dim": "#ffb28c",
+                    "on-primary-container": "#14007e",
+                    "tertiary": "#006a28",
+                    "tertiary-fixed": "#5cfd80",
+                    "outline-variant": "#b2a6d5",
+                    "surface-tint": "#4a40e0",
+                    "on-secondary-container": "#7b3100",
+                    "surface-container-highest": "#e2d7ff",
+                    "on-surface-variant": "#5f557f",
+                    "secondary-container": "#ffc5aa",
+                    "surface-dim": "#dacdff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f5eeff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+<!-- TopNavBar -->
+<nav class="bg-[#faf4ff]/70 dark:bg-[#1a1625]/70 backdrop-blur-3xl sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="font-['Plus_Jakarta_Sans'] text-3xl font-black italic tracking-tighter text-[#4a40e0] dark:text-[#9795ff]">GITY</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-[#32294f] dark:text-[#b2a6d5] font-medium hover:text-[#4a40e0] dark:hover:text-[#9795ff] transition-colors duration-300" href="#">Marketplace</a>
+<a class="text-[#32294f] dark:text-[#b2a6d5] font-medium hover:text-[#4a40e0] dark:hover:text-[#9795ff] transition-colors duration-300" href="#">My Runs</a>
+<a class="text-[#4a40e0] dark:text-[#9795ff] border-b-2 border-[#4a40e0] font-bold transition-colors duration-300" href="#">My Deliveries</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#4a40e0] cursor-pointer scale-95 active:scale-90 transition-transform">notifications</span>
+<span class="material-symbols-outlined text-[#4a40e0] cursor-pointer scale-95 active:scale-90 transition-transform">account_circle</span>
+</div>
+</div>
+</nav>
+<main class="max-w-screen-2xl mx-auto px-6 py-12 md:py-16">
+<header class="mb-12">
+<h1 class="text-display-lg font-bold text-on-surface tracking-tight mb-2">My Deliveries</h1>
+<p class="text-on-surface-variant font-body">Track your active orders and manage your delivery history.</p>
+</header>
+<div class="flex flex-col lg:flex-row gap-8">
+<!-- Left Column: Active Requests (The "Demand" focus) -->
+<section class="flex-1 space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-headline-sm font-bold flex items-center gap-2">
+                        Active Requests
+                        <span class="bg-primary text-on-primary text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-bold">Live</span>
+</h2>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<!-- Active Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-[1.5rem] shadow-[0_12px_32px_rgba(50,41,79,0.06)] relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+<div class="flex items-start justify-between mb-8 relative">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-xl overflow-hidden shadow-md">
+<img alt="Runner" class="w-full h-full object-cover" data-alt="portrait of a young friendly male runner wearing a athletic uniform and a warm smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrudXnUrln3XjXt7KzNcEDJisIgLcVAH4QBViIIpyWozeE25qz6BH84d7m04KH-p4q_NFsfml1AFpeilNkK5r5XvJj5wcwO2EKTG5LMQOsl3oMaVOcoiHIkSTnQhiB9by5zLYT11TxmGbm_kFCiFhTtnb9ORWpSW5hTWufYut4ARF-2YCXcFmNvt9K8coA0UtyWDvEEoY5ZvX7WbOIV3HHgMYgnGMUiy8Y_sA2NhGy-yM7yE-fl9qXQfAtUEt3ByLBPslvfcP93ZE"/>
+</div>
+<div>
+<p class="text-label-sm text-primary mb-0.5">Runner</p>
+<h3 class="text-title-md font-bold text-on-surface">Marcus Chen</h3>
+</div>
+</div>
+<div class="text-right">
+<p class="text-label-sm text-on-surface-variant mb-0.5">ETA</p>
+<p class="text-headline-sm font-black text-primary">12 mins</p>
+</div>
+</div>
+<div class="space-y-6 relative">
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="w-0.5 h-8 bg-primary/20 my-1"></div>
+<div class="w-3 h-3 rounded-full bg-primary animate-pulse"></div>
+</div>
+<div class="flex-1">
+<div class="mb-4">
+<p class="text-label-sm text-tertiary font-bold mb-1 uppercase tracking-wider">Picked up at Gate</p>
+<p class="text-body-md text-on-surface-variant">The package has been verified and picked up.</p>
+</div>
+<div class="bg-surface-container rounded-xl p-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">directions_run</span>
+<span class="text-body-md font-medium text-on-surface">Walking to Block B</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/15 flex gap-3">
+<button class="flex-1 py-3 px-4 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold text-sm tracking-wide transition-all hover:scale-[0.98] active:scale-95 shadow-md">
+                                Contact Runner
+                            </button>
+<button class="p-3 bg-surface-container text-on-surface rounded-xl hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Active Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-[1.5rem] shadow-[0_12px_32px_rgba(50,41,79,0.06)] relative overflow-hidden group">
+<div class="flex items-start justify-between mb-8 relative">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-xl overflow-hidden shadow-md">
+<img alt="Runner" class="w-full h-full object-cover" data-alt="Close up portrait of a smiling young woman with athletic gear in outdoor campus lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU-9tEtj8qnVugyn1kowoSC8gmh66tC7vYGzABonfV4WsUoKWZRui6lPkPjXWe-2MwAnt7mk3T-oYHQQ7sahMp5ChcZ3aKuC3YsuXfUL0cvgm1BvNNY_ifC-_ajbt9Y7p70oxR2zPGpqNuZKgCKabevsNlLzhDG9i-mveTDaqZj_PWMtpYU7PH-YCiaXfeCsxJ3RxSpBTvSDdUFsrqWnuqF7xxeUd53FajZCzi6TrhO5nwlDKgca7jQKsSWE0N6qZ0Y-OcdmqPs1g"/>
+</div>
+<div>
+<p class="text-label-sm text-primary mb-0.5">Runner</p>
+<h3 class="text-title-md font-bold text-on-surface">Sarah Jenkins</h3>
+</div>
+</div>
+<div class="text-right">
+<p class="text-label-sm text-on-surface-variant mb-0.5">ETA</p>
+<p class="text-headline-sm font-black text-primary">4 mins</p>
+</div>
+</div>
+<div class="space-y-6 relative">
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="w-0.5 h-8 bg-primary my-1"></div>
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex-1">
+<div class="mb-2">
+<p class="text-body-md text-on-surface-variant line-through opacity-50">Picked up at Main Store</p>
+</div>
+<div class="mb-4">
+<p class="text-label-sm text-secondary font-bold mb-1 uppercase tracking-wider">Arriving Soon</p>
+<p class="text-body-md text-on-surface-variant">Sarah is near your delivery point: Science Wing.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-6 border-t border-outline-variant/15 flex gap-3">
+<button class="flex-1 py-3 px-4 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold text-sm tracking-wide transition-all hover:scale-[0.98] active:scale-95 shadow-md">
+                                Track Location
+                            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Request History (Supply/Utility focus) -->
+<aside class="w-full lg:w-[400px]">
+<div class="bg-surface-container rounded-[2rem] p-8 min-h-full">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-headline-sm font-bold">Request History</h2>
+<span class="material-symbols-outlined text-on-surface-variant">history</span>
+</div>
+<div class="space-y-8">
+<!-- History Item 1 -->
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-2xl flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">fastfood</span>
+</div>
+<div class="flex-1 border-b border-outline-variant/10 pb-6">
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-bold text-on-surface">Campus Cafe Order</h4>
+<span class="text-label-sm text-tertiary">Completed</span>
+</div>
+<p class="text-body-md text-on-surface-variant mb-3">Oct 24 • Delivered by Alex R.</p>
+<div class="flex items-center gap-2">
+<span class="text-xs bg-surface-container-lowest px-2 py-1 rounded-md text-on-surface-variant font-medium">Science Hall</span>
+<span class="text-xs text-on-surface-variant">Order #1289</span>
+</div>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-2xl flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">description</span>
+</div>
+<div class="flex-1 border-b border-outline-variant/10 pb-6">
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-bold text-on-surface">Printing Pick-up</h4>
+<span class="text-label-sm text-tertiary">Completed</span>
+</div>
+<p class="text-body-md text-on-surface-variant mb-3">Oct 22 • Delivered by Sam K.</p>
+<div class="flex items-center gap-2">
+<span class="text-xs bg-surface-container-lowest px-2 py-1 rounded-md text-on-surface-variant font-medium">Library North</span>
+<span class="text-xs text-on-surface-variant">Order #1244</span>
+</div>
+</div>
+</div>
+<!-- History Item 3 -->
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 bg-surface-container-highest rounded-2xl flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">package_2</span>
+</div>
+<div class="flex-1 border-b border-outline-variant/10 pb-6">
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-bold text-on-surface">Post Office Collect</h4>
+<span class="text-label-sm text-error">Cancelled</span>
+</div>
+<p class="text-body-md text-on-surface-variant mb-3">Oct 21 • No runner assigned</p>
+<div class="flex items-center gap-2">
+<span class="text-xs bg-surface-container-lowest px-2 py-1 rounded-md text-on-surface-variant font-medium">Post Office</span>
+<span class="text-xs text-on-surface-variant">Order #1198</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-4 text-primary font-bold text-sm uppercase tracking-widest hover:bg-primary/5 rounded-xl transition-colors">
+                        View All History
+                    </button>
+</div>
+</aside>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#faf4ff]/70 dark:bg-[#1a1625]/70 backdrop-blur-3xl flex justify-around items-center px-4 pb-8 pt-4 z-50 rounded-t-[1.5rem] shadow-[0_-12px_32px_rgba(50,41,79,0.06)] border-t border-[#b2a6d5]/15">
+<a class="flex flex-col items-center justify-center text-[#32294f] dark:text-[#b2a6d5] px-5 py-2.5 hover:bg-[#ede4ff] dark:hover:bg-[#2d2545] rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">storefront</span>
+<span class="font-['Inter'] text-[11px] font-bold uppercase tracking-widest mt-1">Marketplace</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#32294f] dark:text-[#b2a6d5] px-5 py-2.5 hover:bg-[#ede4ff] dark:hover:bg-[#2d2545] rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">directions_run</span>
+<span class="font-['Inter'] text-[11px] font-bold uppercase tracking-widest mt-1">My Runs</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-gradient-to-br from-[#4a40e0] to-[#9795ff] text-white rounded-2xl px-5 py-2.5 scale-98 active:scale-95 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">package_2</span>
+<span class="font-['Inter'] text-[11px] font-bold uppercase tracking-widest mt-1">My Deliveries</span>
+</a>
+</nav>
+<!-- Contextual FAB (Only for main delivery dashboard) -->
+<button class="fixed bottom-24 right-6 md:bottom-12 md:right-12 w-16 h-16 bg-gradient-to-br from-primary to-primary-container text-white rounded-full flex items-center justify-center shadow-[0_12px_32px_rgba(74,64,224,0.3)] transition-transform hover:scale-110 active:scale-95 group">
+<span class="material-symbols-outlined text-3xl">add</span>
+<span class="absolute right-20 bg-on-surface text-surface py-2 px-4 rounded-xl text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">New Delivery</span>
+</button>
+</body></html>

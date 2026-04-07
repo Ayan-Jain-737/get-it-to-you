@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GITY - Journey Tracker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#9795ff",
+                        "on-surface-variant": "#5f557f",
+                        "surface-bright": "#faf4ff",
+                        "on-secondary-fixed": "#5c2300",
+                        "on-primary-fixed-variant": "#1a0099",
+                        "error": "#b41340",
+                        "tertiary-fixed": "#5cfd80",
+                        "inverse-surface": "#10062d",
+                        "primary": "#4a40e0",
+                        "on-secondary-fixed-variant": "#893700",
+                        "surface-container": "#ede4ff",
+                        "on-primary": "#f4f1ff",
+                        "on-secondary-container": "#7b3100",
+                        "surface-variant": "#e2d7ff",
+                        "inverse-on-surface": "#a296c4",
+                        "on-surface": "#32294f",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e2d7ff",
+                        "on-primary-fixed": "#000000",
+                        "on-tertiary-container": "#005d22",
+                        "on-tertiary": "#cfffce",
+                        "on-tertiary-fixed": "#004819",
+                        "secondary-fixed": "#ffc5aa",
+                        "secondary-fixed-dim": "#ffb28c",
+                        "inverse-primary": "#8582ff",
+                        "on-error-container": "#510017",
+                        "on-primary-container": "#14007e",
+                        "tertiary-dim": "#005d22",
+                        "tertiary-fixed-dim": "#4bee74",
+                        "surface-tint": "#4a40e0",
+                        "outline-variant": "#b2a6d5",
+                        "error-dim": "#a70138",
+                        "on-background": "#32294f",
+                        "secondary-dim": "#883700",
+                        "outline": "#7b719c",
+                        "on-error": "#ffefef",
+                        "surface": "#faf4ff",
+                        "error-container": "#f74b6d",
+                        "tertiary-container": "#5cfd80",
+                        "on-tertiary-fixed-variant": "#006827",
+                        "primary-fixed-dim": "#8885ff",
+                        "tertiary": "#006a28",
+                        "secondary": "#9b3f00",
+                        "background": "#faf4ff",
+                        "on-secondary": "#fff0ea",
+                        "surface-container-low": "#f5eeff",
+                        "surface-dim": "#dacdff",
+                        "surface-container-high": "#e8deff",
+                        "secondary-container": "#ffc5aa",
+                        "primary-container": "#9795ff",
+                        "primary-dim": "#3d30d4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .display-font { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#faf4ff]/70 dark:bg-[#1a1625]/70 backdrop-blur-3xl shadow-[0_12px_32px_rgba(50,41,79,0.06)]">
+<div class="flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">local_shipping</span>
+<span class="text-2xl font-bold tracking-tight text-[#4a40e0] dark:text-[#9795ff] uppercase">GITY</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#e8deff] transition-colors">
+<span class="material-symbols-outlined text-on-surface" data-icon="account_circle">account_circle</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#e8deff] transition-colors">
+<span class="material-symbols-outlined text-on-surface" data-icon="logout">logout</span>
+</button>
+</div>
+</div>
+<div class="bg-[#ede4ff] dark:bg-[#2d2445] h-[1px] w-full absolute bottom-0"></div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-2xl mx-auto">
+<!-- Runner Card (Editorial Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<div class="md:col-span-2 bg-surface-container-lowest p-6 rounded-[1.5rem] shadow-[0_12px_32px_rgba(50,41,79,0.04)] flex items-center gap-5 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<img alt="Rahul the runner" class="w-20 h-20 rounded-2xl object-cover z-10" data-alt="portrait of a friendly young man smiling, natural outdoor lighting with soft green campus background, editorial photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkvRqc6YwKu6a58pcqqjrOTOAPhCr7Yv42gXKkVqxHuhdMec1KUmlmXwhz4Rfv4MHP6576pP5GivwhaIyejy3HKPszc7xEujm4kQD4ShomInkFVZShq7Vq-5CmH62ueZd5TLUIctY-IYT2FE2CAwCXbh59MPnmUyIGKqldwdjIfwJnua5JbHWBQMjTUcLTUr-ABHr1Xh9jyHm3k-VL512Np63ORFybmTe67czXDMwKO7V-7kFWbSh_IMqOZNX3j8PaGpwwriNA7Ys"/>
+<div class="z-10">
+<p class="text-label-sm text-on-surface-variant font-bold uppercase tracking-wider mb-1">Your Runner</p>
+<h2 class="text-headline-sm font-bold text-on-surface">Rahul</h2>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-body-md font-medium">4.9</span>
+<span class="text-body-md text-on-surface-variant ml-1">• 124 runs completed</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container p-6 rounded-[1.5rem] flex flex-col justify-center items-center text-center">
+<p class="text-label-sm text-on-secondary-container font-bold uppercase tracking-wider mb-2">ETA</p>
+<p class="text-display-lg leading-none font-bold text-primary">12</p>
+<p class="text-title-md font-medium text-on-surface-variant">MINS</p>
+</div>
+</div>
+<!-- Order Summary Detail -->
+<div class="bg-surface-container-low p-6 rounded-[1.5rem] mb-8 flex justify-between items-center">
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold uppercase tracking-wider mb-1">Origin</p>
+<div class="flex items-center gap-2">
+<span class="bg-surface-variant px-3 py-1 rounded-full text-label-sm font-bold text-on-surface-variant">GATE 1</span>
+<span class="text-title-md font-semibold">Main Campus Entrance</span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="w-12 h-12 rounded-xl bg-surface-container-lowest flex items-center justify-center shadow-sm hover:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">chat</span>
+</button>
+<button class="w-12 h-12 rounded-xl bg-surface-container-lowest flex items-center justify-center shadow-sm hover:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">call</span>
+</button>
+</div>
+</div>
+<!-- Vertical Journey Tracker (Pulse Trail) -->
+<div class="relative px-4">
+<h3 class="text-headline-sm font-bold mb-8">Journey Progress</h3>
+<div class="space-y-12">
+<!-- State: Accepted (Completed) -->
+<div class="flex gap-6 relative">
+<div class="absolute left-4 top-10 w-[2px] h-[calc(100%+12px)] bg-primary-fixed"></div>
+<div class="relative z-10 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="pt-0.5">
+<p class="text-title-md font-bold text-on-surface">Accepted</p>
+<p class="text-body-md text-on-surface-variant">Rahul picked up your request at 2:14 PM</p>
+</div>
+</div>
+<!-- State: At Gate (Completed) -->
+<div class="flex gap-6 relative">
+<div class="absolute left-4 top-10 w-[2px] h-[calc(100%+12px)] bg-primary-fixed"></div>
+<div class="relative z-10 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="pt-0.5">
+<p class="text-title-md font-bold text-on-surface">At Gate</p>
+<p class="text-body-md text-on-surface-variant">Package picked up from Gate 1 Security</p>
+</div>
+</div>
+<!-- State: Walking Back (Active) -->
+<div class="flex gap-6 relative">
+<div class="absolute left-4 top-10 w-[2px] h-[calc(100%+12px)] bg-outline-variant/30"></div>
+<div class="relative z-10 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white shadow-[0_0_15px_rgba(155,63,0,0.4)] animate-pulse">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">directions_walk</span>
+</div>
+<div class="pt-0.5">
+<div class="flex items-center gap-3">
+<p class="text-title-md font-bold text-on-surface">Walking Back</p>
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Current</span>
+</div>
+<p class="text-body-md text-secondary-dim font-medium mt-1">Rahul is navigating through the Academic Plaza</p>
+</div>
+</div>
+<!-- State: Arrived (Pending) -->
+<div class="flex gap-6 relative">
+<div class="relative z-10 w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">home_pin</span>
+</div>
+<div class="pt-0.5 opacity-40">
+<p class="text-title-md font-bold text-on-surface">Arrived</p>
+<p class="text-body-md text-on-surface-variant">Scheduled arrival at North Residence Hall</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="mt-16">
+<button class="w-full py-5 rounded-[1.5rem] bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold text-lg shadow-[0_12px_32px_rgba(74,64,224,0.25)] hover:scale-[0.98] transition-transform active:scale-95">
+                Package Received
+            </button>
+<p class="text-center text-label-sm text-on-surface-variant mt-4 font-medium uppercase tracking-widest">Only click once package is in hand</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-[#faf4ff]/70 backdrop-blur-3xl rounded-t-[1.5rem] shadow-[0_-8px_24px_rgba(50,41,79,0.04)]">
+<div class="flex justify-around items-center px-4 pt-3 pb-8">
+<div class="flex flex-col items-center justify-center text-[#32294f] px-5 py-2 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="text-[11px] font-bold uppercase tracking-wider mt-1">Marketplace</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-[#4a40e0] text-white rounded-2xl px-5 py-2 scale-90">
+<span class="material-symbols-outlined" data-icon="local_shipping" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<span class="text-[11px] font-bold uppercase tracking-wider mt-1">My Runs</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#32294f] px-5 py-2 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-[11px] font-bold uppercase tracking-wider mt-1">Profile</span>
+</div>
+</div>
+<div class="bg-[#ede4ff] h-[1px] w-full absolute top-0"></div>
+</nav>
+</body></html>
