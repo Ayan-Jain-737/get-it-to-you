@@ -238,9 +238,14 @@ export const AppProvider = ({ children }) => {
       if (!postSnap.exists()) return;
       const originalRequesterId = postSnap.data().requesterId;
       
+      const runnerId = postType === 'request' ? currentUser.uid : originalRequesterId;
+      const requesterId = postType === 'offer' ? currentUser.uid : originalRequesterId;
+      
       await updateDoc(doc(db, 'posts', postId), { 
         status: 'accepted',
-        acceptedBy: userProfile?.name || 'A Student'
+        acceptedBy: userProfile?.name || 'A Student',
+        runnerId,
+        requesterId
       });
       const journeyRef = await addDoc(collection(db, 'journeys'), {
         postId,

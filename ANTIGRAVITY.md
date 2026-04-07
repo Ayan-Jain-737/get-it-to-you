@@ -18,8 +18,8 @@ The application is built with React, React Router, and Firebase.
 
 ## Application Architecture & Routing
 1. **Dashboard** (`/`): The main grid feed. Left column ("Need a Pickup"), Right Column ("Going to Gate" offers).
-2. **My Runs** (`/active-runs` / `ActiveRunsList.jsx`): The area solely dedicated to the **Runner** (the person delivering items). This dynamically renders `<ActiveJourney />` if they have an active task.
-3. **My Deliveries** (`/deliveries` / `MyDeliveries.jsx`): The area dedicated to the **Requester** (the one receiving items). Rebuilt using Stitch's "Your Delivery Management" template. Handles showing active journey tracker in-place for requesters.
+2. **My Runs** (`/active-runs` / `ActiveRunsList.jsx`): The area solely dedicated to the **Runner** (the person delivering items). This dynamically renders `<ActiveJourney />` if they have an active task, otherwise displays a history of their completed runs.
+3. **My Deliveries** (`/deliveries` / `MyDeliveries.jsx`): The area dedicated to the **Requester** (the one receiving items). Rebuilt using Stitch's "Your Delivery Management" template. Handles showing active journey tracker in-place for requesters alongside their historical drop history.
 4. **Post Modal** (`/` overlay): Create Requests (Demand) or Offers (Supply).
 
 ## Global State (`AppContext.jsx`)
@@ -35,10 +35,12 @@ The system enforces isolated views during a live delivery run:
 - **Requester's View** (Person who requested): Sees the Stitched **Runner Journey Tracker** layout. They cannot advance steps, they only monitor the Runner's live progress.
 
 ## Known Changes & Fixes (Context from Chat)
-- Updated `MyDeliveries.jsx` to render the Request tracker conditionally within the same view rather than redirecting requesters to the "My runs" (`/active-runs`) route. Added the floating Contextual FAB.
+- Updated `MyDeliveries.jsx` and `ActiveRunsList.jsx` routing to render the tracking elements conditionally in-place, keeping the appropriate tabs cleanly highlighted without redirect hijacking. 
+- Integrated a full "My Runs History" view into `ActiveRunsList.jsx` mimicking the deliveries history architecture.
+- Re-architected `AppContext.jsx`'s `acceptRequest()` to explicitly store both `runnerId` and `requesterId` directly inside the original `posts` document. This enables bidirectional querying for histories (Who ran what, and who requested what).
 - Updated `Dashboard.jsx` "Going to Gate" feed to prominently display `post.details` to clearly communicate user requirements and logistics matching.
 - Updated `AppContext.jsx`'s `listenToJourney` so that active rides disappear instantaneously on both ends when the ride is set to 'Completed'.
 
 ## Next Steps / Extensibility
-- If future components need to match the updated UI, refer to `src/stitch_templates/*.html` exports.
+- If future components need to match the updated UI, refer to `src/stitch_templates/*.html` exports or Pull via project `5349451494780796661`.
 - Firebase rules must remain configured to allow real-time reading for both `posts` and `journeys` collections or else the syncing UI logic described above will fall back to local mock data logic.

@@ -10,7 +10,11 @@ const Dashboard = () => {
 
   const handleAccept = async (postId, type) => {
     await acceptRequest(postId, type);
-    navigate('/active-runs');
+    if (type === 'offer') {
+      navigate('/deliveries');
+    } else {
+      navigate('/active-runs');
+    }
   };
 
   const handleDelete = async (postId) => {

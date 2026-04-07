@@ -11,7 +11,6 @@ const MyDeliveries = () => {
 
   const handleTrack = async (postId) => {
     await trackJourney(postId);
-    // Do not navigate, the active journey will render in place
   };
 
   if (activeJourney && activeJourney.requesterId === currentUser?.uid) {
