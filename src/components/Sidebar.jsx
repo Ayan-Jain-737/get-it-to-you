@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import NotificationBell from './NotificationBell';
 import styles from './Sidebar.module.css';
 
 const Sidebar = ({ onOpenPostModal }) => {
@@ -42,6 +43,7 @@ const Sidebar = ({ onOpenPostModal }) => {
           </div>
 
           <div className={styles.navActions}>
+            <NotificationBell />
             <button className={styles.iconBtn} onClick={onOpenPostModal} title="Create Post">
              <span className="material-symbols-outlined">add_circle</span>
             </button>

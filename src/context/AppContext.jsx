@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../firebase/config';
-import { collection, addDoc, updateDoc, doc, onSnapshot, serverTimestamp, query, orderBy, setDoc, getDoc, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, onSnapshot, serverTimestamp, query, orderBy, setDoc, getDoc, where, getDocs, deleteField } from 'firebase/firestore';
 import { onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 const AppContext = createContext();
@@ -22,6 +22,7 @@ export const AppProvider = ({ children }) => {
   const [activeJourney, setActiveJourney] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirmationResult, setConfirmationResult] = useState(null);
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
 
   // Auth Listener
   useEffect(() => {
@@ -100,6 +101,37 @@ export const AppProvider = ({ children }) => {
       if (timeoutId) clearTimeout(timeoutId);
     }
   }, []);
+
+  // Listen to unread notifications for current user
+  useEffect(() => {
+    if (!currentUser || DISABLE_FIREBASE) {
+      setUnreadNotifications([]);
+      return;
+    }
+
+    try {
+      const q = query(
+        collection(db, 'notifications'),
+        where('userId', '==', currentUser.uid),
+        where('isRead', '==', false),
+        orderBy('createdAt', 'desc')
+      );
+
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const notifications = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setUnreadNotifications(notifications);
+      }, (error) => {
+        console.error("Error listening to notifications:", error);
+      });
+
+      return () => unsubscribe();
+    } catch (err) {
+      console.warn("Notifications listener error:", err);
+    }
+  }, [currentUser]);
 
   // Phone Auth Methods
   const setupRecaptcha = (containerId) => {
@@ -223,13 +255,52 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const createNotification = async (userId, title, message, type, linkTo) => {
+    if (!userId || DISABLE_FIREBASE) return;
+    try {
+      await addDoc(collection(db, 'notifications'), {
+        userId,
+        title,
+        message,
+        type,
+        linkTo,
+        isRead: false,
+        createdAt: serverTimestamp()
+      });
+    } catch (err) {
+      console.error("Error creating notification:", err);
+    }
+  };
+
+  const markAsRead = async (notificationId) => {
+    if (DISABLE_FIREBASE) {
+      setUnreadNotifications(prev => prev.filter(n => n.id !== notificationId));
+      return;
+    }
+    try {
+      await updateDoc(doc(db, 'notifications', notificationId), {
+        isRead: true
+      });
+    } catch (err) {
+      console.error("Error marking notification as read:", err);
+    }
+  };
+
   const acceptRequest = async (postId, postType) => {
     try {
       if (!currentUser) return;
-      const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
       
       if (DISABLE_FIREBASE) {
-        setActiveJourney({ id: 'mock-journey', status: 'Accepted', postId, postType, runnerId: currentUser.uid, otp: randomOtp });
+        setActiveJourney({ 
+          id: 'mock-journey', 
+          status: 'Accepted', 
+          postId, 
+          postType, 
+          runnerId: currentUser.uid, 
+          otpCode: null, 
+          runnerLocation: { lat: null, lng: null }, 
+          cancellationReason: null 
+        });
         return;
       }
       
@@ -253,10 +324,20 @@ export const AppProvider = ({ children }) => {
         postType,
         runnerId: postType === 'request' ? currentUser.uid : originalRequesterId,
         requesterId: postType === 'offer' ? currentUser.uid : originalRequesterId,
-        otp: randomOtp,
+        otpCode: null,
+        runnerLocation: { lat: null, lng: null },
+        cancellationReason: null,
         createdAt: serverTimestamp()
       });
       listenToJourney(journeyRef.id);
+
+      await createNotification(
+        originalRequesterId,
+        'Run Accepted',
+        `${userProfile?.name || 'A runner'} has accepted your run.`,
+        'journey_update',
+        '/deliveries'
+      );
     } catch (err) {
       console.error("Error accepting request:", err);
     }
@@ -278,7 +359,7 @@ export const AppProvider = ({ children }) => {
 
   const trackJourney = async (postId) => {
     if (DISABLE_FIREBASE) {
-      setActiveJourney({ id: 'mock-tracked-journey', status: 'Accepted', postId, runnerId: 'mock-runner-uid', requesterId: currentUser?.uid, otp: '8888' });
+      setActiveJourney({ id: 'mock-tracked-journey', status: 'Accepted', postId, runnerId: 'mock-runner-uid', requesterId: currentUser?.uid, otpCode: '8888', runnerLocation: { lat: null, lng: null }, cancellationReason: null });
       return;
     }
     try {
@@ -300,8 +381,99 @@ export const AppProvider = ({ children }) => {
     }
     try {
       await updateDoc(doc(db, 'journeys', activeJourney.id), { status: newStatus });
+      // Inject system message
+      await addDoc(collection(db, 'journeys', activeJourney.id, 'messages'), {
+        type: 'system',
+        text: `📍 Runner advanced to: ${newStatus}`,
+        timestamp: serverTimestamp()
+      });
     } catch (err) {
       console.error("Error updating journey status", err);
+    }
+  };
+
+  const generateHandoffOTP = async (journeyId) => {
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    if (DISABLE_FIREBASE) {
+      setActiveJourney(prev => ({ ...prev, otpCode: otp }));
+      return otp;
+    }
+    try {
+      await updateDoc(doc(db, 'journeys', journeyId), { otpCode: otp });
+      return otp;
+    } catch (err) {
+      console.error("Error generating handoff OTP", err);
+      throw err;
+    }
+  };
+
+  const verifyOTPAndComplete = async (journeyId, enteredOTP) => {
+    if (DISABLE_FIREBASE) {
+      if (activeJourney && activeJourney.otpCode === enteredOTP) {
+        setActiveJourney(prev => ({ ...prev, status: 'Completed' }));
+        return true;
+      }
+      throw new Error("Invalid OTP");
+    }
+    try {
+      const journeyRef = doc(db, 'journeys', journeyId);
+      const journeySnap = await getDoc(journeyRef);
+      if (journeySnap.exists()) {
+        if (journeySnap.data().otpCode === enteredOTP) {
+          await updateDoc(journeyRef, { status: 'Completed' });
+          if (journeySnap.data().postId) {
+            await updateDoc(doc(db, 'posts', journeySnap.data().postId), { status: 'completed' });
+          }
+          setActiveJourney(null);
+          return true;
+        } else {
+          throw new Error("Invalid OTP");
+        }
+      } else {
+        throw new Error("Journey not found");
+      }
+    } catch (err) {
+      console.error("Error verifying OTP and completing", err);
+      throw err;
+    }
+  };
+
+  const cancelJourney = async (journeyId, reason, originalPostId) => {
+    if (DISABLE_FIREBASE) {
+      setActiveJourney(null);
+      return;
+    }
+    try {
+      await updateDoc(doc(db, 'journeys', journeyId), {
+        status: 'Cancelled',
+        cancellationReason: reason
+      });
+      if (originalPostId) {
+        await updateDoc(doc(db, 'posts', originalPostId), {
+          status: 'open',
+          runnerId: deleteField(),
+          acceptedBy: deleteField()
+        });
+      }
+      setActiveJourney(null);
+    } catch (err) {
+      console.error("Error cancelling journey", err);
+      throw err;
+    }
+  };
+
+  const updateRunnerLocation = async (journeyId, lat, lng) => {
+    if (DISABLE_FIREBASE) {
+      setActiveJourney(prev => ({ ...prev, runnerLocation: { lat, lng } }));
+      return;
+    }
+    try {
+      await updateDoc(doc(db, 'journeys', journeyId), {
+        runnerLocation: { lat, lng }
+      });
+    } catch (err) {
+      console.error("Error updating runner location", err);
+      throw err;
     }
   };
 
@@ -322,6 +494,48 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const submitReport = async (reportedUserId, journeyId, reason, details = '') => {
+    if (DISABLE_FIREBASE) return;
+    try {
+      await addDoc(collection(db, 'reports'), {
+        reporterId: currentUser.uid,
+        reportedUserId,
+        journeyId,
+        reason,
+        details,
+        createdAt: serverTimestamp()
+      });
+    } catch (err) {
+      console.error("Error submitting report", err);
+    }
+  };
+
+  const getUserStats = async (userId) => {
+    if (DISABLE_FIREBASE) {
+      return { completed: 12, cancelled: 1, pastRuns: [{ id: 'mock1', destination: 'SJT', location: 'Gate 1' }] };
+    }
+    try {
+      const q = query(collection(db, 'journeys'), where('runnerId', '==', userId));
+      const snap = await getDocs(q);
+      let completed = 0;
+      let cancelled = 0;
+      let pastRuns = [];
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (data.status === 'Completed') {
+          completed++;
+          pastRuns.push({ id: doc.id, ...data });
+        } else if (data.status === 'Cancelled') {
+          cancelled++;
+        }
+      });
+      return { completed, cancelled, pastRuns };
+    } catch (err) {
+      console.error("Error fetching user stats", err);
+      return { completed: 0, cancelled: 0, pastRuns: [] };
+    }
+  };
+
   const value = {
     currentUser,
     userProfile,
@@ -338,7 +552,16 @@ export const AppProvider = ({ children }) => {
     acceptRequest,
     updateJourneyStatus,
     completeHandoff,
-    trackJourney
+    trackJourney,
+    generateHandoffOTP,
+    verifyOTPAndComplete,
+    cancelJourney,
+    updateRunnerLocation,
+    createNotification,
+    unreadNotifications,
+    markAsRead,
+    submitReport,
+    getUserStats
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

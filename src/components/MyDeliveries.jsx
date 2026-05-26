@@ -3,11 +3,14 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 import ActiveJourney from './ActiveJourney';
+import ReportModal from './ReportModal';
+import { useState } from 'react';
 
 const MyDeliveries = () => {
   const { feedData, currentUser, trackJourney, activeJourney } = useAppContext();
   const navigate = useNavigate();
   const { openModal } = useOutletContext();
+  const [reportData, setReportData] = useState(null);
 
   const handleTrack = async (postId) => {
     await trackJourney(postId);
@@ -125,8 +128,15 @@ const MyDeliveries = () => {
                         <span className="text-[10px] uppercase font-bold text-tertiary">Completed</span>
                       </div>
                       <p className="text-sm text-on-surface-variant mb-3">Delivered to {post.destination}</p>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 mt-2">
                         <span className="text-xs bg-surface-container-lowest px-2 py-1 rounded-md text-on-surface-variant font-medium truncate max-w-24">{post.location}</span>
+                        <button 
+                          onClick={() => setReportData({ reportedUserId: post.runnerId || post.acceptedBy, journeyId: post.id })}
+                          className="ml-auto text-[10px] uppercase font-bold text-error flex items-center gap-1 hover:bg-error/10 px-2 py-1 rounded transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">flag</span>
+                          Report
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -144,6 +154,13 @@ const MyDeliveries = () => {
         <span className="material-symbols-outlined text-3xl">add</span>
         <span className="absolute right-20 bg-on-surface text-surface py-2 px-4 rounded-xl text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none hidden md:block">New Delivery</span>
       </button>
+
+      <ReportModal 
+        isOpen={!!reportData}
+        onClose={() => setReportData(null)}
+        reportedUserId={reportData?.reportedUserId}
+        journeyId={reportData?.journeyId}
+      />
     </main>
   );
 };

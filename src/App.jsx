@@ -1,6 +1,40 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useOutletContext } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useOutletContext, useNavigate, useLocation } from 'react-router-dom';
 import { AppProvider, useAppContext } from './context/AppContext';
+import { Toaster, toast } from 'react-hot-toast';
+
+const NotificationManager = () => {
+  const { activeJourney } = useAppContext();
+  const prevStatusRef = useRef(null);
+
+  useEffect(() => {
+    if (activeJourney && activeJourney.status !== prevStatusRef.current) {
+      const status = activeJourney.status;
+      if (['Accepted', 'At Gate', 'Walking Back', 'Arrived'].includes(status)) {
+        toast(`Journey Update: ${status}`, {
+          icon: '✨',
+          style: {
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid var(--outline-variant)',
+            color: 'var(--primary)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-ambient)',
+            fontWeight: '600',
+            fontFamily: "'Inter', sans-serif",
+            padding: '12px 20px'
+          }
+        });
+      }
+      prevStatusRef.current = status;
+    } else if (!activeJourney) {
+      prevStatusRef.current = null;
+    }
+  }, [activeJourney]);
+
+  return <Toaster position="top-center" />;
+};
 import LoginScreen from './components/LoginScreen';
 import Dashboard from './components/Dashboard';
 import ActiveJourney from './components/ActiveJourney';
@@ -43,6 +77,41 @@ const SharedLayout = () => {
   );
 };
 
+const JourneyRedirector = () => {
+  const { activeJourney, currentUser } = useAppContext();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (
+      activeJourney &&
+      activeJourney.status === 'Accepted' &&
+      currentUser &&
+      activeJourney.requesterId === currentUser.uid &&
+      location.pathname !== '/deliveries'
+    ) {
+      toast.success('Your request was accepted! Redirecting...', {
+        icon: '🚀',
+        style: {
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid var(--outline-variant)',
+          color: 'var(--primary)',
+          borderRadius: 'var(--radius-md)',
+          boxShadow: 'var(--shadow-ambient)',
+          fontWeight: '600',
+          fontFamily: "'Inter', sans-serif",
+          padding: '12px 20px'
+        }
+      });
+      navigate('/deliveries');
+    }
+  }, [activeJourney, currentUser, location.pathname, navigate]);
+
+  return null;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -73,7 +142,9 @@ const AppRoutes = () => {
 function App() {
   return (
     <AppProvider>
+      <NotificationManager />
       <BrowserRouter>
+        <JourneyRedirector />
         <AppRoutes />
       </BrowserRouter>
     </AppProvider>
