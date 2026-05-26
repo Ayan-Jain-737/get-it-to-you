@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../firebase/config';
 import { collection, addDoc, updateDoc, doc, onSnapshot, serverTimestamp, query, orderBy, setDoc, getDoc, where, getDocs, deleteField } from 'firebase/firestore';
-import { onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 const AppContext = createContext();
 
@@ -21,7 +21,6 @@ export const AppProvider = ({ children }) => {
   const [feedData, setFeedData] = useState([]);
   const [activeJourney, setActiveJourney] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [confirmationResult, setConfirmationResult] = useState(null);
   const [unreadNotifications, setUnreadNotifications] = useState([]);
 
   // Auth Listener
@@ -133,52 +132,6 @@ export const AppProvider = ({ children }) => {
     }
   }, [currentUser]);
 
-  // Phone Auth Methods
-  const setupRecaptcha = (containerId) => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
-        size: 'invisible',
-        callback: (response) => {
-          console.log("Recaptcha solved");
-        }
-      });
-    }
-  };
-
-  const sendOtp = async (phoneNumber, containerId) => {
-    if (DISABLE_FIREBASE) {
-      console.log("Mock OTP sent to " + phoneNumber);
-      return true; 
-    }
-    try {
-      setupRecaptcha(containerId);
-      const appVerifier = window.recaptchaVerifier;
-      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-      setConfirmationResult(confirmation);
-      return true;
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      return false;
-    }
-  };
-
-  const verifyOtp = async (otpCode) => {
-    if (DISABLE_FIREBASE) {
-      const mockUser = { uid: 'mock-user', phoneNumber: '+919999999999' };
-      setCurrentUser(mockUser);
-      localStorage.setItem('gity_user', JSON.stringify(mockUser));
-      return true;
-    }
-    try {
-      if (!confirmationResult) return false;
-      const result = await confirmationResult.confirm(otpCode);
-      setCurrentUser(result.user);
-      return true;
-    } catch (error) {
-      console.error("Error verifying OTP:", error);
-      return false;
-    }
-  };
 
   const signInWithGoogle = async () => {
     if (DISABLE_FIREBASE) {
@@ -205,7 +158,6 @@ export const AppProvider = ({ children }) => {
       return;
     }
     signOut(auth);
-    setConfirmationResult(null);
   };
 
   const updateProfile = async (profileData) => {
@@ -542,8 +494,6 @@ export const AppProvider = ({ children }) => {
     feedData,
     activeJourney,
     loading,
-    sendOtp,
-    verifyOtp,
     signInWithGoogle,
     logout,
     updateProfile,
