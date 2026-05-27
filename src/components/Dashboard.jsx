@@ -93,7 +93,7 @@ const Dashboard = () => {
                     <span className="material-symbols-outlined">package_2</span>
                     <span>{post.details || 'Large Box (Textbooks)'}</span>
                   </div>
-                  <span className={styles.price}>{post.price === 'Free' ? 'Free' : `₹${post.price}`}</span>
+                  <span className={styles.price}>{post.price && post.price !== 'Free' ? post.price : 'Good Karma'}</span>
                 </div>
 
                 {(!currentUser || post.requesterId !== currentUser.uid) ? (
@@ -128,7 +128,7 @@ const Dashboard = () => {
         <section className={styles.supplyColumn}>
           <div style={{ marginBottom: '1rem' }}>
             <span className={styles.taglineSupply}>Supply</span>
-            <h2 className={styles.columnTitle}>Going to Gate</h2>
+            <h2 className={styles.columnTitle}>Ready for Pickup</h2>
           </div>
           
           <div className={styles.feedList}>
@@ -150,11 +150,9 @@ const Dashboard = () => {
                     <p className={styles.supplyDestLabel}>Destination:</p>
                     <p className={styles.supplyDestText}>{post.destination}</p>
                   </div>
-                  {post.price && post.price !== 'Free' && (
-                    <div style={{ marginLeft: 'auto', fontWeight: 700, color: 'var(--primary)' }}>
-                      Will do for: ₹{post.price}
-                    </div>
-                  )}
+                  <div style={{ marginLeft: 'auto', fontWeight: 700, color: 'var(--primary)' }}>
+                    Reward/Offer: {post.price && post.price !== 'Free' ? post.price : 'Good Karma'}
+                  </div>
                 </div>
                 {post.details && (
                   <div style={{ padding: '0.875rem 1rem', background: 'var(--surface-container-high)', borderRadius: '0.75rem', marginBottom: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', border: '1px solid var(--outline-variant)' }}>
@@ -192,7 +190,7 @@ const Dashboard = () => {
             )}
             <button className={styles.globalSupplyBtn} onClick={() => openModal('offer')}>
               <span className="material-symbols-outlined">local_shipping</span>
-              I'm Going to Gate
+              I'm Ready for Pickup
             </button>
           </div>
         </section>

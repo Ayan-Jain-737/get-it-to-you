@@ -25,7 +25,7 @@ const getDistanceFromLatLonInM = (lat1, lon1, lat2, lon2) => {
   return R * c; 
 };
 
-const STATUS_STEPS = ['Accepted', 'At Gate', 'Walking Back', 'Arrived'];
+const STATUS_STEPS = ['Accepted', 'Ready for Pickup', 'Walking Back', 'Arrived'];
 
 // Custom pulsing marker for the Runner
 const pulsingMarkerIcon = L.divIcon({
@@ -320,7 +320,7 @@ const ActiveJourney = () => {
               <p className="text-xl font-bold text-on-surface font-headline">{postInfo.details || 'Campus Pick-up'}</p>
             </div>
             <div className="bg-[#ffc5aa]/30 px-4 py-2 rounded-2xl text-center">
-              <p className="text-[#9b3f00] font-bold text-lg">₹{postInfo.price || '0'}</p>
+              <p className="text-[#9b3f00] font-bold text-lg">{postInfo.price && postInfo.price !== 'Free' ? postInfo.price : 'Good Karma'}</p>
               <p className="text-[10px] font-bold text-[#9b3f00] uppercase">Earning</p>
             </div>
           </div>
@@ -427,7 +427,8 @@ const ActiveJourney = () => {
           )}
           <button
             onClick={() => setShowCancelModal(true)}
-            className="w-full mt-4 py-4 rounded-[1.5rem] font-bold flex items-center justify-center gap-2 transition-all text-sm tracking-wide border-2 border-error/50 text-error hover:bg-error/10"
+            disabled={activeJourney.status === 'Arrived'}
+            className={`w-full mt-4 py-4 rounded-[1.5rem] font-bold flex items-center justify-center gap-2 transition-all text-sm tracking-wide border-2 ${activeJourney.status === 'Arrived' ? 'border-outline-variant/30 text-on-surface-variant opacity-50 cursor-not-allowed' : 'border-error/50 text-error hover:bg-error/10'}`}
           >
             <span className="material-symbols-outlined text-lg">cancel</span>
             Cancel Run
@@ -581,7 +582,8 @@ const ActiveJourney = () => {
             </button>
             <button
               onClick={() => setShowCancelModal(true)}
-              className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-xs border border-error/30 text-error hover:bg-error/10"
+              disabled={activeJourney.status === 'Arrived'}
+              className={`flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-xs border ${activeJourney.status === 'Arrived' ? 'border-outline-variant/30 text-on-surface-variant opacity-50 cursor-not-allowed' : 'border-error/30 text-error hover:bg-error/10'}`}
             >
               <span className="material-symbols-outlined text-[14px]">cancel</span>
               Cancel

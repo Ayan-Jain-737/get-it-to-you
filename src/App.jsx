@@ -45,10 +45,28 @@ import Sidebar from './components/Sidebar';
 import PostModal from './components/PostModal';
 import './App.css';
 
+const LoadingSpinner = () => (
+  <div className="min-h-screen bg-surface-container-lowest flex flex-col items-center justify-center">
+    <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+    <p className="text-on-surface-variant font-medium animate-pulse">Initializing GITY...</p>
+  </div>
+);
+
 const ProtectedRoute = ({ children }) => {
   const { currentUser, loading } = useAppContext();
-  if (loading) return <div>Loading...</div>;
-  if (!currentUser) return <Navigate to="/login" />;
+  
+  if (loading) return <LoadingSpinner />;
+  if (!currentUser) return <Navigate to="/login" replace />;
+  
+  return children;
+};
+
+const PublicRoute = ({ children }) => {
+  const { currentUser, loading } = useAppContext();
+  
+  if (loading) return <LoadingSpinner />;
+  if (currentUser) return <Navigate to="/dashboard" replace />;
+  
   return children;
 };
 
@@ -115,7 +133,14 @@ const JourneyRedirector = () => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/login" element={<LoginScreen />} />
+      <Route 
+        path="/login" 
+        element={
+          <PublicRoute>
+            <LoginScreen />
+          </PublicRoute>
+        } 
+      />
       <Route 
         path="/" 
         element={

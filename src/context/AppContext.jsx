@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { db, auth } from '../firebase/config';
 import { collection, addDoc, updateDoc, doc, onSnapshot, serverTimestamp, query, orderBy, setDoc, getDoc, where, getDocs, deleteField } from 'firebase/firestore';
 import { onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { toast } from 'react-hot-toast';
 
 const AppContext = createContext();
 
@@ -20,8 +21,12 @@ export const AppProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [feedData, setFeedData] = useState([]);
   const [activeJourney, setActiveJourney] = useState(null);
+  const [activeJourneyId, setActiveJourneyId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [unreadNotifications, setUnreadNotifications] = useState([]);
+  
+  const sessionStartTime = useRef(Date.now());
+  const initialPostsLoaded = useRef(false);
 
   // Auth Listener
   useEffect(() => {
@@ -31,12 +36,15 @@ export const AppProvider = ({ children }) => {
         setCurrentUser(JSON.parse(savedUser));
         setUserProfile({ name: 'Student', dorm: 'Main Gate' });
       }
+      setLoading(false);
       return;
     }
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       if (user) {
+        sessionStartTime.current = Date.now();
+        initialPostsLoaded.current = false;
         try {
           const profileRef = doc(db, 'users', user.uid);
           const profileSnap = await getDoc(profileRef);
@@ -54,6 +62,7 @@ export const AppProvider = ({ children }) => {
       } else {
         setUserProfile(null);
       }
+      setLoading(false);
     });
     return () => unsubscribeAuth && unsubscribeAuth();
   }, []);
@@ -62,7 +71,6 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     if (DISABLE_FIREBASE) {
       setFeedData(MOCK_DATA);
-      setLoading(false);
       return;
     }
 
@@ -73,21 +81,42 @@ export const AppProvider = ({ children }) => {
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const posts = snapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data({ serverTimestamps: 'estimate' })
         }));
         setFeedData(posts);
-        setLoading(false);
+
+        if (!initialPostsLoaded.current) {
+          initialPostsLoaded.current = true;
+        } else {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added') {
+              const newPost = change.doc.data({ serverTimestamps: 'estimate' });
+              const postTime = newPost.createdAt?.toMillis ? newPost.createdAt.toMillis() : Date.now();
+              
+              if (currentUser && newPost.requesterId !== currentUser.uid && postTime >= sessionStartTime.current) {
+                toast(`New ${newPost.type} available!`, {
+                  icon: '📣',
+                  style: {
+                    background: 'var(--surface-container-highest)',
+                    color: 'var(--on-surface)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--outline-variant)'
+                  }
+                });
+              }
+            }
+          });
+        }
+
         if (timeoutId) clearTimeout(timeoutId);
       }, (error) => {
         console.warn("Firestore not fully configured yet:", error.message);
-        setLoading(false);
         if (timeoutId) clearTimeout(timeoutId);
       });
 
       // Safety fallback: if Firebase hangs, unlock UI after 3s
       timeoutId = setTimeout(() => {
-        console.log("Firestore connection timeout triggered - unlocking UI");
-        setLoading(false);
+        console.log("Firestore connection timeout triggered");
       }, 3000);
 
       return () => {
@@ -96,10 +125,9 @@ export const AppProvider = ({ children }) => {
       };
     } catch (err) {
       console.warn("Firebase initialization error:", err);
-      setLoading(false);
       if (timeoutId) clearTimeout(timeoutId);
     }
-  }, []);
+  }, [currentUser?.uid]);
 
   // Listen to unread notifications for current user
   useEffect(() => {
@@ -296,18 +324,29 @@ export const AppProvider = ({ children }) => {
   };
 
   const listenToJourney = (journeyId) => {
-    if (DISABLE_FIREBASE) return;
-    onSnapshot(doc(db, 'journeys', journeyId), (docSnap) => {
+    setActiveJourneyId(journeyId);
+  };
+
+  useEffect(() => {
+    if (!activeJourneyId || DISABLE_FIREBASE) return;
+    
+    const unsubscribe = onSnapshot(doc(db, 'journeys', activeJourneyId), (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        if (data.status === 'Completed') {
+        if (data.status === 'Completed' || data.status === 'Cancelled') {
           setActiveJourney(null);
+          setActiveJourneyId(null);
         } else {
           setActiveJourney({ id: docSnap.id, ...data });
         }
+      } else {
+        setActiveJourney(null);
+        setActiveJourneyId(null);
       }
     });
-  };
+
+    return () => unsubscribe();
+  }, [activeJourneyId]);
 
   const trackJourney = async (postId) => {
     if (DISABLE_FIREBASE) {
@@ -332,7 +371,11 @@ export const AppProvider = ({ children }) => {
       return;
     }
     try {
-      await updateDoc(doc(db, 'journeys', activeJourney.id), { status: newStatus });
+      const updateData = { status: newStatus };
+      if (newStatus === 'Ready for Pickup') {
+        updateData.readyForPickupAt = serverTimestamp();
+      }
+      await updateDoc(doc(db, 'journeys', activeJourney.id), updateData);
       // Inject system message
       await addDoc(collection(db, 'journeys', activeJourney.id, 'messages'), {
         type: 'system',

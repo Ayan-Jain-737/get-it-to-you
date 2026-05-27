@@ -30,7 +30,7 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
       location,
       destination,
       details,
-      price: price || 'Free',
+      price: price || 'Good Karma',
       isUrgent
     });
     onClose();
@@ -60,7 +60,7 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
               className={`${styles.toggleBtn} ${postType === 'offer' ? styles.active : ''}`}
               onClick={() => setPostType('offer')}
             >
-              Going to Gate
+              Ready for Pickup
             </button>
           </div>
 
@@ -103,12 +103,13 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
               placeholder={postType === 'request' ? "e.g. Swiggy order arriving in 10 mins..." : "e.g. Can carry small packages, meeting near main entrance..."}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
+              style={{ resize: 'none' }}
               required
             />
           </div>
 
           <div className={styles.inputGroup}>
-            <label>{postType === 'request' ? 'Ready to Pay (₹)' : 'Will do it for (₹)'}</label>
+            <label>Reward/Offer</label>
             <input
               type="text"
               placeholder="e.g. 50, Free, Coffee..."
