@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { PackageX } from 'lucide-react';
 import ActiveJourney from './ActiveJourney';
+import OrderDetailsModal from './OrderDetailsModal';
 
 const ActiveRunsList = () => {
   const { activeJourney, currentUser, feedData, trackJourney } = useAppContext();
+  const [selectedPost, setSelectedPost] = useState(null);
 
   // If there's an active run and user is the runner, show the details directly
   if (activeJourney && activeJourney.runnerId === currentUser?.uid) {
@@ -21,8 +23,8 @@ const ActiveRunsList = () => {
   return (
     <main className="max-w-screen-2xl mx-auto px-6 py-12 md:py-16">
       <header className="mb-12">
-        <h1 className="text-[2.5rem] leading-tight font-bold text-on-surface tracking-tight mb-2 font-headline">My Runs</h1>
-        <p className="text-on-surface-variant font-body">Manage your active deliveries and past runs.</p>
+        <h1 className="text-[2.5rem] leading-tight font-bold text-on-surface tracking-tight mb-2 font-headline">My Tasks</h1>
+        <p className="text-on-surface-variant font-body">Track the favors you are doing and your past tasks.</p>
       </header>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -79,7 +81,7 @@ const ActiveRunsList = () => {
         <aside className="w-full lg:w-[400px]">
           <div className="bg-surface-container rounded-[2rem] p-8 min-h-full">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl font-bold text-on-surface font-headline">My Runs History</h2>
+              <h2 className="text-xl font-bold text-on-surface font-headline">My Tasks History</h2>
               <span className="material-symbols-outlined text-on-surface-variant">history</span>
             </div>
             
@@ -88,7 +90,7 @@ const ActiveRunsList = () => {
                 <p className="text-sm text-on-surface-variant italic text-center py-8">No past runs found.</p>
               ) : (
                 history.map(post => (
-                  <div key={post.id} className="flex items-start gap-4 bg-surface-container-lowest p-4 rounded-[1.5rem] border border-outline-variant/10 shadow-sm relative overflow-hidden">
+                  <div key={post.id} className="flex items-start gap-4 bg-surface-container-lowest p-4 rounded-[1.5rem] border border-outline-variant/10 shadow-sm relative overflow-hidden cursor-pointer hover:bg-surface-container-highest transition-colors" onClick={() => setSelectedPost(post)}>
                     <div className="absolute top-0 right-0 w-8 h-8 bg-tertiary/10 rounded-bl-3xl"></div>
                     <div className="w-12 h-12 bg-surface-container-highest rounded-2xl flex items-center justify-center flex-shrink-0">
                       <span className="material-symbols-outlined text-primary">directions_run</span>
@@ -117,6 +119,11 @@ const ActiveRunsList = () => {
         </aside>
 
       </div>
+      <OrderDetailsModal 
+        isOpen={!!selectedPost}
+        onClose={() => setSelectedPost(null)}
+        post={selectedPost}
+      />
     </main>
   );
 };

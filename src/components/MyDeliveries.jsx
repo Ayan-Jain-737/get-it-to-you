@@ -4,6 +4,7 @@ import { useAppContext } from '../context/AppContext';
 
 import ActiveJourney from './ActiveJourney';
 import ReportModal from './ReportModal';
+import OrderDetailsModal from './OrderDetailsModal';
 import { useState } from 'react';
 
 const MyDeliveries = () => {
@@ -11,6 +12,7 @@ const MyDeliveries = () => {
   const navigate = useNavigate();
   const { openModal } = useOutletContext();
   const [reportData, setReportData] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   const handleTrack = async (postId) => {
     await trackJourney(postId);
@@ -27,8 +29,8 @@ const MyDeliveries = () => {
   return (
     <main className="max-w-screen-2xl mx-auto px-6 py-12 md:py-16">
       <header className="mb-12">
-        <h1 className="text-[2.5rem] leading-tight font-bold text-on-surface tracking-tight mb-2 font-headline">My Deliveries</h1>
-        <p className="text-on-surface-variant font-body">Track your active orders and manage your delivery history.</p>
+        <h1 className="text-[2.5rem] leading-tight font-bold text-on-surface tracking-tight mb-2 font-headline">My Requests</h1>
+        <p className="text-on-surface-variant font-body">Track what you asked for and manage your request history.</p>
       </header>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -118,7 +120,7 @@ const MyDeliveries = () => {
                 <p className="text-sm text-on-surface-variant italic text-center py-8">No past history found.</p>
               ) : (
                 feedData.filter(p => p.requesterId === currentUser?.uid && p.status === 'completed').map(post => (
-                  <div key={post.id} className="flex items-start gap-4">
+                  <div key={post.id} className="flex items-start gap-4 cursor-pointer hover:bg-surface-container-highest p-2 -mx-2 rounded-xl transition-colors" onClick={() => setSelectedPost(post)}>
                     <div className="w-12 h-12 bg-surface-container-highest rounded-2xl flex items-center justify-center flex-shrink-0">
                       <span className="material-symbols-outlined text-primary">package_2</span>
                     </div>
@@ -131,7 +133,7 @@ const MyDeliveries = () => {
                       <div className="flex items-center gap-2 mt-2">
                         <span className="text-xs bg-surface-container-lowest px-2 py-1 rounded-md text-on-surface-variant font-medium truncate max-w-24">{post.location}</span>
                         <button 
-                          onClick={() => setReportData({ reportedUserId: post.runnerId || post.acceptedBy, journeyId: post.id })}
+                          onClick={(e) => { e.stopPropagation(); setReportData({ reportedUserId: post.runnerId || post.acceptedBy, journeyId: post.id }); }}
                           className="ml-auto text-[10px] uppercase font-bold text-error flex items-center gap-1 hover:bg-error/10 px-2 py-1 rounded transition-colors"
                         >
                           <span className="material-symbols-outlined text-[14px]">flag</span>
@@ -160,6 +162,11 @@ const MyDeliveries = () => {
         onClose={() => setReportData(null)}
         reportedUserId={reportData?.reportedUserId}
         journeyId={reportData?.journeyId}
+      />
+      <OrderDetailsModal 
+        isOpen={!!selectedPost}
+        onClose={() => setSelectedPost(null)}
+        post={selectedPost}
       />
     </main>
   );

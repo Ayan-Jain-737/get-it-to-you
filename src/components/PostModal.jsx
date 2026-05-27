@@ -8,10 +8,8 @@ const LOCATIONS = [
   "Food Court",
   "SJT",
   "TT",
-  "Block A", "Block B", "Block C", "Block D", "Block E", "Block F", "Block G", 
-  "Block H", "Block J", "Block K", "Block L", "Block M", "Block N", "Block P", 
-  "Block Q", "Block R", "Block S", "Block T",
-  "Emerald Hall", "Sapphire Court", "Ruby Terrace"
+  "Library",
+  "Hostels"
 ];
 
 const PostModal = ({ onClose, initialType = 'request' }) => {
@@ -65,7 +63,7 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Pickup Location</label>
+            <label>Pickup From</label>
             <select value={location} onChange={(e) => setLocation(e.target.value)}>
               {LOCATIONS.map(loc => (
                 <option key={loc} value={loc}>{loc}</option>
@@ -74,7 +72,7 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
           </div>
 
           <div className={styles.inputGroup}>
-            <label>Destination</label>
+            <label>Drop-off At</label>
             <select value={destination} onChange={(e) => setDestination(e.target.value)}>
               {LOCATIONS.map(loc => (
                 <option key={loc} value={loc}>{loc}</option>

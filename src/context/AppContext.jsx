@@ -507,27 +507,71 @@ export const AppProvider = ({ children }) => {
 
   const getUserStats = async (userId) => {
     if (DISABLE_FIREBASE) {
-      return { completed: 12, cancelled: 1, pastRuns: [{ id: 'mock1', destination: 'SJT', location: 'Gate 1' }] };
+      return { tasksCompleted: 8, requestsCompleted: 4, cancelled: 1, pastRuns: [] };
     }
     try {
-      const q = query(collection(db, 'journeys'), where('runnerId', '==', userId));
-      const snap = await getDocs(q);
-      let completed = 0;
+      const runnerQ = query(collection(db, 'journeys'), where('runnerId', '==', userId));
+      const reqQ = query(collection(db, 'journeys'), where('requesterId', '==', userId));
+      
+      const [runnerSnap, reqSnap] = await Promise.all([getDocs(runnerQ), getDocs(reqQ)]);
+      
+      let tasksCompleted = 0;
+      let requestsCompleted = 0;
       let cancelled = 0;
       let pastRuns = [];
-      snap.forEach(doc => {
+      
+      runnerSnap.forEach(doc => {
         const data = doc.data();
         if (data.status === 'Completed') {
-          completed++;
+          tasksCompleted++;
           pastRuns.push({ id: doc.id, ...data });
         } else if (data.status === 'Cancelled') {
           cancelled++;
         }
       });
-      return { completed, cancelled, pastRuns };
+      
+      reqSnap.forEach(doc => {
+        const data = doc.data();
+        if (data.status === 'Completed') {
+          requestsCompleted++;
+          pastRuns.push({ id: doc.id, ...data });
+        } else if (data.status === 'Cancelled') {
+          cancelled++;
+        }
+      });
+      
+      // Sort by descending createdAt
+      pastRuns.sort((a, b) => {
+        const t1 = a.createdAt?.seconds || 0;
+        const t2 = b.createdAt?.seconds || 0;
+        return t2 - t1;
+      });
+      
+      return { tasksCompleted, requestsCompleted, cancelled, pastRuns };
     } catch (err) {
       console.error("Error fetching user stats", err);
-      return { completed: 0, cancelled: 0, pastRuns: [] };
+      return { tasksCompleted: 0, requestsCompleted: 0, cancelled: 0, pastRuns: [] };
+    }
+  };
+
+  const getJourneyHistory = async (postId) => {
+    if (DISABLE_FIREBASE) return null;
+    try {
+      const q = query(collection(db, 'journeys'), where('postId', '==', postId));
+      const snap = await getDocs(q);
+      if (snap.empty) return null;
+      
+      const journeyDoc = snap.docs[0];
+      const journeyData = { id: journeyDoc.id, ...journeyDoc.data() };
+      
+      const msgQ = query(collection(db, 'journeys', journeyDoc.id, 'messages'), orderBy('timestamp', 'asc'));
+      const msgSnap = await getDocs(msgQ);
+      const messages = msgSnap.docs.map(m => ({ id: m.id, ...m.data() }));
+      
+      return { journey: journeyData, messages };
+    } catch (err) {
+      console.error("Error fetching journey history:", err);
+      return null;
     }
   };
 
@@ -554,7 +598,8 @@ export const AppProvider = ({ children }) => {
     unreadNotifications,
     markAsRead,
     submitReport,
-    getUserStats
+    getUserStats,
+    getJourneyHistory
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

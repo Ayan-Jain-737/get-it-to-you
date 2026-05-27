@@ -26,13 +26,13 @@ const Sidebar = ({ onOpenPostModal }) => {
               to="/active-runs"
               className={({ isActive }) => `${styles.navLink} ${isActive ? styles.activeNavLink : ''}`}
             >
-              My Runs
+              My Tasks
             </NavLink>
             <NavLink 
               to="/deliveries"
               className={({ isActive }) => `${styles.navLink} ${isActive ? styles.activeNavLink : ''}`}
             >
-              My Deliveries
+              My Requests
             </NavLink>
             <NavLink 
               to="/profile"
@@ -71,14 +71,14 @@ const Sidebar = ({ onOpenPostModal }) => {
             className={({ isActive }) => `${styles.bottomNavLink} ${isActive ? styles.activeBottomNavLink : ''}`}
           >
             <span className="material-symbols-outlined">local_shipping</span>
-            <span className={styles.bottomNavLinkText}>My Runs</span>
+            <span className={styles.bottomNavLinkText}>My Tasks</span>
           </NavLink>
           <NavLink 
             to="/deliveries" 
             className={({ isActive }) => `${styles.bottomNavLink} ${isActive ? styles.activeBottomNavLink : ''}`}
           >
             <span className="material-symbols-outlined">package_2</span>
-            <span className={styles.bottomNavLinkText}>My Deliveries</span>
+            <span className={styles.bottomNavLinkText}>My Requests</span>
           </NavLink>
           <NavLink 
             to="/profile" 

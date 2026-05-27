@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
+import OrderDetailsModal from './OrderDetailsModal';
 
 const Profile = () => {
   const { userProfile, updateProfile, currentUser, getUserStats } = useAppContext();
@@ -8,8 +9,9 @@ const Profile = () => {
   const [dorm, setDorm] = useState(userProfile?.dorm || "Main Gate");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [selectedRun, setSelectedRun] = useState(null);
 
-  const [stats, setStats] = useState({ completed: 0, cancelled: 0, pastRuns: [] });
+  const [stats, setStats] = useState({ tasksCompleted: 0, requestsCompleted: 0, cancelled: 0, pastRuns: [] });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
 
   useEffect(() => {
@@ -33,8 +35,9 @@ const Profile = () => {
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const totalRuns = stats.completed + stats.cancelled;
-  const reliabilityScore = totalRuns === 0 ? 100 : Math.round((stats.completed / totalRuns) * 100);
+  const completedRuns = stats.tasksCompleted + stats.requestsCompleted;
+  const totalRuns = completedRuns + stats.cancelled;
+  const reliabilityScore = totalRuns === 0 ? 100 : Math.round((completedRuns / totalRuns) * 100);
   
   // Calculate SVG stroke dasharray for the circular progress (circumference = 2 * pi * r)
   // r = 36, circumference = 226.19
@@ -89,14 +92,18 @@ const Profile = () => {
               Your score is based on completed deliveries vs. cancellations. A high score builds trust within the GITY network.
             </p>
 
-            <div className="flex gap-4 w-full">
-              <div className="flex-1 bg-surface-container py-3 rounded-xl">
-                <p className="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider mb-1">Completed</p>
-                <p className="text-xl font-bold text-on-surface font-headline">{isLoadingStats ? '-' : stats.completed}</p>
+            <div className="flex gap-3 w-full">
+              <div className="flex-1 bg-surface-container p-3 rounded-xl text-center">
+                <p className="text-[9px] uppercase font-bold text-on-surface-variant tracking-wider mb-1">Total Requests</p>
+                <p className="text-lg font-bold text-on-surface font-headline">{isLoadingStats ? '-' : stats.requestsCompleted}</p>
               </div>
-              <div className="flex-1 bg-surface-container py-3 rounded-xl">
-                <p className="text-[10px] uppercase font-bold text-error tracking-wider mb-1">Cancelled</p>
-                <p className="text-xl font-bold text-error font-headline">{isLoadingStats ? '-' : stats.cancelled}</p>
+              <div className="flex-1 bg-surface-container p-3 rounded-xl text-center">
+                <p className="text-[9px] uppercase font-bold text-on-surface-variant tracking-wider mb-1">Total Tasks</p>
+                <p className="text-lg font-bold text-on-surface font-headline">{isLoadingStats ? '-' : stats.tasksCompleted}</p>
+              </div>
+              <div className="flex-1 bg-surface-container p-3 rounded-xl text-center">
+                <p className="text-[9px] uppercase font-bold text-error tracking-wider mb-1">Cancelled</p>
+                <p className="text-lg font-bold text-error font-headline">{isLoadingStats ? '-' : stats.cancelled}</p>
               </div>
             </div>
           </div>
@@ -126,23 +133,13 @@ const Profile = () => {
                   onChange={(e) => setDorm(e.target.value)}
                   className="w-full bg-surface-container-lowest hover:bg-surface-container-highest transition-colors text-on-surface rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 >
-                  <option disabled value="">Select Dorm Block</option>
-                  <optgroup label="Common">
-                    <option value="Main Gate">Main Gate</option>
-                    <option value="Food Court">Food Court</option>
-                    <option value="SJT">SJT</option>
-                    <option value="TT">TT</option>
-                  </optgroup>
-                  <optgroup label="Dorm Blocks">
-                    {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T'].map(block => (
-                      <option key={`Block ${block}`} value={`Block ${block}`}>Block {block}</option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Ladies' Hostels">
-                    <option value="Emerald Hall">Emerald Hall</option>
-                    <option value="Sapphire Court">Sapphire Court</option>
-                    <option value="Ruby Terrace">Ruby Terrace</option>
-                  </optgroup>
+                  <option disabled value="">Select Core Landmark</option>
+                  <option value="Main Gate">Main Gate</option>
+                  <option value="Food Court">Food Court</option>
+                  <option value="SJT">SJT</option>
+                  <option value="TT">TT</option>
+                  <option value="Library">Library</option>
+                  <option value="Hostels">Hostels</option>
                 </select>
               </div>
 
@@ -181,24 +178,26 @@ const Profile = () => {
                     <div key={i} className="h-20 bg-surface-variant/30 rounded-xl"></div>
                   ))}
                 </div>
-              ) : stats.pastRuns.length === 0 ? (
+              ) : stats.pastRuns?.length === 0 ? (
                 <div className="text-center py-12 bg-surface-container rounded-2xl">
                   <span className="material-symbols-outlined text-4xl text-on-surface-variant opacity-50 mb-3">inventory_2</span>
                   <p className="text-on-surface font-bold">No completed runs yet</p>
                   <p className="text-sm text-on-surface-variant">Accept a request to build your trust evidence.</p>
                 </div>
               ) : (
-                stats.pastRuns.map((run, idx) => (
-                  <div key={run.id || idx} className="flex items-start gap-4 p-4 rounded-2xl border border-outline-variant/10 hover:bg-surface-container-lowest transition-colors">
+                stats.pastRuns?.map((run, idx) => (
+                  <div key={run.id || idx} onClick={() => setSelectedRun(run)} className="flex items-start gap-4 p-4 rounded-2xl border border-outline-variant/10 hover:bg-surface-container-highest transition-colors cursor-pointer">
                     <div className="w-12 h-12 bg-tertiary/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="material-symbols-outlined text-tertiary text-xl">task_alt</span>
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-1">
                         <h4 className="font-bold text-on-surface text-sm">Delivered to {run.destination || 'Campus'}</h4>
-                        <span className="text-[10px] bg-tertiary/10 text-tertiary px-2 py-0.5 rounded uppercase font-bold tracking-wider">Verified</span>
+                        {run.status === 'Completed' && (
+                          <span className="text-[10px] bg-tertiary/10 text-tertiary px-2 py-0.5 rounded uppercase font-bold tracking-wider">Verified</span>
+                        )}
                       </div>
-                      <p className="text-xs text-on-surface-variant mb-2">Picked up from {run.location || 'Unknown'}</p>
+                      <p className="text-xs text-on-surface-variant mb-2">Picked up from {run.pickupLocation || run.pickup || run.location || 'Campus Landmark'}</p>
                       <div className="flex items-center gap-1 text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">
                         <span className="material-symbols-outlined text-[12px]">schedule</span>
                         {run.createdAt ? new Date(run.createdAt.seconds * 1000).toLocaleDateString() : 'Recently'}
@@ -212,6 +211,12 @@ const Profile = () => {
         </section>
 
       </div>
+      
+      <OrderDetailsModal 
+        isOpen={!!selectedRun}
+        onClose={() => setSelectedRun(null)}
+        post={selectedRun}
+      />
     </main>
   );
 };
