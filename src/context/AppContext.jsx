@@ -3,6 +3,7 @@ import { db, auth } from '../firebase/config';
 import { collection, addDoc, updateDoc, doc, onSnapshot, serverTimestamp, query, orderBy, setDoc, getDoc, where, getDocs, deleteField, runTransaction } from 'firebase/firestore';
 import { onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { toast } from 'react-hot-toast';
+import { VIT_LOCATIONS, getHaversineDistance } from '../constants';
 
 const AppContext = createContext();
 
@@ -231,6 +232,7 @@ export const AppProvider = ({ children }) => {
       const userRef = doc(db, 'users', currentUser.uid);
       const postRef = doc(collection(db, 'posts'));
 
+      let computedCost = 0;
       await runTransaction(db, async (transaction) => {
         const userSnap = await transaction.get(userRef);
         if (!userSnap.exists()) throw new Error("User does not exist");
@@ -238,17 +240,36 @@ export const AppProvider = ({ children }) => {
         const userData = userSnap.data();
         let newBalance = userData.gcBalance || 0;
         
-        if (postData.type === 'request') {
-          if (newBalance < 75) {
-            throw new Error("Insufficient GC balance (requires 75 GC)");
+        const locObj = VIT_LOCATIONS.find(l => l.id === postData.location);
+        const destObj = VIT_LOCATIONS.find(l => l.id === postData.destination);
+        let dynamicCost = 75;
+        let runnerReward = 50;
+        
+        if (locObj && destObj) {
+          const distance = getHaversineDistance(locObj.lat, locObj.lng, destObj.lat, destObj.lng);
+          if (distance < 500) {
+            dynamicCost = 50;
+            runnerReward = 35;
+          } else if (distance > 1500) {
+            dynamicCost = 100;
+            runnerReward = 70;
           }
-          newBalance -= 75;
+        }
+        
+        if (postData.type === 'request') {
+          if (newBalance < dynamicCost) {
+            throw new Error(`Insufficient GC balance (requires ${dynamicCost} GC)`);
+          }
+          newBalance -= dynamicCost;
+          computedCost = dynamicCost;
           const newStats = { ...userData.stats, lifetimeRequests: (userData.stats?.lifetimeRequests || 0) + 1 };
           transaction.update(userRef, { gcBalance: newBalance, stats: newStats });
         }
         
         transaction.set(postRef, {
           ...postData,
+          cost: dynamicCost,
+          runnerReward: runnerReward,
           requesterId: currentUser.uid,
           requesterName: userData.name || 'Student',
           status: 'open',
@@ -256,10 +277,10 @@ export const AppProvider = ({ children }) => {
         });
       });
       
-      if (postData.type === 'request') {
+      if (postData.type === 'request' && computedCost > 0) {
         setUserProfile(prev => ({
           ...prev,
-          gcBalance: prev.gcBalance - 75,
+          gcBalance: prev.gcBalance - computedCost,
           stats: {
             ...prev.stats,
             lifetimeRequests: (prev.stats?.lifetimeRequests || 0) + 1
@@ -290,12 +311,13 @@ export const AppProvider = ({ children }) => {
         
         const postData = postSnap.data();
         
-        // If it was a request and is still open, refund 75 GC
+        // If it was a request and is still open, refund the dynamic cost
         if (postData.type === 'request' && postData.status === 'open' && postData.requesterId === currentUser.uid) {
            const userSnap = await transaction.get(userRef);
            if (userSnap.exists()) {
              let newBalance = userSnap.data().gcBalance || 0;
-             newBalance = Math.min(500, newBalance + 75);
+             const refundAmount = postData.cost || 75;
+             newBalance = Math.min(500, newBalance + refundAmount);
              transaction.update(userRef, { gcBalance: newBalance });
            }
         }
@@ -499,12 +521,23 @@ export const AppProvider = ({ children }) => {
           const runnerRef = doc(db, 'users', journeyData.runnerId);
           runnerSnap = await transaction.get(runnerRef);
         }
+        
+        let postSnap = null;
+        let postRef = null;
+        if (journeyData.postId) {
+          postRef = doc(db, 'posts', journeyData.postId);
+          postSnap = await transaction.get(postRef);
+        }
 
         // --- 2. ALL MATH & LOGIC & WRITES ---
         transaction.update(journeyRef, { status: 'Completed' });
         
-        if (journeyData.postId) {
-          const postRef = doc(db, 'posts', journeyData.postId);
+        let postData = null;
+        let runnerReward = 50;
+        
+        if (postSnap && postSnap.exists()) {
+          postData = postSnap.data();
+          runnerReward = postData.runnerReward || 50;
           transaction.update(postRef, { status: 'completed' });
         }
         
@@ -517,31 +550,67 @@ export const AppProvider = ({ children }) => {
           let claimInbox = runnerData.claimInbox || [];
           let questState = runnerData.questState || {};
           
-          // Add 50 GC base reward (capped at 500)
-          newBalance = Math.min(500, newBalance + 50);
+          newBalance = Math.min(500, newBalance + runnerReward);
           
-          // Increment stats
           stats.lifetimeTasksCompleted = (stats.lifetimeTasksCompleted || 0) + 1;
           const runs = stats.lifetimeTasksCompleted;
           
-          // Milestones
-          if (runs === 25) claimInbox.push({ id: Date.now().toString() + '-25', title: '25 Runs Milestone', amount: 50 });
-          else if (runs === 50) claimInbox.push({ id: Date.now().toString() + '-50', title: '50 Runs Milestone', amount: 100 });
-          else if (runs === 75) claimInbox.push({ id: Date.now().toString() + '-75', title: '75 Runs Milestone', amount: 150 });
-          else if (runs === 100) claimInbox.push({ id: Date.now().toString() + '-100', title: '100 Runs Milestone', amount: 200 });
-          
           const now = new Date();
           const todayDateStr = now.toDateString();
-          const currentHour = now.getHours();
+          const nowSeconds = Math.floor(now.getTime() / 1000);
           
+          // 1. One-Time Quests
+          if (runs === 1) {
+            claimInbox.push({ id: Date.now().toString() + '-icebreaker', title: 'The Icebreaker', amount: 50 });
+            questState.icebreaker = true;
+          }
+
+          // 2. Behavioral Quests
+          if (!questState.sprinter && journeyData.createdAt && (nowSeconds - journeyData.createdAt.seconds) < 15 * 60) {
+            claimInbox.push({ id: Date.now().toString() + '-sprinter', title: 'The Sprinter', amount: 30 });
+            questState.sprinter = true;
+          }
+          
+          if (!questState.rescuer && postData && postData.createdAt && journeyData.createdAt && (journeyData.createdAt.seconds - postData.createdAt.seconds) > 25 * 60) {
+            claimInbox.push({ id: Date.now().toString() + '-rescuer', title: 'The Rescuer', amount: 20 });
+            questState.rescuer = true;
+          }
+          
+          if (!questState.lastorder && postData && postData.createdAt) {
+            const postDate = new Date(postData.createdAt.seconds * 1000);
+            if (postDate.getHours() === 18 && postDate.getMinutes() >= 30) {
+               claimInbox.push({ id: Date.now().toString() + '-lastorder', title: 'The Last Order', amount: 15 });
+               questState.lastorder = true;
+            }
+          }
+          
+          // Daily Quest
           if (questState.lastTaskDate !== todayDateStr) {
             claimInbox.push({ id: Date.now().toString() + '-daily', title: 'The Daily Warmup', amount: 10 });
             questState.lastTaskDate = todayDateStr;
           }
           
-          if (currentHour >= 18 && currentHour < 19) {
-            claimInbox.push({ id: Date.now().toString() + '-clutch', title: 'The Clutch Master', amount: 25 });
+          // 3. Loyalty Quests (Iron Streak)
+          if (!questState.ironStreakCompleted) {
+             const oneWeekAgo = nowSeconds - 7 * 24 * 60 * 60;
+             if (questState.streakStartDate && questState.streakStartDate > oneWeekAgo) {
+                 questState.currentStreak = (questState.currentStreak || 0) + 1;
+             } else {
+                 questState.streakStartDate = nowSeconds;
+                 questState.currentStreak = 1;
+             }
+             
+             if (questState.currentStreak >= 5) {
+                 claimInbox.push({ id: Date.now().toString() + '-ironstreak', title: 'The Iron Streak', amount: 50 });
+                 questState.ironStreakCompleted = true;
+             }
           }
+          
+          // 4. Milestones
+          if (runs === 25) claimInbox.push({ id: Date.now().toString() + '-25', title: '25 Deliveries Milestone', amount: 50 });
+          else if (runs === 50) claimInbox.push({ id: Date.now().toString() + '-50', title: '50 Deliveries Milestone', amount: 100 });
+          else if (runs === 75) claimInbox.push({ id: Date.now().toString() + '-75', title: '75 Deliveries Milestone', amount: 150 });
+          else if (runs === 100) claimInbox.push({ id: Date.now().toString() + '-100', title: '100 Deliveries (The Centurion)', amount: 200 });
           
           transaction.update(runnerRef, { gcBalance: newBalance, stats, claimInbox, questState });
           
@@ -608,7 +677,8 @@ export const AppProvider = ({ children }) => {
         if (postSnap && postSnap.exists()) {
              if (reqSnap && reqSnap.exists()) {
                  let newBalance = reqSnap.data().gcBalance || 0;
-                 newBalance = Math.min(500, newBalance + 75); // Full 75 GC Refund
+                 const refundAmount = postData.cost || 75;
+                 newBalance = Math.min(500, newBalance + refundAmount); // Dynamic Refund
                  transaction.update(requesterRef, { gcBalance: newBalance });
              }
              transaction.update(postRef, { status: 'cancelled' });
@@ -743,6 +813,8 @@ export const AppProvider = ({ children }) => {
     if (!currentUser || DISABLE_FIREBASE) return;
     try {
       const userRef = doc(db, 'users', currentUser.uid);
+      let claimedAmount = 0;
+      
       await runTransaction(db, async (transaction) => {
         const snap = await transaction.get(userRef);
         if (!snap.exists()) return;
@@ -756,11 +828,20 @@ export const AppProvider = ({ children }) => {
             throw new Error("Wallet full! Cannot claim reward right now.");
           }
           
+          claimedAmount = reward.amount;
           let newBalance = (data.gcBalance || 0) + reward.amount;
           claimInbox.splice(rewardIndex, 1);
           transaction.update(userRef, { gcBalance: newBalance, claimInbox });
         }
       });
+      
+      if (claimedAmount > 0) {
+        setUserProfile(prev => ({
+          ...prev,
+          gcBalance: prev.gcBalance + claimedAmount,
+          claimInbox: prev.claimInbox.filter(reward => reward.id !== rewardId)
+        }));
+      }
     } catch(err) {
       console.error(err);
       throw err;

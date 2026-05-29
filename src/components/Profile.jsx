@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { useAppContext } from '../context/AppContext';
 import OrderDetailsModal from './OrderDetailsModal';
 
@@ -21,6 +22,36 @@ const Profile = () => {
 
   const [stats, setStats] = useState({ tasksCompleted: 0, requestsCompleted: 0, cancelled: 0, pastRuns: [] });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
+
+  const [dailyTimeLeft, setDailyTimeLeft] = useState("");
+  const [weeklyTimeLeft, setWeeklyTimeLeft] = useState("");
+
+  useEffect(() => {
+    const updateTimers = () => {
+      const now = new Date();
+      
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0);
+      const dailyDiff = midnight - now;
+      const dHours = Math.floor(dailyDiff / (1000 * 60 * 60));
+      const dMinutes = Math.floor((dailyDiff % (1000 * 60 * 60)) / (1000 * 60));
+      setDailyTimeLeft(`${dHours}h ${dMinutes}m`);
+
+      let daysUntilSunday = 7 - now.getDay();
+      if (daysUntilSunday === 7) daysUntilSunday = 0; // if it's already sunday
+      const nextSundayMidnight = new Date(now);
+      nextSundayMidnight.setDate(now.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday));
+      nextSundayMidnight.setHours(24, 0, 0, 0);
+      const weeklyDiff = nextSundayMidnight - now;
+      const wDays = Math.floor(weeklyDiff / (1000 * 60 * 60 * 24));
+      const wHours = Math.floor((weeklyDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      setWeeklyTimeLeft(`${wDays}d ${wHours}h`);
+    };
+
+    updateTimers();
+    const interval = setInterval(updateTimers, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -200,58 +231,122 @@ const Profile = () => {
           </div>
         </section>
 
-        {/* Right Column: Trust Evidence */}
+        {/* Right Column: Quest Board */}
         <section className="lg:col-span-7">
-          <div className="bg-surface-container-lowest p-8 rounded-xl min-h-full" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
+          <div className="bg-[#fff] p-8 rounded-xl min-h-full" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-xl font-bold text-on-surface font-headline flex items-center gap-2">
-                  <span className="material-symbols-outlined text-tertiary">verified_user</span>
-                  Trust Evidence
+                <h2 className="text-2xl font-bold text-[#000] font-headline flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">local_fire_department</span>
+                  Available Quests
                 </h2>
-                <p className="text-sm text-on-surface-variant mt-1">A verifiable history of your completed deliveries.</p>
+                <p className="text-sm font-bold text-[#666] mt-1">Complete tasks to earn GC and build your reputation.</p>
               </div>
             </div>
 
             <div className="space-y-6">
-              {isLoadingStats ? (
-                <div className="animate-pulse space-y-4">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-20 bg-surface-variant/30 rounded-xl"></div>
-                  ))}
-                </div>
-              ) : stats.pastRuns?.length === 0 ? (
-                <div className="text-center py-12 bg-surface-container rounded-2xl">
-                  <span className="material-symbols-outlined text-4xl text-on-surface-variant opacity-50 mb-3">inventory_2</span>
-                  <p className="text-on-surface font-bold">No completed runs yet</p>
-                  <p className="text-sm text-on-surface-variant">Accept a request to build your trust evidence.</p>
-                </div>
-              ) : (
-                stats.pastRuns?.map((run, idx) => (
-                  <div key={run.id || idx} onClick={() => setSelectedRun(run)} className="flex items-start gap-4 p-4 rounded-xl cursor-pointer hover:-translate-y-1 transition-transform" style={{ border: '2px solid #000', boxShadow: '2px 2px 0px #000', background: '#fff' }}>
-                    <div className="w-12 h-12 bg-tertiary/10 rounded-full flex items-center justify-center flex-shrink-0 border-2 border-black">
-                      <span className="material-symbols-outlined text-tertiary text-xl">task_alt</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-bold text-on-surface text-sm">Delivered to {run.destination || 'Campus'}</h4>
-                        {run.status === 'Completed' && (
-                          <span className="text-[10px] bg-tertiary/10 text-tertiary px-2 py-0.5 rounded uppercase font-bold tracking-wider">Verified</span>
-                        )}
+              
+              {(() => {
+                const questState = userProfile?.questState || {};
+                const runs = stats.tasksCompleted || 0;
+                
+                const QuestCard = ({ title, desc, reward, completed, progress, total, icon, bg, accent, onClick }) => {
+                  const isDone = completed || (progress !== undefined && progress >= total);
+                  const percent = isDone ? 100 : progress !== undefined ? (progress / total) * 100 : 0;
+                  
+                  return (
+                    <div className="p-4 rounded-xl flex flex-col justify-center transition-all mb-4 cursor-pointer hover:opacity-90" onClick={onClick} style={{ border: '2px solid #000', boxShadow: isDone ? 'none' : '4px 4px 0px #000', background: isDone ? '#e0e0e0' : bg }}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 border-black ${isDone ? 'bg-[#bdbdbd]' : 'bg-[#fff]'}`}>
+                            <span className={`material-symbols-outlined ${isDone ? 'text-[#000]' : ''}`} style={{ color: isDone ? '#000' : accent }}>{icon}</span>
+                          </div>
+                          <div>
+                            <h4 className={`font-bold text-sm ${isDone ? 'line-through text-[#666]' : ''}`}>{title}</h4>
+                            <p className="text-xs font-bold text-[#666]">{desc}</p>
+                          </div>
+                        </div>
+                        <div className="text-right flex flex-col items-end">
+                          {isDone ? (
+                            <span className="font-black text-[#000] uppercase">Claimed</span>
+                          ) : (
+                            <span className="font-black" style={{ color: accent }}>{reward} GC</span>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-xs text-on-surface-variant mb-2">Picked up from {run.pickupLocation || run.pickup || run.location || 'Campus Landmark'}</p>
-                      <div className="flex items-center gap-1 text-[10px] text-on-surface-variant uppercase font-bold tracking-wider">
-                        <span className="material-symbols-outlined text-[12px]">schedule</span>
-                        {run.createdAt ? new Date(run.createdAt.seconds * 1000).toLocaleDateString() : 'Recently'}
-                      </div>
+                      {progress !== undefined && (
+                        <div className="w-full flex items-center gap-3 mt-2">
+                          <div className="flex-1 h-4 bg-[#fff] relative" style={{ border: '2px solid #000' }}>
+                            <div className="absolute top-0 left-0 h-full" style={{ background: accent, width: `${percent}%`, borderRight: percent > 0 && percent < 100 ? '2px solid #000' : 'none' }}></div>
+                          </div>
+                          <span className="text-xs font-bold text-[#000] w-10 text-right">{isDone ? total : progress}/{total}</span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))
-              )}
+                  );
+                };
+
+                const mockTrustFall = () => {
+                  if (!questState.trustFall) {
+                    updateProfile({ questState: { ...questState, trustFall: true } });
+                    toast.success("Trust Fall Mocked!");
+                  }
+                };
+
+                const mockAmbassador = () => {
+                  if (!questState.ambassador) {
+                    updateProfile({ questState: { ...questState, ambassador: true } });
+                    toast.success("Ambassador Mocked!");
+                  }
+                };
+
+                return (
+                  <>
+                    {/* One-Time Quests */}
+                    <div>
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">One-Time / Onboarding</h3>
+                      </div>
+                      <QuestCard title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="50" icon="sports_martial_arts" bg="#fff8e1" accent="#ff8f00" completed={questState.icebreaker} progress={runs} total={1} />
+                      <QuestCard title="The Trust Fall" desc="Upload a profile picture (Click to mock)" reward="30" icon="verified_user" bg="#e8f5e9" accent="#2e7d32" completed={questState.trustFall} onClick={mockTrustFall} />
+                      <QuestCard title="The Ambassador" desc="Share your Runner Profile (Click to mock)" reward="40" icon="share" bg="#e3f2fd" accent="#1565c0" completed={questState.ambassador} onClick={mockAmbassador} />
+                      <QuestCard title="The Wingman" desc="Refer a friend who completes a run." reward="25" icon="handshake" bg="#fce4ec" accent="#c2185b" completed={questState.wingman} progress={0} total={1} />
+                    </div>
+
+                    {/* Behavioral Quests */}
+                    <div>
+                      <div className="flex justify-between items-center mb-3 pt-4">
+                        <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">Behavioral Quests</h3>
+                      </div>
+                      <QuestCard title="The Sprinter" desc="Complete a run in < 15 minutes." reward="30" icon="timer" bg="#ede7f6" accent="#4527a0" completed={questState.sprinter} />
+                      <QuestCard title="The Rescuer" desc="Accept a request sitting for > 25 minutes." reward="20" icon="healing" bg="#ffebee" accent="#c62828" completed={questState.rescuer} />
+                      <QuestCard title="The Last Order" desc="Complete a delivery requested between 6:30 PM - 7:00 PM." reward="15" icon="dark_mode" bg="#e0f7fa" accent="#006064" completed={questState.lastorder} />
+                    </div>
+
+                    {/* Loyalty Quests */}
+                    <div>
+                      <div className="flex justify-between items-center mb-3 pt-4">
+                        <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">Loyalty Quests</h3>
+                      </div>
+                      <QuestCard title="The Iron Streak" desc="Complete 5 deliveries in a week." reward="50" icon="local_fire_department" bg="#fff3e0" accent="#e65100" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
+                    </div>
+
+                    {/* Milestones */}
+                    <div>
+                      <div className="flex justify-between items-center mb-3 pt-4">
+                        <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">Milestones</h3>
+                      </div>
+                      <QuestCard title="25 Deliveries" desc="Milestone reward" reward="50" icon="military_tech" bg="#fff0f5" accent="#880e4f" completed={runs >= 25} progress={runs} total={25} />
+                      <QuestCard title="50 Deliveries" desc="Milestone reward" reward="100" icon="workspace_premium" bg="#fff0f5" accent="#880e4f" completed={runs >= 50} progress={runs} total={50} />
+                      <QuestCard title="75 Deliveries" desc="Milestone reward" reward="150" icon="diamond" bg="#fff0f5" accent="#880e4f" completed={runs >= 75} progress={runs} total={75} />
+                      <QuestCard title="The Centurion" desc="100 Lifetime Deliveries" reward="200" icon="stars" bg="#fff0f5" accent="#880e4f" completed={runs >= 100} progress={runs} total={100} />
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </section>
-
       </div>
       
       <OrderDetailsModal 
