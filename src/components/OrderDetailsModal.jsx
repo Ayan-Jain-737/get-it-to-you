@@ -15,178 +15,182 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
   if (!isOpen || !post) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-[#fffdf5] w-full max-w-md max-h-[90vh] flex flex-col shadow-[8px_8px_0px_#000] overflow-hidden border-2 border-black relative" style={{ fontFamily: '"Courier New", Courier, monospace' }}>
-        
-        {/* Receipt Jagged Edge Top (optional aesthetic) */}
-        <div style={{ width: '100%', height: '8px', backgroundImage: 'radial-gradient(circle, #fffdf5 4px, transparent 5px)', backgroundSize: '10px 10px', backgroundPosition: '-5px -5px', position: 'absolute', top: -4, borderTop: '2px dashed #000' }}></div>
-        
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b-2 border-dashed border-black">
-          <h2 className="text-2xl font-bold uppercase tracking-widest flex items-center gap-2">
-            *** GITY RECEIPT ***
-          </h2>
-          <button onClick={onClose} className="p-1 hover:bg-black hover:text-white transition-colors border-2 border-transparent hover:border-black rounded-full">
-            <X size={24} />
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-margin-page bg-on-surface/80 backdrop-blur-sm font-body-md animate-in fade-in duration-100">
+      {/* Modal Container: Neo-Brutalist Thermal Receipt */}
+      <div className="relative w-full max-w-md max-h-[90vh] flex flex-col">
+        {/* Top Zigzag Edge */}
+        <div className="absolute -top-3 left-0 w-full h-4 overflow-hidden flex z-20">
+          <div className="w-full flex justify-between h-full text-surface-container-lowest fill-current">
+            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 10">
+              <polygon points="0,10 5,0 10,10 15,0 20,10 25,0 30,10 35,0 40,10 45,0 50,10 55,0 60,10 65,0 70,10 75,0 80,10 85,0 90,10 95,0 100,10"></polygon>
+            </svg>
+          </div>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1 text-black">
-          
-          {/* Summary Card */}
-          <div className="space-y-4">
-            <div className="text-center mb-6">
-              <p className="uppercase text-sm font-bold tracking-widest border-b border-dashed border-black pb-2 inline-block">Order Details</p>
-            </div>
-            
-            <div className="flex justify-between items-end border-b-2 border-dashed border-black pb-2">
+        {/* Main Receipt Body */}
+        <div className="bg-surface-container-lowest border-l-border-width border-r-border-width border-on-surface shadow-[6px_6px_0px_0px_#1b1b1b] flex flex-col p-6 overflow-y-auto no-scrollbar relative z-10">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b-2 border-dashed border-on-surface pb-3 mb-4">
+            <h2 className="font-label-mono text-sm font-black uppercase tracking-widest text-on-surface">
+              *** GITY RECEIPT ***
+            </h2>
+            <button 
+              onClick={onClose} 
+              className="p-1 hover:bg-surface-variant border border-on-surface transition-all flex items-center justify-center"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Details */}
+          <div className="space-y-4 text-on-surface">
+            <div className="flex justify-between items-start border-b border-dashed border-on-surface pb-2">
               <div>
-                <p className="text-xs uppercase font-bold text-gray-600 mb-1">Item</p>
-                <h3 className="font-bold text-lg">{post.item || post.description || post.details || 'Campus Pick-up'}</h3>
+                <p className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">Item</p>
+                <h3 className="font-headline-md text-base font-black truncate max-w-[200px]">{post.item || post.description || post.details || 'Campus Pick-up'}</h3>
               </div>
               <div className="text-right">
-                <p className="text-xs uppercase font-bold text-gray-600 mb-1">
+                <p className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">
                   {post.type === 'request' ? (
                     currentUser && post.requesterId === currentUser.uid ? 'Cost' : 'Reward'
                   ) : (
                     currentUser && post.requesterId === currentUser.uid ? 'Reward' : 'Cost'
                   )}
                 </p>
-                <p className="font-bold">
+                <p className="font-black text-sm">
                   {post.type === 'request' ? (
-                    currentUser && post.requesterId === currentUser.uid ? `${post.cost || 75} GC` : `${post.runnerReward || 50} GC`
+                    currentUser && post.requesterId === currentUser.uid ? `75 GC` : `50 GC`
                   ) : (
-                    currentUser && post.requesterId === currentUser.uid ? `${post.runnerReward || 50} GC` : `${post.cost || 75} GC`
+                    currentUser && post.requesterId === currentUser.uid ? `50 GC` : `75 GC`
                   )}
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-6 pt-2 border-b-2 border-dashed border-black pb-4">
-              <div className="flex-1">
-                <p className="text-xs uppercase font-bold text-gray-600 mb-1">From</p>
-                <p className="font-bold">{post.pickupLocation || post.pickup || post.location || 'Campus Landmark'}</p>
+            <div className="flex items-start gap-4 border-b border-dashed border-on-surface pb-3">
+              <div className="flex-1 min-w-0">
+                <p className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">From</p>
+                <p className="font-bold text-xs truncate">{post.pickupLocation || post.pickup || post.location || 'Campus Landmark'}</p>
               </div>
-              <div className="flex-1">
-                <p className="text-xs uppercase font-bold text-gray-600 mb-1">To</p>
-                <p className="font-bold">{post.destination || 'Campus'}</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">To</p>
+                <p className="font-bold text-xs truncate">{post.destination || 'Campus'}</p>
               </div>
             </div>
 
+            {/* Counterparty wiring logic */}
             {history?.journey && (
-              <div className="pt-4 border-t-2 border-dashed border-black mt-4">
-                <div className="flex justify-between items-center">
-                  <p className="text-xs uppercase font-bold text-gray-600">
-                    {currentUser.uid === post.requesterId ? 'DELIVERED BY:' : 'REQUESTED BY:'}
-                  </p>
-                  <p 
-                    className="font-bold uppercase tracking-wider cursor-pointer border-b-2 border-dashed border-black hover:text-primary transition-colors"
-                    onClick={() => setProfileTargetUid(currentUser.uid === post.requesterId ? history.journey.runnerId : post.requesterId)}
-                  >
-                    {currentUser.uid === post.requesterId ? (history.journey.runnerName || 'Runner') : (post.requesterName || 'Requester')}
-                  </p>
-                </div>
+              <div className="flex justify-between items-center border-b border-dashed border-on-surface pb-3 pt-1">
+                <span className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant">
+                  {currentUser.uid === post.requesterId ? 'DELIVERED BY:' : 'REQUESTED BY:'}
+                </span>
+                <span 
+                  className="font-bold text-xs uppercase underline cursor-pointer hover:text-primary transition-all"
+                  onClick={() => setProfileTargetUid(currentUser.uid === post.requesterId ? history.journey.runnerId : post.requesterId)}
+                >
+                  {currentUser.uid === post.requesterId ? (history.journey.runnerName || 'Runner') : (post.requesterName || 'Requester')}
+                </span>
               </div>
             )}
           </div>
 
-          {/* Timestamps & Status */}
+          {/* Loading or Detailed Logs */}
           {loading ? (
-            <div className="flex justify-center p-8">
-              <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            <div className="flex justify-center py-6">
+              <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
             </div>
           ) : (
-            <>
-              <div className="space-y-4">
-                <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
-                  <Clock size={16} className="text-tertiary" /> Timeline
+            <div className="space-y-4 mt-4">
+              {/* Timeline */}
+              <div className="space-y-2">
+                <h4 className="font-label-mono text-[10px] uppercase font-bold text-on-surface border-b border-dashed border-on-surface pb-1 flex items-center gap-1.5">
+                  <Clock size={12} /> Timeline Logs
                 </h4>
-                <div className="bg-surface-container p-5 rounded-2xl border border-outline-variant/30 space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-on-surface-variant font-medium">Requested</span>
-                    <span className="font-bold text-on-surface">
+                <div className="bg-surface-container p-3 border border-on-surface text-xs space-y-1.5">
+                  <div className="flex justify-between">
+                    <span className="text-on-surface-variant font-bold">Requested</span>
+                    <span className="font-bold">
                       {post.createdAt?.toDate ? post.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Unknown'}
                     </span>
                   </div>
                   {history?.journey?.createdAt && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-on-surface-variant font-medium">Accepted</span>
-                      <span className="font-bold text-on-surface">
+                    <div className="flex justify-between">
+                      <span className="text-on-surface-variant font-bold">Accepted</span>
+                      <span className="font-bold">
                         {history.journey.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   )}
                   {history?.journey?.readyForPickupAt && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-on-surface-variant font-medium">Ready for Pickup</span>
-                      <span className="font-bold text-on-surface">
+                    <div className="flex justify-between">
+                      <span className="text-on-surface-variant font-bold">Ready</span>
+                      <span className="font-bold">
                         {history.journey.readyForPickupAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between text-sm pt-3 border-t border-outline-variant/20">
-                    <span className="text-on-surface-variant font-bold">Final Status</span>
-                    <span className="font-bold text-tertiary flex items-center gap-1">
-                      <CheckCircle size={14} /> Completed
+                  <div className="flex justify-between border-t border-on-surface border-dashed pt-1.5 mt-1 font-black">
+                    <span>Status</span>
+                    <span className="text-secondary flex items-center gap-1">
+                      <CheckCircle size={10} /> Completed
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Economic Summary */}
+              {/* Transactions details */}
               <div className="space-y-2">
-                <h4 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 border-dashed border-black pb-2">
-                  <span className="material-symbols-outlined text-xl">account_balance_wallet</span> GC Transaction
+                <h4 className="font-label-mono text-[10px] uppercase font-bold text-on-surface border-b border-dashed border-on-surface pb-1">
+                  GC Transaction Summary
                 </h4>
-                <div className="p-4 border-2 border-black bg-white shadow-[4px_4px_0px_#000]">
+                <div className="p-3 border-2 border-on-surface bg-surface-container-lowest font-black text-xs">
                   {post.type === 'request' ? (
                     post.requesterId === currentUser?.uid ? (
-                      <div className="flex justify-between items-center text-red-600 font-bold">
-                        <span>Requester Escrow</span>
-                        <span className="text-xl">-{post.cost || 75} GC</span>
+                      <div className="flex justify-between text-error">
+                        <span>Escrow Charge</span>
+                        <span>-75 GC</span>
                       </div>
                     ) : (
-                      <div className="flex justify-between items-center text-green-600 font-bold">
-                        <span>Runner Reward</span>
-                        <span className="text-xl">+{post.runnerReward || 50} GC</span>
+                      <div className="flex justify-between text-secondary">
+                        <span>Reward Earned</span>
+                        <span>+50 GC</span>
                       </div>
                     )
                   ) : (
                     post.requesterId === currentUser?.uid ? (
-                      <div className="flex justify-between items-center text-green-600 font-bold">
-                        <span>Runner Reward</span>
-                        <span className="text-xl">+{post.runnerReward || 50} GC</span>
+                      <div className="flex justify-between text-secondary">
+                        <span>Reward Earned</span>
+                        <span>+50 GC</span>
                       </div>
                     ) : (
-                      <div className="flex justify-between items-center text-red-600 font-bold">
-                        <span>Requester Escrow</span>
-                        <span className="text-xl">-{post.cost || 75} GC</span>
+                      <div className="flex justify-between text-error">
+                        <span>Escrow Charge</span>
+                        <span>-75 GC</span>
                       </div>
                     )
                   )}
                 </div>
               </div>
 
-              {/* Chat History */}
-              <div className="space-y-2 pt-4">
-                <h4 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 border-dashed border-black pb-2">
-                  <span className="material-symbols-outlined text-xl">chat</span> Transcript
+              {/* Chat Transcripts */}
+              <div className="space-y-2">
+                <h4 className="font-label-mono text-[10px] uppercase font-bold text-on-surface border-b border-dashed border-on-surface pb-1">
+                  Chat Transcript
                 </h4>
-                <div className="p-4 border-2 border-black bg-white shadow-[4px_4px_0px_#000] max-h-40 overflow-y-auto space-y-4">
+                <div className="p-3 border-2 border-on-surface bg-surface-container-lowest max-h-36 overflow-y-auto space-y-2 text-xs">
                   {history?.messages && history.messages.length > 0 ? (
                     history.messages.map(msg => (
-                      <div key={msg.id} className="text-sm">
+                      <div key={msg.id}>
                         {msg.type === 'system' ? (
-                          <div className="text-center text-xs uppercase font-bold text-gray-500 my-2 tracking-wide border-b border-dashed border-gray-300 pb-1">
+                          <div className="text-center text-[9px] uppercase font-bold text-on-surface-variant py-1 border-b border-on-surface border-dotted">
                             {msg.text}
                           </div>
                         ) : (
                           <div className={`flex flex-col ${msg.senderId === post.requesterId ? 'items-end' : 'items-start'}`}>
-                            <span className="text-xs font-bold text-gray-600 mb-0.5">
+                            <span className="text-[9px] font-black text-on-surface-variant">
                               {msg.senderId === post.requesterId ? post.requesterName : (post.acceptedBy || 'Runner')}
                             </span>
-                            <div className={`px-3 py-2 border-2 border-black ${msg.senderId === post.requesterId ? 'bg-black text-white' : 'bg-white text-black'}`}>
+                            <div className={`px-2 py-1 border border-on-surface ${msg.senderId === post.requesterId ? 'bg-surface-container text-on-surface' : 'bg-surface-container-lowest text-on-surface'}`}>
                               {msg.text}
                             </div>
                           </div>
@@ -194,16 +198,41 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-sm italic">No messages sent.</p>
+                    <p className="text-center text-[11px] text-on-surface-variant italic">No messages logged.</p>
                   )}
                 </div>
               </div>
-            </>
+            </div>
           )}
 
-          {/* Jagged Bottom Edge */}
-          <div className="text-center pt-8 opacity-50">
-            - - - END OF RECEIPT - - -
+          {/* Barcode & Footer stamp */}
+          <div className="mt-6 flex flex-col items-center">
+            <div className="flex justify-center h-[32px] gap-[2px] mb-2 opacity-80">
+              <div className="w-[1px] h-full bg-on-surface"></div>
+              <div className="w-[3px] h-full bg-on-surface"></div>
+              <div className="w-[1px] h-full bg-on-surface"></div>
+              <div className="w-[2px] h-full bg-on-surface"></div>
+              <div className="w-[4px] h-full bg-on-surface"></div>
+              <div className="w-[1px] h-full bg-on-surface"></div>
+              <div className="w-[3px] h-full bg-on-surface"></div>
+              <div className="w-[2px] h-full bg-on-surface"></div>
+              <div className="w-[1px] h-full bg-on-surface"></div>
+              <div className="w-[4px] h-full bg-on-surface"></div>
+              <div className="w-[2px] h-full bg-on-surface"></div>
+              <div className="w-[1px] h-full bg-on-surface"></div>
+            </div>
+            <div className="font-label-mono text-[9px] text-on-surface-variant tracking-wider uppercase">
+              - - - END OF GITY TRANSACTION - - -
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Zigzag Edge */}
+        <div className="absolute -bottom-3 left-0 w-full h-4 overflow-hidden flex z-20">
+          <div className="w-full flex justify-between h-full text-surface-container-lowest fill-current">
+            <svg className="w-full h-full transform rotate-180" preserveAspectRatio="none" viewBox="0 0 100 10">
+              <polygon points="0,10 5,0 10,10 15,0 20,10 25,0 30,10 35,0 40,10 45,0 50,10 55,0 60,10 65,0 70,10 75,0 80,10 85,0 90,10 95,0 100,10"></polygon>
+            </svg>
           </div>
         </div>
       </div>

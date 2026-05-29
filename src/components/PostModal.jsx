@@ -1,9 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { usePostModal } from '../hooks/usePostModal';
-import styles from './PostModal.module.css';
-
-import { VIT_LOCATIONS, getHaversineDistance } from '../constants';
+import { VIT_LOCATIONS } from '../constants';
 
 const groupedLocations = VIT_LOCATIONS.reduce((acc, loc) => {
   if (!acc[loc.category]) acc[loc.category] = [];
@@ -24,114 +22,129 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
     isUrgent,
     setIsUrgent,
     dynamicCost,
+    runnerReward,
     zoneText,
     handleSubmit,
     userProfile
   } = usePostModal(initialType, onClose);
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
-        <div className={styles.header}>
-          <h2>Create a Post</h2>
-          <button className={styles.closeBtn} onClick={onClose}>
-            <X size={24} />
+    <div className="fixed inset-0 bg-on-background/40 backdrop-blur-sm flex items-center justify-center p-margin-page z-[200] font-body-md animate-in fade-in duration-100">
+      <div className="w-full max-w-lg bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#000000] p-stack-md flex flex-col gap-stack-md relative animate-in zoom-in-95 duration-150">
+        <div className="flex justify-between items-center border-b-border-width border-on-surface pb-stack-sm mb-2">
+          <h2 className="font-headline-lg text-headline-md uppercase tracking-tight text-on-surface">Create a Post</h2>
+          <button 
+            onClick={onClose}
+            className="border-2 border-on-surface p-1 shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:bg-primary-container bg-surface-container-lowest transition-all flex items-center justify-center"
+          >
+            <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.toggleGroup}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-stack-md">
+          {/* Post Type Selector Toggle */}
+          <div className="grid grid-cols-2 border-2 border-on-surface shadow-[4px_4px_0px_0px_#000000] mb-2">
             <button
               type="button"
-              className={`${styles.toggleBtn} ${postType === 'request' ? styles.active : ''}`}
               onClick={() => setPostType('request')}
+              className={`py-3 font-headline-md text-body-lg uppercase tracking-wider font-bold transition-colors ${postType === 'request' ? 'bg-primary-container text-on-surface border-r-2 border-on-surface' : 'bg-surface-container-lowest text-on-surface-variant border-r-2 border-on-surface'}`}
             >
               Need a Pickup
             </button>
             <button
               type="button"
-              className={`${styles.toggleBtn} ${postType === 'offer' ? styles.active : ''}`}
               onClick={() => setPostType('offer')}
+              className={`py-3 font-headline-md text-body-lg uppercase tracking-wider font-bold transition-colors ${postType === 'offer' ? 'bg-primary-container text-on-surface' : 'bg-surface-container-lowest text-on-surface-variant'}`}
             >
               Ready for Pickup
             </button>
           </div>
 
-          <div className={styles.inputGroup}>
-            <label style={{ fontWeight: 'bold', fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Pickup From</label>
+          {/* Pickup Selection */}
+          <div className="flex flex-col gap-1">
+            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">Pickup From</label>
             <select 
               value={location} 
               onChange={(e) => setLocation(e.target.value)}
-              style={{ width: '100%', padding: '12px', border: '2px solid #000', borderRadius: '4px', boxShadow: '4px 4px 0px #000', outline: 'none', background: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer', color: '#000' }}
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
             >
               {Object.entries(groupedLocations).map(([category, locs]) => (
-                <optgroup key={category} label={category} style={{ fontWeight: 'bold', background: '#f4f4f0' }}>
+                <optgroup key={category} label={category} className="font-bold bg-surface-variant">
                   {locs.map(loc => (
-                    <option key={loc.id} value={loc.id} style={{ fontWeight: 'normal', background: '#fff' }}>{loc.label}</option>
+                    <option key={loc.id} value={loc.id} className="bg-surface-container-lowest font-normal">{loc.label}</option>
                   ))}
                 </optgroup>
               ))}
             </select>
           </div>
 
-          <div className={styles.inputGroup}>
-            <label style={{ fontWeight: 'bold', fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Drop-off At</label>
+          {/* Dropoff Selection */}
+          <div className="flex flex-col gap-1">
+            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">Drop-off At</label>
             <select 
               value={destination} 
               onChange={(e) => setDestination(e.target.value)}
-              style={{ width: '100%', padding: '12px', border: '2px solid #000', borderRadius: '4px', boxShadow: '4px 4px 0px #000', outline: 'none', background: '#fff', fontSize: '1rem', fontWeight: 600, cursor: 'pointer', color: '#000' }}
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
             >
               {Object.entries(groupedLocations).map(([category, locs]) => (
-                <optgroup key={category} label={category} style={{ fontWeight: 'bold', background: '#f4f4f0' }}>
+                <optgroup key={category} label={category} className="font-bold bg-surface-variant">
                   {locs.map(loc => (
-                    <option key={loc.id} value={loc.id} style={{ fontWeight: 'normal', background: '#fff' }}>{loc.label}</option>
+                    <option key={loc.id} value={loc.id} className="bg-surface-container-lowest font-normal">{loc.label}</option>
                   ))}
                 </optgroup>
               ))}
             </select>
           </div>
 
+          {/* Urgent Selector (Request Only) */}
           {postType === 'request' && (
-            <div className={styles.inputGroup}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginTop: '0.5rem', color: 'var(--on-surface-variant)', fontSize: '0.875rem', fontWeight: 600 }}>
-                <input 
-                  type="checkbox" 
-                  checked={isUrgent} 
-                  onChange={(e) => setIsUrgent(e.target.checked)} 
-                  style={{ width: '1.25rem', height: '1.25rem', accentColor: 'var(--primary)' }}
-                />
-                Mark as URGENT
-              </label>
-            </div>
+            <label className="flex items-center gap-2 cursor-pointer font-label-mono text-label-tag text-on-surface font-bold uppercase mt-1">
+              <input 
+                type="checkbox" 
+                checked={isUrgent} 
+                onChange={(e) => setIsUrgent(e.target.checked)} 
+                className="w-5 h-5 border-2 border-on-surface checked:bg-primary rounded-none focus:ring-0 focus:ring-offset-0"
+              />
+              Mark as URGENT
+            </label>
           )}
 
-          <div className={styles.inputGroup}>
-            <label>Specific Details</label>
+          {/* Specific Details */}
+          <div className="flex flex-col gap-1">
+            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">Specific Details</label>
             <textarea
-              rows="3"
+              rows="2"
               placeholder={postType === 'request' ? "e.g. Swiggy order arriving in 10 mins..." : "e.g. Can carry small packages, meeting near main entrance..."}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              style={{ resize: 'none' }}
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#000000] resize-none"
               required
             />
           </div>
 
-          <div className={styles.inputGroup} style={{ marginTop: '16px' }}>
-            <div style={{ background: '#fff', border: '2px solid #000', boxShadow: '4px 4px 0px #000', padding: '16px', display: 'flex', flexCol: 'column', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-              <span style={{ fontSize: '1.1rem', color: '#000' }}>Cost: {dynamicCost} GC</span>
-              <span style={{ fontSize: '0.75rem', color: '#666', marginLeft: '8px' }}>({zoneText} - Deducted instantly)</span>
-            </div>
+          {/* Cost breakdown */}
+          <div className="p-stack-sm bg-surface-container-highest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col items-center justify-center">
+            <span className="font-headline-md text-body-lg font-black text-on-surface">
+              {postType === 'request' ? `Cost: ${dynamicCost} GC` : `Reward: ${runnerReward} GC`}
+            </span>
+            <span className="font-label-mono text-[11px] text-on-surface-variant">
+              {postType === 'request' ? `(${zoneText} - Deducted instantly)` : `(${zoneText} - Earned on delivery)`}
+            </span>
           </div>
 
+          {/* Insufficient Funds Warning */}
           {postType === 'request' && (userProfile?.gcBalance < dynamicCost) && (
-            <div style={{ color: 'red', fontSize: '0.875rem', marginBottom: '1rem', fontWeight: 600, textAlign: 'center', backgroundColor: 'rgba(255,0,0,0.1)', padding: '0.5rem', borderRadius: '0.5rem', marginTop: '1rem' }}>
-              <span className="material-symbols-outlined" style={{ verticalAlign: 'middle', fontSize: '1.1rem', marginRight: '4px' }}>error</span>
-              Insufficient funds ({dynamicCost} GC required). You have {userProfile?.gcBalance || 0} GC.
+            <div className="bg-tertiary-container text-on-tertiary-container border-2 border-on-surface p-2 text-center font-body-md font-bold uppercase text-xs">
+              ⚠️ Insufficient funds ({dynamicCost} GC required). You have {userProfile?.gcBalance || 0} GC.
             </div>
           )}
 
-          <button type="submit" className="btn-primary" disabled={postType === 'request' && (userProfile?.gcBalance < dynamicCost)} style={{ width: '100%', marginTop: '1rem', padding: '1rem', borderRadius: '1rem', fontWeight: 700, backgroundColor: 'var(--primary)', color: 'white', border: 'none', cursor: (postType === 'request' && userProfile?.gcBalance < dynamicCost) ? 'not-allowed' : 'pointer', transition: 'opacity 0.2s', opacity: (postType === 'request' && userProfile?.gcBalance < dynamicCost) ? 0.5 : 1 }} onMouseEnter={e => { if (!(postType === 'request' && userProfile?.gcBalance < dynamicCost)) e.target.style.opacity = '0.9'; }} onMouseLeave={e => { if (!(postType === 'request' && userProfile?.gcBalance < dynamicCost)) e.target.style.opacity = '1'; }}>
+          {/* Submit Button */}
+          <button 
+            type="submit" 
+            disabled={postType === 'request' && (userProfile?.gcBalance < dynamicCost)}
+            className="w-full p-stack-sm bg-primary-container hover:bg-primary-fixed-dim text-on-surface border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-body-lg font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             {postType === 'request' ? `Post Request (${dynamicCost} GC)` : 'Post Availability'}
           </button>
         </form>

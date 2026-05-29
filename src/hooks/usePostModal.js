@@ -15,15 +15,18 @@ export const usePostModal = (initialType, onClose) => {
   
   let distance = 0;
   let dynamicCost = 75;
+  let runnerReward = 50;
   let zoneText = "Zone 2";
   
   if (locObj && destObj) {
     distance = getHaversineDistance(locObj.lat, locObj.lng, destObj.lat, destObj.lng);
     if (distance < 500) {
       dynamicCost = 50;
+      runnerReward = 35;
       zoneText = "Zone 1";
     } else if (distance > 1500) {
       dynamicCost = 100;
+      runnerReward = 70;
       zoneText = "Zone 3";
     }
   }
@@ -54,6 +57,7 @@ export const usePostModal = (initialType, onClose) => {
     isUrgent,
     setIsUrgent,
     dynamicCost,
+    runnerReward,
     zoneText,
     handleSubmit,
     userProfile

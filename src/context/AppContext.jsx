@@ -256,8 +256,13 @@ export const AppProvider = ({ children }) => {
       }
       const userRef = doc(db, 'users', currentUser.uid);
       const postRef = doc(collection(db, 'posts'));
-
       let computedCost = 0;
+      
+      const freshStats = await getUserStats(currentUser.uid);
+      const completedRuns = (freshStats.tasksCompleted || 0) + (freshStats.requestsCompleted || 0);
+      const totalRuns = completedRuns + (freshStats.cancelled || 0);
+      const reliabilityScore = totalRuns === 0 ? 100 : Math.round((completedRuns / totalRuns) * 100);
+
       await runTransaction(db, async (transaction) => {
         const userSnap = await transaction.get(userRef);
         if (!userSnap.exists()) throw new Error("User does not exist");
@@ -291,11 +296,7 @@ export const AppProvider = ({ children }) => {
           transaction.update(userRef, { gcBalance: newBalance, stats: newStats });
         }
         
-        const s = userData.stats || {};
-        const completedRuns = (s.tasksCompleted || 0) + (s.requestsCompleted || 0);
-        const totalRuns = completedRuns + (s.cancelled || 0);
-        const reliabilityScore = totalRuns === 0 ? 100 : Math.round((completedRuns / totalRuns) * 100);
-        
+
         transaction.set(postRef, {
           ...postData,
           cost: dynamicCost,
@@ -350,7 +351,7 @@ export const AppProvider = ({ children }) => {
              const userData = userSnap.data();
              let currentBalance = userData.gcBalance || 0;
              let overflowBalance = userData.overflowBalance || 0;
-             const refundAmount = postData.cost || 75;
+             const refundAmount = postData.cost || 50;
              
              actualRefund = refundAmount; // Pass total refund amount
              let projectedBalance = currentBalance + refundAmount;
@@ -444,7 +445,7 @@ export const AppProvider = ({ children }) => {
         if (postData.status !== 'open') throw new Error("Post is no longer open.");
         
         originalRequesterId = postData.requesterId;
-        postCost = postData.cost || 75;
+        postCost = postData.cost || 50;
         
         runnerId = postType === 'request' ? currentUser.uid : originalRequesterId;
         requesterId = postType === 'offer' ? currentUser.uid : originalRequesterId;
@@ -774,7 +775,7 @@ export const AppProvider = ({ children }) => {
                  const userData = reqSnap.data();
                  let currentBalance = userData.gcBalance || 0;
                  let overflowBalance = userData.overflowBalance || 0;
-                 const refundAmount = postData.cost || 75;
+                 const refundAmount = postData.cost || 50;
                  
                  if (currentUser.uid === journeyData.requesterId) {
                     actualRefund = refundAmount;
@@ -1028,7 +1029,7 @@ export const AppProvider = ({ children }) => {
       if (!snap.exists()) return null;
       
       const data = snap.data();
-      const s = data.stats || {};
+      const s = await getUserStats(targetUid);
       const completedRuns = (s.tasksCompleted || 0) + (s.requestsCompleted || 0);
       const totalRuns = completedRuns + (s.cancelled || 0);
       const reliabilityScore = totalRuns === 0 ? 100 : Math.round((completedRuns / totalRuns) * 100);

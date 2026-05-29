@@ -33,20 +33,48 @@ const Profile = () => {
   } = useProfile();
 
   return (
-    <main className="max-w-screen-xl mx-auto px-6 py-12 md:py-16">
-      <header className="mb-12">
-        <h1 className="text-[2.5rem] leading-tight font-bold text-on-surface tracking-tight mb-2 font-headline">Your Profile</h1>
-        <p className="text-on-surface-variant font-body">Manage your preferences and view your reliability metrics.</p>
+    <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-surface-container-low text-on-surface">
+      {/* Header */}
+      <header className="flex items-end justify-between border-b-border-width border-on-surface pb-stack-sm mb-4">
+        <div>
+          <h1 className="font-headline-xl text-headline-lg-mobile md:text-headline-xl font-black uppercase tracking-tighter text-on-surface">Economy Vault</h1>
+          <p className="font-body-lg text-body-lg text-on-surface-variant mt-2 border-l-border-width border-on-surface pl-stack-sm">
+            Manage your credentials, preferences, and claim earnings.
+          </p>
+        </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Column: Stats & Reliability */}
-        <section className="lg:col-span-5 space-y-6">
-          <div className="bg-surface-container-lowest p-8 rounded-xl flex flex-col items-center justify-center text-center" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
-            <div className="relative w-32 h-32 mb-6">
+      {/* Main Content Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        {/* Left Column: Wallet, Reserve, Preferences */}
+        <section className="lg:col-span-5 flex flex-col gap-stack-md">
+          {/* Main Wallet Cap display */}
+          <div className="bg-surface-container-lowest border-border-width border-on-surface neo-shadow p-stack-lg relative overflow-hidden group">
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div className="relative z-10 text-center">
+              <div className="font-label-mono text-body-md uppercase mb-2 tracking-widest text-on-surface-variant">GITY Coins (GC) Available</div>
+              <div className="font-headline-xl text-[48px] md:text-[64px] leading-none font-black flex items-center justify-center gap-4 text-on-surface">
+                {userProfile?.gcBalance || 0} <span className="text-[24px] text-surface-tint">/ 500</span>
+              </div>
+              <div className="mt-stack-md flex justify-center">
+                <div className="w-full max-w-md h-6 border-2 border-on-surface bg-surface-container-highest rounded-none overflow-hidden neo-shadow relative">
+                  <div 
+                    style={{ width: `${Math.min(100, ((userProfile?.gcBalance || 0) / 500) * 100)}%` }} 
+                    className="absolute top-0 left-0 h-full bg-primary-container border-r-2 border-on-surface flex items-center justify-end px-2"
+                  >
+                    <span className="font-label-mono text-[10px] font-bold text-on-surface">
+                      {Math.round(Math.min(100, ((userProfile?.gcBalance || 0) / 500) * 100))}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Reliability Chart */}
+          <div className="bg-surface-container-lowest p-6 border-border-width border-on-surface neo-shadow flex flex-col items-center justify-center text-center">
+            <div className="relative w-28 h-28 mb-4">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                {/* Background circle */}
                 <circle 
                   cx="50" cy="50" r="36" 
                   fill="transparent" 
@@ -54,129 +82,126 @@ const Profile = () => {
                   strokeWidth="8" 
                   className="text-surface-variant" 
                 />
-                {/* Progress circle */}
                 <circle 
                   cx="50" cy="50" r="36" 
                   fill="transparent" 
                   stroke="currentColor" 
                   strokeWidth="8" 
                   strokeLinecap="round"
-                  className={reliabilityScore >= 80 ? 'text-tertiary-container' : reliabilityScore >= 50 ? 'text-[#ffc5aa]' : 'text-error'}
+                  className={reliabilityScore >= 80 ? 'text-secondary' : reliabilityScore >= 50 ? 'text-primary' : 'text-error'}
                   strokeDasharray={circumference}
                   strokeDashoffset={isLoadingStats ? circumference : strokeDashoffset}
                   style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-black font-headline text-on-surface">
-                  {isLoadingStats ? '-' : reliabilityScore}
+                <span className="text-2xl font-black font-headline text-on-surface">
+                  {isLoadingStats ? '-' : reliabilityScore}%
                 </span>
-                <span className="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Score</span>
+                <span className="text-[9px] uppercase font-bold text-on-surface-variant tracking-wider">Score</span>
               </div>
             </div>
             
-            <h2 className="text-2xl font-bold font-headline text-on-surface mb-2">Reliability Score</h2>
-            <p className="text-sm text-on-surface-variant max-w-xs mb-6">
-              Your score is based on completed deliveries vs. cancellations. A high score builds trust within the GITY network.
+            <h2 className="text-xl font-bold font-headline text-on-surface mb-1">Reliability Index</h2>
+            <p className="text-xs text-on-surface-variant max-w-xs mb-4">
+              Determined by your completion rate. High ratings unlock quests and rewards.
             </p>
 
-            <div className="flex gap-3 w-full">
-              <div className="flex-1 bg-surface-container p-3 rounded-xl text-center">
-                <p className="text-[9px] uppercase font-bold text-on-surface-variant tracking-wider mb-1">Total Requests</p>
-                <p className="text-lg font-bold text-on-surface font-headline">{isLoadingStats ? '-' : stats.requestsCompleted}</p>
+            <div className="grid grid-cols-3 gap-2 w-full">
+              <div className="bg-surface-container p-2 border border-on-surface text-center">
+                <p className="text-[8px] uppercase font-bold text-on-surface-variant tracking-wider">Requests</p>
+                <p className="text-md font-bold text-on-surface font-headline">{isLoadingStats ? '-' : stats.requestsCompleted}</p>
               </div>
-              <div className="flex-1 bg-surface-container p-3 rounded-xl text-center">
-                <p className="text-[9px] uppercase font-bold text-on-surface-variant tracking-wider mb-1">Total Tasks</p>
-                <p className="text-lg font-bold text-on-surface font-headline">{isLoadingStats ? '-' : stats.tasksCompleted}</p>
+              <div className="bg-surface-container p-2 border border-on-surface text-center">
+                <p className="text-[8px] uppercase font-bold text-on-surface-variant tracking-wider">Tasks</p>
+                <p className="text-md font-bold text-on-surface font-headline">{isLoadingStats ? '-' : stats.tasksCompleted}</p>
               </div>
-              <div className="flex-1 bg-surface-container p-3 rounded-xl text-center">
-                <p className="text-[9px] uppercase font-bold text-error tracking-wider mb-1">Cancelled</p>
-                <p className="text-lg font-bold text-error font-headline">{isLoadingStats ? '-' : stats.cancelled}</p>
+              <div className="bg-surface-container p-2 border border-on-surface text-center">
+                <p className="text-[8px] uppercase font-bold text-error tracking-wider">Cancelled</p>
+                <p className="text-md font-bold text-error font-headline">{isLoadingStats ? '-' : stats.cancelled}</p>
               </div>
             </div>
           </div>
-          
+
+          {/* Reserve Bank / Overflow Tank */}
           {userProfile?.overflowBalance > 0 && (
-            <div className="bg-[#fff9c4] p-8 rounded-xl flex flex-col" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-on-surface text-3xl">account_balance</span>
-                <h2 className="text-2xl font-bold font-headline text-on-surface">Reserve Bank</h2>
-              </div>
-              <p className="text-sm font-bold text-on-surface-variant mb-6">
-                Your wallet exceeded the 500 GC cap. Your extra payouts are stored here.
-              </p>
-              
-              <div className="flex items-center justify-between bg-[#fff] p-4 rounded-xl border-2 border-black mb-6">
-                <span className="font-bold uppercase tracking-wider text-xs">Overflow Balance</span>
-                <span className="font-black text-xl">{userProfile.overflowBalance} GC</span>
-              </div>
-              
-              <div className="flex gap-2">
-                <input 
-                  type="number" 
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                  placeholder="Amount"
-                  max={userProfile.overflowBalance}
-                  className="flex-1 px-4 py-3 border-2 border-black rounded-xl font-bold focus:outline-none"
-                  disabled={userProfile.gcBalance >= 500}
-                />
-                <button 
-                  onClick={async () => {
-                    try {
-                      setIsWithdrawing(true);
-                      await withdrawFromOverflow(withdrawAmount);
-                      setWithdrawAmount('');
-                    } catch (e) {
-                      // context handles toast
-                    } finally {
-                      setIsWithdrawing(false);
-                    }
-                  }}
-                  disabled={userProfile.gcBalance >= 500 || isWithdrawing || !withdrawAmount || parseInt(withdrawAmount) <= 0 || parseInt(withdrawAmount) > userProfile.overflowBalance || userProfile.gcBalance + parseInt(withdrawAmount) > 500}
-                  className="bg-black text-white font-bold px-6 py-3 rounded-xl hover:-translate-y-1 active:translate-y-0 transition-transform shadow-[4px_4px_0px_#9795ff] disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none"
-                >
-                  {isWithdrawing ? '...' : 'Withdraw'}
-                </button>
-              </div>
-              {userProfile.gcBalance >= 500 && (
-                <p className="text-error text-xs font-bold mt-3 text-center">
-                  Main wallet maxed out. Spend GC to withdraw.
+            <div className="bg-primary-container p-6 border-border-width border-on-surface neo-shadow flex flex-col relative overflow-hidden">
+              <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(45deg,#000,#000_10px,transparent_10px,transparent_20px)] pointer-events-none"></div>
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined text-on-surface text-2xl">account_balance</span>
+                  <h2 className="text-lg font-bold font-headline text-on-surface uppercase">Reserve Vault</h2>
+                </div>
+                <p className="text-xs font-bold text-on-surface-variant mb-4">
+                  Credits exceeded the 500 GC maximum limits. Held securely here.
                 </p>
-              )}
-              {userProfile.gcBalance < 500 && parseInt(withdrawAmount) > 0 && (userProfile.gcBalance + parseInt(withdrawAmount) > 500) && (
-                <p className="text-error text-xs font-bold mt-3 text-center">
-                  Cannot withdraw {withdrawAmount} GC. Wallet would exceed 500 GC.
-                </p>
-              )}
+                
+                <div className="flex items-center justify-between bg-surface-container-lowest p-3 border-2 border-on-surface mb-4">
+                  <span className="font-bold uppercase tracking-wider text-[10px]">Reserve Balance</span>
+                  <span className="font-black text-lg">{userProfile.overflowBalance} GC</span>
+                </div>
+                
+                <div className="flex gap-2">
+                  <input 
+                    type="number" 
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    placeholder="Amount"
+                    max={userProfile.overflowBalance}
+                    className="flex-grow px-3 py-2 border-2 border-on-surface bg-surface-container-lowest font-bold focus:outline-none text-sm"
+                    disabled={userProfile.gcBalance >= 500}
+                  />
+                  <button 
+                    onClick={async () => {
+                      try {
+                        setIsWithdrawing(true);
+                        await withdrawFromOverflow(withdrawAmount);
+                        setWithdrawAmount('');
+                      } catch (e) {
+                        // handled by context toast
+                      } finally {
+                        setIsWithdrawing(false);
+                      }
+                    }}
+                    disabled={userProfile.gcBalance >= 500 || isWithdrawing || !withdrawAmount || parseInt(withdrawAmount) <= 0 || parseInt(withdrawAmount) > userProfile.overflowBalance || userProfile.gcBalance + parseInt(withdrawAmount) > 500}
+                    className="bg-surface-container-lowest text-on-surface border-2 border-on-surface font-bold px-4 py-2 hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:pointer-events-none uppercase text-xs shadow-[2px_2px_0px_0px_#000000]"
+                  >
+                    {isWithdrawing ? '...' : 'Withdraw'}
+                  </button>
+                </div>
+                {userProfile.gcBalance >= 500 && (
+                  <p className="text-error text-[10px] font-bold mt-2 text-center">
+                    Wallet full. Spend GC to withdraw.
+                  </p>
+                )}
+              </div>
             </div>
           )}
-          
 
-          <div className="bg-surface-container-lowest p-8 rounded-xl" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
-            <h2 className="text-xl font-bold text-on-surface font-headline mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">settings</span>
-              Preferences
+          {/* Preferences Settings */}
+          <div className="bg-surface-container-lowest p-6 border-border-width border-on-surface neo-shadow">
+            <h2 className="text-lg font-bold text-on-surface font-headline mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary">settings</span> Preferences
             </h2>
-            <form onSubmit={handleSave} className="space-y-5">
+            <form onSubmit={handleSave} className="space-y-4">
               <div>
-                <label className="block text-label-sm font-bold text-on-surface mb-2 uppercase tracking-wide">Full Name</label>
+                <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-wide">Full Name</label>
                 <input 
                   type="text" 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Alex Johnson"
+                  placeholder="Scholar Name"
                   required
-                  className="w-full bg-surface-container-lowest hover:bg-surface-container-highest transition-colors text-on-surface rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full bg-surface-container-lowest border-2 border-on-surface px-3 py-2 text-sm focus:outline-none focus:bg-primary-container transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-label-sm font-bold text-on-surface mb-2 uppercase tracking-wide">Location / Dorm</label>
+                <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-wide">Location / Dorm</label>
                 <select 
                   value={dorm} 
                   onChange={(e) => setDorm(e.target.value)}
-                  className="w-full bg-surface-container-lowest hover:bg-surface-container-highest transition-colors text-on-surface rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full bg-surface-container-lowest border-2 border-on-surface px-3 py-2 text-sm focus:outline-none focus:bg-primary-container transition-all"
                 >
                   <option disabled value="">Select Core Landmark</option>
                   <option value="Main Gate">Main Gate</option>
@@ -192,37 +217,33 @@ const Profile = () => {
                 <button 
                   type="submit" 
                   disabled={saving}
-                  className="w-full py-3 rounded-xl bg-primary text-white font-bold text-sm tracking-wide shadow-md hover:bg-primary-dim transition-all active:scale-[0.98]"
+                  className="w-full py-3 bg-primary-container hover:bg-primary-fixed-dim text-on-surface border-2 border-on-surface shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase tracking-wider text-xs transition-all disabled:opacity-50"
                 >
-                  {saving ? 'Saving...' : 'Save Changes'}
+                  {saving ? 'Saving...' : 'Save Preferences'}
                 </button>
               </div>
               
-              {saved && <p className="text-sm font-bold text-tertiary text-center animate-pulse">Changes saved successfully!</p>}
+              {saved && <p className="text-xs font-bold text-secondary text-center animate-pulse">Changes saved successfully!</p>}
             </form>
           </div>
         </section>
 
         {/* Right Column: Quest Board */}
         <section className="lg:col-span-7">
-          <div className="bg-[#fff] p-8 rounded-xl min-h-full" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl font-bold text-[#000] font-headline flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">local_fire_department</span>
-                  Available Quests
-                </h2>
-                <p className="text-sm font-bold text-[#666] mt-1">Complete tasks to earn GC and build your reputation.</p>
-              </div>
+          <div className="bg-surface-container-lowest p-6 border-border-width border-on-surface neo-shadow min-h-full">
+            <div className="flex flex-col mb-6">
+              <h2 className="text-xl font-bold text-on-surface font-headline flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">local_fire_department</span>
+                Available Quests
+              </h2>
+              <p className="text-xs font-bold text-on-surface-variant mt-1">Complete tasks to earn GC and build reputation.</p>
             </div>
 
-            <div className="space-y-6">
-              
+            <div className="space-y-4">
               {(() => {
                 const questState = userProfile?.questState || {};
                 const runs = stats.tasksCompleted || 0;
                 
-                // Helper to count weekend warrior (runs this week)
                 const getWeekStr = (d) => {
                   const date = new Date(d.getTime());
                   date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
@@ -231,9 +252,9 @@ const Profile = () => {
                   return `${date.getUTCFullYear()}-W${weekNo}`;
                 };
                 const currentWeekStr = getWeekStr(new Date());
-                const isWeekendWarriorDone = stats.pastRuns?.filter(r => r.status === 'Completed' && r.createdAt && getWeekStr(new Date(r.createdAt.seconds * 1000)) === currentWeekStr).length >= 5;
                 const weeklyCount = stats.pastRuns?.filter(r => r.status === 'Completed' && r.createdAt && getWeekStr(new Date(r.createdAt.seconds * 1000)) === currentWeekStr).length || 0;
-                
+                const isWeekendWarriorDone = weeklyCount >= 5;
+
                 const QuestCard = ({ id, title, desc, reward, completed, progress, total, icon, bg, accent, onClick }) => {
                   const isClaimed = questState[id] === 'claimed';
                   const isCompletedUnclaimed = !isClaimed && (completed || (progress !== undefined && progress >= total));
@@ -257,78 +278,71 @@ const Profile = () => {
                   };
 
                   return (
-                    <div className={`p-4 rounded-xl flex flex-col justify-center transition-all mb-4 ${isCompletedUnclaimed || onClick ? 'cursor-pointer hover:opacity-90 hover:scale-[1.01]' : ''}`} onClick={handleAction} style={{ border: '2px solid #000', boxShadow: isClaimed ? 'none' : '4px 4px 0px #000', background: isClaimed ? '#e0e0e0' : (isCompletedUnclaimed ? '#e8f5e9' : bg) }}>
+                    <div 
+                      className={`p-4 border-2 border-on-surface flex flex-col justify-center transition-all mb-4 relative overflow-hidden ${isCompletedUnclaimed || onClick ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000000]' : ''}`}
+                      onClick={handleAction}
+                      style={{ 
+                        boxShadow: isClaimed ? 'none' : '4px 4px 0px 0px #000000', 
+                        background: isClaimed ? '#e2e2e2' : (isCompletedUnclaimed ? '#d4f5d4' : bg) 
+                      }}
+                    >
+                      {isClaimed && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                          <div className="border-4 border-on-surface px-4 py-1 font-headline-xl text-headline-md font-black uppercase text-on-surface transform -rotate-12 bg-surface-container-lowest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            CLAIMED
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-4">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 border-black ${isClaimed ? 'bg-[#bdbdbd]' : 'bg-[#fff]'}`}>
-                            <span className={`material-symbols-outlined ${isClaimed ? 'text-[#000]' : ''}`} style={{ color: isClaimed ? '#000' : accent }}>{icon}</span>
+                          <div className="w-10 h-10 border-2 border-on-surface bg-surface-container-lowest flex items-center justify-center flex-shrink-0">
+                            <span className="material-symbols-outlined" style={{ color: isClaimed ? '#888' : accent }}>{icon}</span>
                           </div>
                           <div>
-                            <h4 className={`font-bold text-sm ${isClaimed ? 'line-through text-[#666]' : ''}`}>{title}</h4>
-                            <p className="text-xs font-bold text-[#666]">{desc}</p>
+                            <h4 className={`font-bold text-sm text-on-surface ${isClaimed ? 'line-through text-on-surface-variant' : ''}`}>{title}</h4>
+                            <p className="text-xs font-bold text-on-surface-variant">{desc}</p>
                           </div>
                         </div>
                         <div className="text-right flex flex-col items-end justify-center">
-                          {isClaimed ? (
-                            <span className="font-black text-[#000] uppercase bg-[#bdbdbd] px-2 py-1 rounded text-[10px]" style={{ border: '2px solid #000' }}>Claimed</span>
-                          ) : isCompletedUnclaimed ? (
-                            <button className="font-black text-[#000] uppercase bg-[#aed581] px-3 py-1 rounded shadow-sm hover:bg-[#8bc34a] transition-colors text-xs" style={{ border: '2px solid #000', boxShadow: '2px 2px 0px #000' }}>
+                          {isClaimed ? null : isCompletedUnclaimed ? (
+                            <button className="font-black text-on-surface uppercase bg-primary-container px-3 py-1 border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000] text-xs">
                               Claim {reward} GC
                             </button>
                           ) : (
-                            <span className="font-black" style={{ color: accent }}>{reward} GC</span>
+                            <span className="font-black font-label-mono text-xs" style={{ color: accent }}>{reward} GC</span>
                           )}
                         </div>
                       </div>
+
                       {isInProgress && progress !== undefined && (
                         <div className="w-full flex items-center gap-3 mt-2">
-                          <div className="flex-1 h-4 bg-[#fff] relative" style={{ border: '2px solid #000' }}>
-                            <div className="absolute top-0 left-0 h-full" style={{ background: accent, width: `${percent}%`, borderRight: percent > 0 && percent < 100 ? '2px solid #000' : 'none' }}></div>
+                          <div className="flex-1 h-3 bg-surface-container-lowest border-2 border-on-surface relative overflow-hidden">
+                            <div className="absolute top-0 left-0 h-full" style={{ background: accent, width: `${percent}%` }}></div>
                           </div>
-                          <span className="text-xs font-bold text-[#000] w-10 text-right">{progress}/{total}</span>
+                          <span className="text-xs font-bold text-on-surface w-10 text-right">{progress}/{total}</span>
                         </div>
                       )}
                     </div>
                   );
                 };
 
-
-                
                 const TabButton = ({ id, label }) => {
                   const isActive = activeTab === id;
                   return (
                     <button
                       onClick={() => setActiveTab(id)}
-                      className={`flex-1 py-2 text-center font-bold uppercase tracking-widest text-sm transition-all ${isActive ? 'bg-[#e0e0e0] translate-y-[2px] translate-x-[2px]' : 'bg-[#fff] hover:bg-[#f5f5f5]'}`}
-                      style={{ border: '2px solid #000', boxShadow: isActive ? 'none' : '4px 4px 0px #000' }}
+                      className={`flex-1 py-2 text-center font-bold uppercase tracking-widest text-[11px] transition-all border-2 border-on-surface ${isActive ? 'bg-primary-container text-on-surface shadow-none translate-x-[2px] translate-y-[2px]' : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low shadow-[3px_3px_0px_0px_#000000]'}`}
                     >
                       {label}
                     </button>
                   );
                 };
 
-                const getDailyTimeLeft = () => {
-                  const now = new Date();
-                  const midnight = new Date(now);
-                  midnight.setHours(24, 0, 0, 0);
-                  const diffMs = midnight - now;
-                  const h = Math.floor(diffMs / (1000 * 60 * 60));
-                  const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                  return `${h}h ${m}m`;
-                };
-
-                const getWeeklyTimeLeft = () => {
-                  const now = new Date();
-                  const day = now.getDay();
-                  const daysLeft = day === 0 ? 0 : 7 - day;
-                  if (daysLeft === 0) return getDailyTimeLeft();
-                  return `${daysLeft} days`;
-                };
-
                 return (
                   <>
                     {/* Tab Navigation */}
-                    <div className="flex gap-4 mb-6">
+                    <div className="flex gap-2 mb-6">
                       <TabButton id="daily" label="Daily" />
                       <TabButton id="weekly" label="Weekly" />
                       <TabButton id="milestones" label="Milestones" />
@@ -337,48 +351,48 @@ const Profile = () => {
                     {activeTab === 'daily' && (
                       <div>
                         <div className="flex justify-between items-center mb-3">
-                          <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">Daily Quests</h3>
-                          <span className="text-xs font-bold text-[#d32f2f] bg-[#ffebee] px-2 py-1 rounded" style={{ border: '2px solid #d32f2f' }}>
-                            Resets in {getDailyTimeLeft()}
+                          <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface">Daily Quests</h3>
+                          <span className="text-[10px] font-bold text-error bg-error-container px-2 py-0.5 border border-error uppercase">
+                            Resets in {dailyTimeLeft || getDailyTimeLeft()}
                           </span>
                         </div>
-                        <QuestCard id="daily" title="The Daily Warmup" desc="Complete 1 delivery today." reward="10" icon="directions_run" bg="#fffdf5" accent="#e65100" completed={questState.daily} progress={questState.daily ? 1 : 0} total={1} />
-                        <QuestCard id="sprinter" title="The Sprinter" desc="Complete a run in < 15 minutes." reward="30" icon="timer" bg="#ede7f6" accent="#4527a0" completed={questState.sprinter} />
-                        <QuestCard id="rescuer" title="The Rescuer" desc="Accept a request sitting for > 25 minutes." reward="20" icon="healing" bg="#ffebee" accent="#c62828" completed={questState.rescuer} />
-                        <QuestCard id="lastorder" title="The Last Order" desc="Complete a delivery requested between 6:30 PM - 7:00 PM." reward="15" icon="dark_mode" bg="#e0f7fa" accent="#006064" completed={questState.lastorder} />
+                        <QuestCard id="daily" title="The Daily Warmup" desc="Complete 1 delivery today." reward="10" icon="directions_run" bg="#fffdf5" accent="#626200" completed={questState.daily} progress={questState.daily ? 1 : 0} total={1} />
+                        <QuestCard id="sprinter" title="The Sprinter" desc="Complete a run in < 15 minutes." reward="30" icon="timer" bg="#fdf5ff" accent="#626200" completed={questState.sprinter} />
+                        <QuestCard id="rescuer" title="The Rescuer" desc="Accept a request sitting for > 25 minutes." reward="20" icon="healing" bg="#fff5f5" accent="#ba1a1a" completed={questState.rescuer} />
+                        <QuestCard id="lastorder" title="The Last Order" desc="Complete a delivery requested between 6:30 PM - 7:00 PM." reward="15" icon="dark_mode" bg="#f5faff" accent="#006e20" completed={questState.lastorder} />
                       </div>
                     )}
 
                     {activeTab === 'weekly' && (
                       <div>
                         <div className="flex justify-between items-center mb-3">
-                          <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">Weekly Quests</h3>
-                          <span className="text-xs font-bold text-[#1976d2] bg-[#e3f2fd] px-2 py-1 rounded" style={{ border: '2px solid #1976d2' }}>
-                            Ends in {getWeeklyTimeLeft()}
+                          <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface">Weekly Quests</h3>
+                          <span className="text-[10px] font-bold text-secondary bg-secondary-container px-2 py-0.5 border border-secondary uppercase">
+                            Ends in {weeklyTimeLeft || getWeeklyTimeLeft()}
                           </span>
                         </div>
-                        <QuestCard id="weekendWarrior" title="Weekend Warrior" desc="Complete 5 deliveries this week." reward="50" icon="workspace_premium" bg="#f5faff" accent="#0d47a1" completed={isWeekendWarriorDone} progress={weeklyCount} total={5} />
-                        <QuestCard id="ironStreak" title="The Iron Streak" desc="Hit 5 concurrent weekly active streaks." reward="50" icon="local_fire_department" bg="#fff3e0" accent="#e65100" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
+                        <QuestCard id="weekendWarrior" title="Weekend Warrior" desc="Complete 5 deliveries this week." reward="50" icon="workspace_premium" bg="#f5fffa" accent="#006e20" completed={isWeekendWarriorDone} progress={weeklyCount} total={5} />
+                        <QuestCard id="ironStreak" title="The Iron Streak" desc="Hit 5 concurrent weekly active streaks." reward="50" icon="local_fire_department" bg="#fff9f5" accent="#c00100" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
                       </div>
                     )}
 
                     {activeTab === 'milestones' && (
                       <div>
-                        <div className="flex justify-between items-center mb-3">
-                          <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">Onboarding</h3>
+                        <div className="flex justify-between items-center mb-2">
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Onboarding</h3>
                         </div>
-                        <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="50" icon="sports_martial_arts" bg="#fff8e1" accent="#ff8f00" completed={questState.icebreaker} progress={runs} total={1} />
-                        <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture" reward="30" icon="verified_user" bg="#e8f5e9" accent="#2e7d32" completed={questState.trustFall} />
-                        <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile" reward="40" icon="share" bg="#e3f2fd" accent="#1565c0" completed={questState.ambassador} />
-                        <QuestCard id="wingman" title="The Wingman" desc="Refer a friend who completes a run." reward="25" icon="handshake" bg="#fce4ec" accent="#c2185b" completed={questState.wingman} progress={0} total={1} />
+                        <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="50" icon="sports_martial_arts" bg="#fffdf5" accent="#626200" completed={questState.icebreaker} progress={runs} total={1} />
+                        <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture" reward="30" icon="verified_user" bg="#f5fffa" accent="#006e20" completed={questState.trustFall} />
+                        <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile" reward="40" icon="share" bg="#f5faff" accent="#006e20" completed={questState.ambassador} />
+                        <QuestCard id="wingman" title="The Wingman" desc="Refer a friend who completes a run." reward="25" icon="handshake" bg="#fff5fa" accent="#ba1a1a" completed={questState.wingman} progress={0} total={1} />
                         
-                        <div className="flex justify-between items-center mb-3 pt-4">
-                          <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">Milestones</h3>
+                        <div className="flex justify-between items-center mb-2 pt-4 border-t-2 border-dashed border-on-surface">
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Milestones</h3>
                         </div>
-                        <QuestCard id="milestone25" title="25 Deliveries" desc="Milestone reward" reward="50" icon="military_tech" bg="#fff0f5" accent="#880e4f" completed={questState.milestone25} progress={runs} total={25} />
-                        <QuestCard id="milestone50" title="50 Deliveries" desc="Milestone reward" reward="100" icon="workspace_premium" bg="#fff0f5" accent="#880e4f" completed={questState.milestone50} progress={runs} total={50} />
-                        <QuestCard id="milestone75" title="75 Deliveries" desc="Milestone reward" reward="150" icon="diamond" bg="#fff0f5" accent="#880e4f" completed={questState.milestone75} progress={runs} total={75} />
-                        <QuestCard id="milestone100" title="The Centurion" desc="100 Lifetime Deliveries" reward="200" icon="stars" bg="#fff0f5" accent="#880e4f" completed={questState.milestone100} progress={runs} total={100} />
+                        <QuestCard id="milestone25" title="25 Deliveries" desc="Milestone reward" reward="50" icon="military_tech" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone25} progress={runs} total={25} />
+                        <QuestCard id="milestone50" title="50 Deliveries" desc="Milestone reward" reward="100" icon="workspace_premium" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone50} progress={runs} total={50} />
+                        <QuestCard id="milestone75" title="75 Deliveries" desc="Milestone reward" reward="150" icon="diamond" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone75} progress={runs} total={75} />
+                        <QuestCard id="milestone100" title="The Centurion" desc="100 Lifetime Deliveries" reward="200" icon="stars" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone100} progress={runs} total={100} />
                       </div>
                     )}
                   </>
@@ -396,6 +410,25 @@ const Profile = () => {
       />
     </main>
   );
+};
+
+// Helper fallback generators for resets
+const getDailyTimeLeft = () => {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const diffMs = midnight - now;
+  const h = Math.floor(diffMs / (1000 * 60 * 60));
+  const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  return `${h}h ${m}m`;
+};
+
+const getWeeklyTimeLeft = () => {
+  const now = new Date();
+  const day = now.getDay();
+  const daysLeft = day === 0 ? 0 : 7 - day;
+  if (daysLeft === 0) return getDailyTimeLeft();
+  return `${daysLeft} days`;
 };
 
 export default Profile;

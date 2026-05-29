@@ -85,9 +85,9 @@ const SharedLayout = () => {
 
   // Route wrapper that provides Navigation and handles PostModal
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--background)' }}>
+    <div className="min-h-screen bg-surface-container-low text-on-surface flex flex-col md:flex-row">
       <Sidebar onOpenPostModal={() => openModal('request')} />
-      <div>
+      <div className="flex-1 md:ml-64 min-h-screen">
         <Outlet context={{ openModal }} />
       </div>
       {isModalOpen && <PostModal initialType={modalType} onClose={() => setIsModalOpen(false)} />}

@@ -2,7 +2,6 @@ import React from 'react';
 import PublicProfileModal from './PublicProfileModal';
 import ConfirmModal from './ConfirmModal';
 import { useDashboard } from '../hooks/useDashboard';
-import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
   const {
@@ -21,202 +20,215 @@ const Dashboard = () => {
   } = useDashboard();
 
   return (
-    <main className={styles.mainFeed}>
-      {/* Hero Editorial Section */}
-      <header className={styles.heroHeader}>
-        <h1 className={styles.heroTitle}>
-          The Campus <br/><span style={{ color: 'var(--primary)' }}>Micro-Logistics</span> Exchange.
-        </h1>
-        <p className={styles.heroSubtitle}>
-          Broadcast your needs or share your route. A peer-to-peer network built for the speed of campus life.
-        </p>
-      </header>
+    <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-surface-container-low">
+      {/* Header Section */}
+      <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-stack-md border-b-border-width border-on-surface pb-stack-sm">
+        <div>
+          <h1 className="font-headline-xl text-headline-lg-mobile md:text-headline-xl font-black uppercase tracking-tighter text-on-surface">Marketplace</h1>
+          <p className="font-body-lg text-body-lg text-on-surface-variant mt-2 border-l-border-width border-on-surface pl-stack-sm">
+            The peer-to-peer micro-logistics exchange for campus life.
+          </p>
+        </div>
+      </section>
 
       {/* Split-Feed Architecture */}
-      <div className={styles.gridManager}>
-        {/* Left Column: Demand (Need a Pickup) */}
-        <section className={styles.demandColumn}>
-          <div className={styles.demandHeader}>
-            <div>
-              <span className={styles.taglineDemand}>Demand</span>
-              <h2 className={styles.columnTitle}>Need a Pickup</h2>
-            </div>
-            <button className={styles.postRequestBtn} onClick={() => openModal('request')}>
-              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add_circle</span>
-              Post Request
-            </button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+        {/* Left Column: Need a Pickup */}
+        <section className="flex flex-col gap-stack-md">
+          <div className="flex justify-between items-center bg-primary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] rotate-[-1deg]">
+            <h2 className="font-headline-lg text-headline-md font-black uppercase tracking-tight">Need a Pickup</h2>
+            <span className="font-label-mono text-label-tag bg-surface-container-lowest border-2 border-on-surface px-2 py-0.5">{pickups.length} ACTIVE</span>
           </div>
-          
-          <div className={styles.feedList}>
-            {pickups.length === 0 && <p className={styles.empty}>No current requests.</p>}
+
+          <div className="flex flex-col gap-stack-md mt-2">
             {pickups.map(post => (
-              <div key={post.id} className={styles.postCard}>
-                <div className={styles.cardTop}>
-                  <div className={styles.userMeta}>
-                    <div className={styles.avatar}>
+              <article 
+                key={post.id} 
+                className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000]"
+              >
+                {post.isUrgent && (
+                  <div className="absolute -top-3 -left-3 bg-tertiary text-on-error border-border-width border-on-surface px-stack-sm py-1 font-label-mono text-label-tag font-black z-20 shadow-[4px_4px_0px_0px_#000000] rotate-3">
+                    URGENT
+                  </div>
+                )}
+                
+                <div className="absolute top-stack-sm right-stack-sm bg-surface-variant border-2 border-on-surface px-2 py-0.5 font-label-tag text-label-tag z-10">
+                  {getTimeAgo(post.createdAt)}
+                </div>
+
+                <div className="p-stack-md flex-1 flex flex-col gap-stack-md border-b-border-width border-on-surface">
+                  <div className="flex items-center gap-stack-sm pr-24">
+                    <div className="w-10 h-10 border-border-width border-on-surface bg-secondary-container flex items-center justify-center font-headline-md font-bold uppercase text-on-surface flex-shrink-0">
                       {post.requesterName[0].toUpperCase()}
                     </div>
-                    <div className={styles.nameBlock}>
-                      <h3 style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div className="min-w-0">
+                      <div className="font-headline-md text-body-lg font-bold leading-tight truncate">
                         <span 
                           onClick={() => setProfileTargetUid(post.requesterId)}
-                          style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: 900 }}
+                          className="cursor-pointer underline hover:text-primary transition-colors"
                         >
                           {post.requesterName}
                         </span>
-                        {post.requesterScore && (
-                          <span title={`Reliability Score: ${post.requesterScore}`} style={{ fontSize: '0.75rem', backgroundColor: '#e3f2fd', color: '#1976d2', padding: '2px 6px', borderRadius: '12px', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>verified</span>
-                            {post.requesterScore}%
-                          </span>
-                        )}
-                      </h3>
-                      <p className={styles.timeLabel}>{getTimeAgo(post.createdAt)}</p>
+                      </div>
+                      {post.requesterScore && (
+                        <div className="inline-flex items-center gap-1 bg-surface-container-highest border-2 border-on-surface px-1 font-label-tag text-label-tag mt-1">
+                          <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span> {post.requesterScore}% Reliability
+                        </div>
+                      )}
                     </div>
                   </div>
-                  {post.isUrgent && <span className={styles.urgentBadge}>Urgent</span>}
-                </div>
 
-                <div className={styles.routeBlock}>
-                  <div className={styles.timeline}>
-                    <div className={styles.pointTarget}></div>
-                    <div className={styles.pointLine}></div>
-                    <div className={styles.pointSolid}></div>
-                  </div>
-                  <div className={styles.locations}>
-                    <div>
-                      <p className={styles.locLabel}>From</p>
-                      <p className={styles.locText}>{post.location}</p>
+                  <div className={`p-stack-sm border-border-width border-on-surface mt-2 relative overflow-hidden ${post.isUrgent ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-primary-container text-on-surface'}`}>
+                    <div className="absolute -right-4 -bottom-4 opacity-10 pointer-events-none text-on-surface">
+                      <span className="material-symbols-outlined text-9xl">directions_run</span>
                     </div>
-                    <div>
-                      <p className={styles.locLabel}>To</p>
-                      <p className={styles.locText}>{post.destination}</p>
+                    <h3 className="font-headline-md text-body-lg font-bold mb-2 break-words">{post.details || 'Large Box'}</h3>
+                    <div className="font-body-md text-body-md flex flex-col gap-2 relative z-10">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 bg-on-surface block flex-shrink-0"></span>
+                        <span className="truncate">From: {post.location}</span>
+                      </div>
+                      <div className="w-1 h-3 bg-on-surface ml-1"></div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 border-2 border-on-surface block bg-surface-container-lowest flex-shrink-0"></span>
+                        <span className="truncate">To: {post.destination}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className={styles.cardFooter}>
-                  <div className={styles.packageInfo}>
-                    <span className="material-symbols-outlined">package_2</span>
-                    <span>{post.details || 'Large Box (Textbooks)'}</span>
+                <div className="p-stack-sm flex justify-between items-center bg-surface-container-high border-b-border-width border-on-surface">
+                  <div className="font-label-mono text-label-tag text-on-surface-variant uppercase">
+                    {currentUser && post.requesterId === currentUser.uid ? 'Cost' : 'Reward'}
                   </div>
-                  <span className={styles.price}>
-                    {post.type === 'request' ? (
-                      currentUser && post.requesterId === currentUser.uid ? `Cost: ${post.cost || 75} GC` : `Reward: ${post.runnerReward || 50} GC`
-                    ) : (
-                      currentUser && post.requesterId === currentUser.uid ? `Reward: ${post.runnerReward || 50} GC` : `Cost: ${post.cost || 75} GC`
-                    )}
-                  </span>
+                  <div className="font-headline-lg text-body-lg font-black bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] px-stack-sm py-1 -rotate-2">
+                    {currentUser && post.requesterId === currentUser.uid ? `75 GC` : `50 GC`}
+                  </div>
                 </div>
 
                 {(!currentUser || post.requesterId !== currentUser.uid) ? (
                   <button 
-                    className={styles.acceptBtn}
                     onClick={() => handleAccept(post.id, 'request')}
+                    className="w-full p-stack-sm bg-secondary-container hover:bg-secondary-fixed border-none font-headline-md text-body-lg font-bold active:bg-secondary-fixed-dim transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2"
                   >
-                    Accept Delivery
+                    Accept Task <span className="material-symbols-outlined">arrow_forward</span>
                   </button>
                 ) : (
                   <button 
-                    className={styles.acceptBtn}
-                    style={{ backgroundColor: 'rgba(255,0,0,0.1)', color: 'red' }}
                     onClick={() => handleDelete(post.id)}
+                    className="w-full p-stack-sm bg-tertiary text-on-error hover:bg-red-700 border-none font-headline-md text-body-lg font-bold transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2"
                   >
-                    Remove Request
+                    Remove Request <span className="material-symbols-outlined">delete</span>
                   </button>
                 )}
-              </div>
+              </article>
             ))}
+
             {pickups.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '3rem 1rem', background: 'var(--surface-container-lowest)', borderRadius: '1.5rem', color: 'var(--on-surface-variant)' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5, display: 'block' }}>inbox</span>
-                <p style={{ fontWeight: 600 }}>No active requests right now.</p>
-                <p style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>Be the first to post a pickup request!</p>
+              <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-lg min-h-[250px] flex flex-col items-center justify-center relative">
+                <span className="material-symbols-outlined text-5xl text-outline mb-stack-md">assignment</span>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No Active Requests</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant text-center max-w-sm">There are no current pickup requests. Be the first to broadcast a need!</p>
               </div>
             )}
+
+            <button 
+              onClick={() => openModal('request')}
+              className="w-full p-stack-md bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase flex items-center justify-center gap-2 mt-2 hover:bg-primary-fixed-dim"
+            >
+              <span className="material-symbols-outlined font-black">add_circle</span> Post Request
+            </button>
           </div>
         </section>
 
-        {/* Right Column: Supply (Going to Gate) */}
-        <section className={styles.supplyColumn}>
-          <div style={{ marginBottom: '1rem' }}>
-            <span className={styles.taglineSupply}>Supply</span>
-            <h2 className={styles.columnTitle}>Ready for Pickup</h2>
+        {/* Right Column: Ready for Pickup */}
+        <section className="flex flex-col gap-stack-md">
+          <div className="flex justify-between items-center bg-secondary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] rotate-[1deg]">
+            <h2 className="font-headline-lg text-headline-md font-black uppercase tracking-tight">Ready for Pickup</h2>
+            <span className="font-label-mono text-label-tag bg-surface-container-lowest border-2 border-on-surface px-2 py-0.5">{offers.length} ACTIVE</span>
           </div>
-          
-          <div className={styles.feedList}>
-            {offers.length === 0 && <p className={styles.empty}>No current offers.</p>}
+
+          <div className="flex flex-col gap-stack-md mt-2">
             {offers.map(post => (
-              <div key={post.id} className={styles.supplyCard}>
-                <div className={styles.supplyTop}>
-                  <div className={styles.supplyAvatar}>
-                    {post.requesterName[0].toUpperCase()}
-                  </div>
-                  <div className={styles.supplyMeta}>
-                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span 
-                        onClick={() => setProfileTargetUid(post.requesterId)}
-                        style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: 900 }}
-                      >
-                        {post.requesterName}
-                      </span>
-                      {post.requesterScore && (
-                        <span title={`Reliability Score: ${post.requesterScore}`} style={{ fontSize: '0.75rem', backgroundColor: '#e3f2fd', color: '#1976d2', padding: '2px 6px', borderRadius: '12px', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>verified</span>
-                          {post.requesterScore}%
+              <article 
+                key={post.id} 
+                className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000]"
+              >
+                <div className="absolute top-stack-sm right-stack-sm bg-surface-variant border-2 border-on-surface px-2 py-0.5 font-label-tag text-label-tag z-10">
+                  {getTimeAgo(post.createdAt)}
+                </div>
+
+                <div className="p-stack-md flex-1 flex flex-col gap-stack-md border-b-border-width border-on-surface">
+                  <div className="flex items-center gap-stack-sm pr-24">
+                    <div className="w-10 h-10 border-border-width border-on-surface bg-primary-container flex items-center justify-center font-headline-md font-bold uppercase text-on-surface flex-shrink-0">
+                      {post.requesterName[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-headline-md text-body-lg font-bold leading-tight truncate">
+                        <span 
+                          onClick={() => setProfileTargetUid(post.requesterId)}
+                          className="cursor-pointer underline hover:text-primary transition-colors"
+                        >
+                          {post.requesterName}
                         </span>
+                      </div>
+                      {post.requesterScore && (
+                        <div className="inline-flex items-center gap-1 bg-surface-container-highest border-2 border-on-surface px-1 font-label-tag text-label-tag mt-1">
+                          <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span> {post.requesterScore}% Reliability
+                        </div>
                       )}
-                    </h4>
-                    <p>{getTimeAgo(post.createdAt)}</p>
-                  </div>
-                </div>
-                <div className={styles.supplyRoute}>
-                  <span className={`material-symbols-outlined ${styles.routeIcon}`}>route</span>
-                  <div className={styles.supplyDest}>
-                    <p className={styles.supplyDestLabel}>Destination:</p>
-                    <p className={styles.supplyDestText}>{post.destination}</p>
-                  </div>
-                  <div style={{ marginLeft: 'auto', fontWeight: 700, color: 'var(--primary)' }}>
-                    {currentUser && post.requesterId === currentUser.uid ? `Reward: ${post.runnerReward || 50} GC` : `Cost: ${post.cost || 75} GC`}
-                  </div>
-                </div>
-                {post.details && (
-                  <div style={{ padding: '0.875rem 1rem', background: 'var(--surface-container-high)', borderRadius: '0.75rem', marginBottom: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start', border: '1px solid var(--outline-variant)' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '1.25rem', color: 'var(--primary)', marginTop: '2px' }}>info</span>
-                    <div>
-                      <p style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Details / Requirements</p>
-                      <p style={{ fontSize: '0.875rem', color: 'var(--on-surface)', fontWeight: 500, lineHeight: 1.4 }}>{post.details}</p>
                     </div>
                   </div>
-                )}
+
+                  <div className="bg-surface-variant p-stack-sm border-border-width border-on-surface mt-2 relative overflow-hidden">
+                    <div className="absolute -right-4 -bottom-4 opacity-10 pointer-events-none text-on-surface">
+                      <span className="material-symbols-outlined text-9xl">directions_walk</span>
+                    </div>
+                    <h3 className="font-headline-md text-body-lg font-bold mb-2 break-words">Heading to: {post.destination}</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">{post.details}</p>
+                  </div>
+                </div>
+
+                <div className="p-stack-sm flex justify-between items-center bg-surface-container-high border-b-border-width border-on-surface">
+                  <div className="font-label-mono text-label-tag text-on-surface-variant uppercase">
+                    {currentUser && post.requesterId === currentUser.uid ? 'Reward' : 'Cost'}
+                  </div>
+                  <div className="font-headline-lg text-body-lg font-black bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] px-stack-sm py-1 rotate-2">
+                    {currentUser && post.requesterId === currentUser.uid ? `50 GC` : `75 GC`}
+                  </div>
+                </div>
+
                 {(!currentUser || post.requesterId !== currentUser.uid) ? (
                   <button 
-                    className={styles.supplyBtn}
                     onClick={() => handleAccept(post.id, 'offer')}
+                    className="w-full p-stack-sm bg-secondary-container hover:bg-secondary-fixed border-none font-headline-md text-body-lg font-bold active:bg-secondary-fixed-dim transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2"
                   >
-                    Ask for Pickup
+                    Ask for Pickup <span className="material-symbols-outlined">arrow_forward</span>
                   </button>
                 ) : (
                   <button 
-                    className={styles.supplyBtn}
-                    style={{ borderColor: 'red', color: 'red' }}
                     onClick={() => handleDelete(post.id)}
+                    className="w-full p-stack-sm bg-tertiary text-on-error hover:bg-red-700 border-none font-headline-md text-body-lg font-bold transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2"
                   >
-                    Remove Offer
+                    Remove Offer <span className="material-symbols-outlined">delete</span>
                   </button>
                 )}
-              </div>
+              </article>
             ))}
+
             {offers.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '3rem 1rem', background: 'rgba(255,255,255,0.3)', borderRadius: '1.5rem', color: 'var(--on-surface-variant)' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5, display: 'block' }}>directions_walk</span>
-                <p style={{ fontWeight: 600 }}>No active offers right now.</p>
-                <p style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>If you're heading to the gate, let others know!</p>
+              <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-lg min-h-[250px] flex flex-col items-center justify-center relative">
+                <span className="material-symbols-outlined text-5xl text-outline mb-stack-md">directions_walk</span>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No Active Offers</h3>
+                <p className="font-body-md text-body-md text-on-surface-variant text-center max-w-sm">No runners are broadcasting their routes right now. Check back shortly!</p>
               </div>
             )}
-            <button className={styles.globalSupplyBtn} onClick={() => openModal('offer')}>
-              <span className="material-symbols-outlined">local_shipping</span>
-              I'm Ready for Pickup
+
+            <button 
+              onClick={() => openModal('offer')}
+              className="w-full p-stack-md bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase flex items-center justify-center gap-2 mt-2 hover:bg-primary-fixed-dim"
+            >
+              <span className="material-symbols-outlined">local_shipping</span> I'm Ready for Pickup
             </button>
           </div>
         </section>

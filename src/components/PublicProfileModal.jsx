@@ -10,14 +10,19 @@ const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
   const renderBadges = (questState) => {
     const claimedQuests = Object.keys(questState || {}).filter(k => questState[k] === 'claimed');
     if (claimedQuests.length === 0) {
-      return <p style={{ fontSize: '0.875rem', color: '#666', fontStyle: 'italic' }}>No public badges yet.</p>;
+      return <p className="text-xs text-on-surface-variant italic text-center w-full col-span-2 py-4">No public badges yet.</p>;
     }
     return (
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <div className="grid grid-cols-2 gap-3 w-full">
         {claimedQuests.map(questId => (
-          <div key={questId} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', background: 'var(--primary)', color: 'white', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.75rem', boxShadow: '2px 2px 0px #000', border: '1px solid #000' }}>
-            <Award size={14} />
-            <span style={{ textTransform: 'uppercase' }}>{questId.replace(/-/g, ' ')}</span>
+          <div 
+            key={questId} 
+            className="flex flex-col items-center justify-center p-3 border-2 border-on-surface bg-primary-container shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-center group"
+          >
+            <span className="material-symbols-outlined text-[32px] text-on-surface mb-2">military_tech</span>
+            <span className="font-label-tag text-[10px] text-on-surface uppercase font-bold break-words w-full">
+              {questId.replace(/-/g, ' ')}
+            </span>
           </div>
         ))}
       </div>
@@ -25,72 +30,75 @@ const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div style={{ background: '#fff', width: '100%', maxWidth: '400px', border: '4px solid #000', boxShadow: '8px 8px 0px #000', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-margin-page bg-on-surface/85 backdrop-blur-sm font-body-md animate-in fade-in duration-100">
+      <main className="relative z-50 w-full max-w-md bg-surface-container border-border-width border-on-surface shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col animate-in zoom-in-95 duration-150">
         
-        {/* Header */}
-        <div style={{ borderBottom: '4px solid #000', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f0f0f0' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', margin: 0 }}>Player Card</h2>
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px' }}>
-            <X size={24} color="#000" strokeWidth={3} />
+        {/* Header Section */}
+        <header className="p-4 border-b-border-width border-on-surface bg-surface-container-lowest flex items-center justify-between">
+          <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-tight">Player Profile</h2>
+          <button 
+            onClick={onClose}
+            aria-label="Close modal" 
+            className="w-10 h-10 flex items-center justify-center bg-surface-container border-2 border-on-surface shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+          >
+            <X size={20} className="text-on-surface" />
           </button>
-        </div>
+        </header>
 
-        {/* Content */}
-        <div style={{ padding: '24px', flex: 1 }}>
+        {/* Profile Content */}
+        <div className="p-6 bg-surface-container-lowest flex flex-col items-center">
           {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-              <div style={{ width: '40px', height: '40px', border: '4px solid #ccc', borderTopColor: '#000', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+            <div className="flex justify-center py-10 w-full">
+              <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
             </div>
           ) : !profileData ? (
-            <p style={{ textAlign: 'center', fontWeight: 'bold' }}>Profile not found.</p>
+            <p className="text-center font-bold py-6">Profile not found.</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              
-              {/* Section 1: Identity */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ width: '64px', height: '64px', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 900, border: '3px solid #000', boxShadow: '3px 3px 0px #000', borderRadius: '8px' }}>
-                  {(profileData.name || 'S')[0].toUpperCase()}
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: 900, margin: '0 0 4px 0' }}>{profileData.name}</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', fontWeight: 700, backgroundColor: '#e0f7fa', color: '#006064', padding: '4px 8px', borderRadius: '16px', border: '2px solid #000' }}>
-                    <Star size={14} fill="#006064" /> Reliability: {profileData.reliabilityScore}%
-                  </div>
-                </div>
+            <div className="w-full flex flex-col items-center gap-4">
+              {/* Avatar Icon */}
+              <div className="w-20 h-20 border-border-width border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-primary-container flex items-center justify-center font-headline-xl text-3xl font-black text-on-surface">
+                {(profileData.name || 'S')[0].toUpperCase()}
               </div>
 
-              {/* Section 2: Stats */}
-              <div style={{ border: '3px solid #000', padding: '16px', boxShadow: '4px 4px 0px #000', display: 'flex', gap: '16px', backgroundColor: '#fff9c4' }}>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 900, marginBottom: '4px' }}>Completed Runs</p>
-                  <p style={{ fontSize: '2rem', fontWeight: 900, margin: 0 }}>
+              {/* Name and reliability score */}
+              <h1 className="font-headline-lg text-headline-md text-on-surface uppercase bg-surface-container-lowest px-4 py-1 border-2 border-on-surface shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                {profileData.name}
+              </h1>
+
+              <div className="flex items-center gap-2 bg-secondary-container border-2 border-on-surface px-4 py-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mt-2">
+                <span className="material-symbols-outlined text-on-secondary-container" style={{ fontVariationSettings: "'FILL' 1" }}>shield</span>
+                <span className="font-label-mono text-xs font-bold text-on-secondary-container uppercase">
+                  Reliability Score: {profileData.reliabilityScore}%
+                </span>
+              </div>
+
+              {/* Stats Card */}
+              <div className="grid grid-cols-2 gap-4 border-2 border-on-surface p-3 shadow-[3px_3px_0px_0px_#000000] bg-surface-container w-full mt-4">
+                <div className="text-center border-r-2 border-on-surface border-dashed">
+                  <p className="font-label-mono text-[9px] uppercase text-on-surface-variant font-bold">Completed Runs</p>
+                  <p className="font-headline-md text-lg font-black mt-1">
                     {(profileData.stats?.tasksCompleted || 0) + (profileData.stats?.requestsCompleted || 0)}
                   </p>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 900, marginBottom: '4px' }}>Requested</p>
-                  <p style={{ fontSize: '2rem', fontWeight: 900, margin: 0 }}>{profileData.stats?.requestsCompleted || 0}</p>
+                <div className="text-center">
+                  <p className="font-label-mono text-[9px] uppercase text-on-surface-variant font-bold">Requests Posted</p>
+                  <p className="font-headline-md text-lg font-black mt-1">
+                    {profileData.stats?.requestsCompleted || 0}
+                  </p>
                 </div>
               </div>
 
-              {/* Section 3: Trophy Room */}
-              <div>
-                <h4 style={{ fontSize: '1rem', fontWeight: 900, textTransform: 'uppercase', borderBottom: '2px dashed #000', paddingBottom: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Award size={18} /> Trophy Room
-                </h4>
+              {/* Badges Trophy Room */}
+              <div className="w-full mt-4">
+                <h3 className="font-headline-md text-xs font-black text-on-surface uppercase mb-3 border-b-2 border-on-surface pb-1 flex items-center gap-1.5">
+                  <Award size={14} /> Trophy Room
+                </h3>
                 {renderBadges(profileData.questState)}
               </div>
             </div>
           )}
         </div>
-      </div>
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      </main>
     </div>
   );
 };

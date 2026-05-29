@@ -1,5 +1,6 @@
 import React from 'react';
 import { useReportModal } from '../hooks/useReportModal';
+import { X } from 'lucide-react';
 
 const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId }) => {
   const {
@@ -14,75 +15,70 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-inverse-surface/40 backdrop-blur-sm transition-all duration-300">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-margin-page bg-on-surface/85 backdrop-blur-sm font-body-md animate-in fade-in duration-100">
       <div 
         className="absolute inset-0 z-0" 
         onClick={onClose}
       ></div>
       
-      <div className="bg-surface-container-lowest w-full max-w-md rounded-[2rem] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="p-6 sm:p-8">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h2 className="text-2xl font-bold font-headline text-error mb-1">Report Issue</h2>
-              <p className="text-sm text-on-surface-variant font-body">Please describe the problem you encountered.</p>
-            </div>
-            <button 
-              onClick={onClose}
-              className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors"
+      <div className="bg-surface-container-lowest w-full max-w-md border-border-width border-on-surface shadow-[8px_8px_0px_0px_#000000] relative z-10 overflow-hidden animate-in zoom-in-95 duration-150 p-6 flex flex-col gap-4">
+        <div className="flex justify-between items-center border-b-2 border-on-surface pb-3">
+          <div>
+            <h2 className="font-headline-lg text-headline-md uppercase tracking-tight text-error leading-none">Report Issue</h2>
+            <p className="text-xs font-bold text-on-surface-variant mt-1.5">Help us understand the issue with this run.</p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="w-10 h-10 border-2 border-on-surface flex items-center justify-center bg-surface-container shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+          >
+            <X size={20} className="text-on-surface" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">Reason</label>
+            <select 
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md focus:bg-primary-container outline-none transition-colors"
             >
-              <span className="material-symbols-outlined">close</span>
-            </button>
+              <option value="Never showed up">Never showed up</option>
+              <option value="Item damaged or missing">Item damaged or missing</option>
+              <option value="Inappropriate behavior">Inappropriate behavior</option>
+              <option value="Late delivery">Late delivery</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-label-sm font-bold text-on-surface mb-2 uppercase tracking-wide">Reason</label>
-              <div className="relative">
-                <select 
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  className="w-full appearance-none bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium"
-                >
-                  <option value="Never showed up">Never showed up</option>
-                  <option value="Item damaged or missing">Item damaged or missing</option>
-                  <option value="Inappropriate behavior">Inappropriate behavior</option>
-                  <option value="Late delivery">Late delivery</option>
-                  <option value="Other">Other</option>
-                </select>
-                <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
-              </div>
-            </div>
+          <div className="flex flex-col gap-1">
+            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">Additional Details</label>
+            <textarea 
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md focus:bg-primary-container outline-none transition-colors resize-none"
+              placeholder="Provide optional context about what happened..."
+              rows="4"
+            ></textarea>
+          </div>
 
-            <div>
-              <label className="block text-label-sm font-bold text-on-surface mb-2 uppercase tracking-wide">Additional Details</label>
-              <textarea 
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-                className="w-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium resize-none"
-                placeholder="Optional context about what happened..."
-                rows="4"
-              ></textarea>
-            </div>
-
-            <div className="pt-4">
-              <button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="w-full py-4 rounded-xl bg-error text-on-error font-bold text-sm tracking-wide shadow-lg shadow-error/20 hover:bg-error-dim transition-all active:scale-[0.98] flex justify-center items-center gap-2"
-              >
-                {isSubmitting ? (
-                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-[20px]">flag</span>
-                    Submit Report
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="pt-2">
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="w-full py-3 bg-tertiary hover:bg-red-700 text-on-error border-2 border-on-surface shadow-[4px_4px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-xs flex justify-center items-center gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                'Submitting...'
+              ) : (
+                <>
+                  <span className="material-symbols-outlined text-[16px] font-black">flag</span>
+                  Submit Report
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
