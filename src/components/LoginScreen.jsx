@@ -62,7 +62,7 @@ const LoginScreen = () => {
       </div>
 
       <footer className={styles.footer}>
-        Built by Ayan Jain, Anweshika Mehta & Divyansh Patel <span style={{ width: '4px', height: '4px', backgroundColor: 'var(--primary)', borderRadius: '50%' }}></span>
+        Built by AYAN JAIN <span style={{ width: '4px', height: '4px', backgroundColor: 'var(--primary)', borderRadius: '50%' }}></span>
       </footer>
     </div>
   );
