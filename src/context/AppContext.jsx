@@ -57,6 +57,33 @@ export const AppProvider = ({ children }) => {
             if (!data.questState) { data.questState = { lastTaskDate: null }; updated = true; }
             if (!data.claimInbox) { data.claimInbox = []; updated = true; }
             
+            const now = new Date();
+            const currentDateString = now.toDateString();
+            const getWeekStr = (d) => {
+              const date = new Date(d.getTime());
+              date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
+              const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+              const weekNo = Math.ceil(( ( (date - yearStart) / 86400000) + 1)/7);
+              return `${date.getUTCFullYear()}-W${weekNo}`;
+            };
+            const currentWeekString = getWeekStr(now);
+            
+            if (data.questState.lastDailyReset !== currentDateString) {
+               delete data.questState.daily;
+               delete data.questState.sprinter;
+               delete data.questState.rescuer;
+               delete data.questState.lastorder;
+               data.questState.lastDailyReset = currentDateString;
+               updated = true;
+            }
+            
+            if (data.questState.lastWeeklyReset !== currentWeekString) {
+               delete data.questState.weekendWarrior;
+               delete data.questState.ironStreakCompleted;
+               data.questState.lastWeeklyReset = currentWeekString;
+               updated = true;
+            }
+            
             if (updated) {
               await setDoc(profileRef, data, { merge: true });
             }
@@ -560,33 +587,29 @@ export const AppProvider = ({ children }) => {
           const nowSeconds = Math.floor(now.getTime() / 1000);
           
           // 1. One-Time Quests
-          if (runs === 1) {
-            claimInbox.push({ id: Date.now().toString() + '-icebreaker', title: 'The Icebreaker', amount: 50 });
+          if (runs === 1 && !questState.icebreaker) {
             questState.icebreaker = true;
           }
 
           // 2. Behavioral Quests
           if (!questState.sprinter && journeyData.createdAt && (nowSeconds - journeyData.createdAt.seconds) < 15 * 60) {
-            claimInbox.push({ id: Date.now().toString() + '-sprinter', title: 'The Sprinter', amount: 30 });
             questState.sprinter = true;
           }
           
           if (!questState.rescuer && postData && postData.createdAt && journeyData.createdAt && (journeyData.createdAt.seconds - postData.createdAt.seconds) > 25 * 60) {
-            claimInbox.push({ id: Date.now().toString() + '-rescuer', title: 'The Rescuer', amount: 20 });
             questState.rescuer = true;
           }
           
           if (!questState.lastorder && postData && postData.createdAt) {
             const postDate = new Date(postData.createdAt.seconds * 1000);
             if (postDate.getHours() === 18 && postDate.getMinutes() >= 30) {
-               claimInbox.push({ id: Date.now().toString() + '-lastorder', title: 'The Last Order', amount: 15 });
                questState.lastorder = true;
             }
           }
           
           // Daily Quest
           if (questState.lastTaskDate !== todayDateStr) {
-            claimInbox.push({ id: Date.now().toString() + '-daily', title: 'The Daily Warmup', amount: 10 });
+            questState.daily = true;
             questState.lastTaskDate = todayDateStr;
           }
           
@@ -601,21 +624,20 @@ export const AppProvider = ({ children }) => {
              }
              
              if (questState.currentStreak >= 5) {
-                 claimInbox.push({ id: Date.now().toString() + '-ironstreak', title: 'The Iron Streak', amount: 50 });
                  questState.ironStreakCompleted = true;
              }
           }
           
           // 4. Milestones
-          if (runs === 25) claimInbox.push({ id: Date.now().toString() + '-25', title: '25 Deliveries Milestone', amount: 50 });
-          else if (runs === 50) claimInbox.push({ id: Date.now().toString() + '-50', title: '50 Deliveries Milestone', amount: 100 });
-          else if (runs === 75) claimInbox.push({ id: Date.now().toString() + '-75', title: '75 Deliveries Milestone', amount: 150 });
-          else if (runs === 100) claimInbox.push({ id: Date.now().toString() + '-100', title: '100 Deliveries (The Centurion)', amount: 200 });
+          if (runs >= 25 && !questState.milestone25) questState.milestone25 = true;
+          if (runs >= 50 && !questState.milestone50) questState.milestone50 = true;
+          if (runs >= 75 && !questState.milestone75) questState.milestone75 = true;
+          if (runs >= 100 && !questState.milestone100) questState.milestone100 = true;
           
-          transaction.update(runnerRef, { gcBalance: newBalance, stats, claimInbox, questState });
+          transaction.update(runnerRef, { gcBalance: newBalance, stats, questState });
           
           if (currentUser && currentUser.uid === journeyData.runnerId) {
-            updatedRunnerData = { gcBalance: newBalance, stats, claimInbox, questState };
+            updatedRunnerData = { gcBalance: newBalance, stats, questState };
           }
         }
       });
@@ -809,39 +831,34 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const claimReward = async (rewardId) => {
+  const claimQuestFromBoard = async (questId, rewardAmount) => {
     if (!currentUser || DISABLE_FIREBASE) return;
     try {
       const userRef = doc(db, 'users', currentUser.uid);
-      let claimedAmount = 0;
+      const parsedReward = parseInt(rewardAmount, 10);
       
       await runTransaction(db, async (transaction) => {
         const snap = await transaction.get(userRef);
         if (!snap.exists()) return;
         const data = snap.data();
-        const claimInbox = data.claimInbox || [];
-        const rewardIndex = claimInbox.findIndex(r => r.id === rewardId);
         
-        if (rewardIndex > -1) {
-          const reward = claimInbox[rewardIndex];
-          if ((data.gcBalance || 0) + reward.amount > 500) {
-            throw new Error("Wallet full! Cannot claim reward right now.");
-          }
-          
-          claimedAmount = reward.amount;
-          let newBalance = (data.gcBalance || 0) + reward.amount;
-          claimInbox.splice(rewardIndex, 1);
-          transaction.update(userRef, { gcBalance: newBalance, claimInbox });
+        let newBalance = (data.gcBalance || 0) + parsedReward;
+        if (newBalance > 500) {
+          throw new Error("Wallet limit reached. Spend GC before claiming.");
         }
+        
+        let questState = data.questState || {};
+        questState[questId] = 'claimed';
+        
+        transaction.update(userRef, { gcBalance: newBalance, questState });
       });
       
-      if (claimedAmount > 0) {
-        setUserProfile(prev => ({
-          ...prev,
-          gcBalance: prev.gcBalance + claimedAmount,
-          claimInbox: prev.claimInbox.filter(reward => reward.id !== rewardId)
-        }));
-      }
+      setUserProfile(prev => ({
+        ...prev,
+        gcBalance: prev.gcBalance + parsedReward,
+        questState: { ...prev.questState, [questId]: 'claimed' }
+      }));
+      
     } catch(err) {
       console.error(err);
       throw err;
@@ -873,7 +890,7 @@ export const AppProvider = ({ children }) => {
     submitReport,
     getUserStats,
     getJourneyHistory,
-    claimReward
+    claimQuestFromBoard
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

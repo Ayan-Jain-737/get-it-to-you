@@ -437,7 +437,7 @@ const ActiveJourney = () => {
             <div className="bg-[#ffc5aa]/20 border border-[#ffc5aa]/30 p-4 rounded-2xl flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[#9b3f00] opacity-80">Reward</p>
-                <p className="text-[#9b3f00] font-bold text-lg">{postInfo.type === 'request' || activeJourney.postType === 'request' ? '50 GC' : (postInfo.price && postInfo.price !== 'Free' ? postInfo.price : 'Good Karma')}</p>
+                <p className="text-[#9b3f00] font-bold text-lg">{postInfo.type === 'request' || activeJourney.postType === 'request' ? `${postInfo.runnerReward || 50} GC` : (postInfo.price && postInfo.price !== 'Free' ? postInfo.price : 'Good Karma')}</p>
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[#9b3f00] opacity-80">Deliver To</p>

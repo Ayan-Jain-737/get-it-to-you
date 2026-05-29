@@ -127,12 +127,12 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                   {post.requesterId === currentUser?.uid ? (
                     <div className="flex justify-between items-center text-red-600 font-bold">
                       <span>Requester Escrow</span>
-                      <span className="text-xl">-75 GC</span>
+                      <span className="text-xl">-{post.cost || 75} GC</span>
                     </div>
                   ) : history?.journey?.runnerId === currentUser?.uid ? (
                     <div className="flex justify-between items-center text-green-600 font-bold">
                       <span>Runner Reward</span>
-                      <span className="text-xl">+50 GC</span>
+                      <span className="text-xl">+{post.runnerReward || 50} GC</span>
                     </div>
                   ) : (
                     <div className="flex justify-between items-center font-bold">

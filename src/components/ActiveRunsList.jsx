@@ -123,7 +123,7 @@ const ActiveRunsList = () => {
                            <span className="text-xs bg-surface-variant text-on-surface-variant px-2 py-1 rounded-md font-medium truncate max-w-[120px]">{post.destination}</span>
                          </div>
                          <div className="bg-[#ffc5aa]/20 px-2 py-1 rounded-md">
-                           <span className="text-xs font-bold text-[#9b3f00]">{post.type === 'request' || post.postType === 'request' ? 'Reward: 50 GC' : (post.price && post.price !== 'Free' ? post.price : 'Good Karma')}</span>
+                           <span className="text-xs font-bold text-[#9b3f00]">{post.type === 'request' || post.postType === 'request' ? `Reward: ${post.runnerReward || 50} GC` : (post.price && post.price !== 'Free' ? post.price : 'Good Karma')}</span>
                          </div>
                       </div>
                     </div>
