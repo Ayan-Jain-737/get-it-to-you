@@ -1,25 +1,24 @@
 import React from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
-
 import ActiveJourney from './ActiveJourney';
 import ReportModal from './ReportModal';
 import OrderDetailsModal from './OrderDetailsModal';
-import { useState } from 'react';
+import { useMyDeliveries } from '../hooks/useMyDeliveries';
 
 const MyDeliveries = () => {
-  const { feedData, currentUser, trackJourney, activeJourney } = useAppContext();
-  const navigate = useNavigate();
-  const { openModal } = useOutletContext();
-  const [reportData, setReportData] = useState(null);
-  const [selectedPost, setSelectedPost] = useState(null);
-
-  const [showMap, setShowMap] = useState(false);
-
-  const handleTrack = async (postId) => {
-    await trackJourney(postId);
-    setShowMap(true);
-  };
+  const {
+    feedData,
+    currentUser,
+    activeJourney,
+    openModal,
+    reportData,
+    setReportData,
+    selectedPost,
+    setSelectedPost,
+    showMap,
+    setShowMap,
+    handleTrack,
+    myAcceptedRequests
+  } = useMyDeliveries();
 
   if (showMap && activeJourney && activeJourney.requesterId === currentUser?.uid) {
     return (
@@ -35,10 +34,6 @@ const MyDeliveries = () => {
       </div>
     );
   }
-
-  const myAcceptedRequests = feedData.filter(
-    post => post.requesterId === currentUser?.uid && post.status === 'accepted'
-  );
 
   return (
     <main className="max-w-screen-2xl mx-auto px-6 py-12 md:py-16">

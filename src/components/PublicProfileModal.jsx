@@ -1,28 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { X, Award, Map, Star, Truck } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import React from 'react';
+import { X, Award, Star } from 'lucide-react';
+import { usePublicProfileModal } from '../hooks/usePublicProfileModal';
 
 const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
-  const { fetchPublicProfile } = useAppContext();
-  const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!isOpen || !targetUid) return;
-    let isMounted = true;
-    setLoading(true);
-    
-    const fetchProfile = async () => {
-      const data = await fetchPublicProfile(targetUid);
-      if (isMounted) {
-        setProfileData(data);
-        setLoading(false);
-      }
-    };
-    
-    fetchProfile();
-    return () => { isMounted = false; };
-  }, [isOpen, targetUid, fetchPublicProfile]);
+  const { profileData, loading } = usePublicProfileModal(isOpen, targetUid);
 
   if (!isOpen) return null;
 

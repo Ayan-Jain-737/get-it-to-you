@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import { useSidebar } from '../hooks/useSidebar';
 import NotificationBell from './NotificationBell';
 import ConfirmModal from './ConfirmModal';
 import styles from './Sidebar.module.css';
 
 const Sidebar = ({ onOpenPostModal }) => {
-  const { logout, userProfile } = useAppContext();
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const { logout, userProfile, isLogoutModalOpen, setIsLogoutModalOpen } = useSidebar();
 
   return (
     <>

@@ -1,30 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X, CheckCircle, Clock } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { useOrderDetailsModal } from '../hooks/useOrderDetailsModal';
 import PublicProfileModal from './PublicProfileModal';
 
 const OrderDetailsModal = ({ isOpen, onClose, post }) => {
-  const { getJourneyHistory, currentUser } = useAppContext();
-  const [history, setHistory] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [profileTargetUid, setProfileTargetUid] = useState(null);
-
-  useEffect(() => {
-    if (!isOpen || !post) return;
-    
-    let isMounted = true;
-    const fetchHistory = async () => {
-      setLoading(true);
-      const data = await getJourneyHistory(post.id);
-      if (isMounted) {
-        setHistory(data);
-        setLoading(false);
-      }
-    };
-    
-    fetchHistory();
-    return () => { isMounted = false; };
-  }, [isOpen, post, getJourneyHistory]);
+  const {
+    currentUser,
+    history,
+    loading,
+    profileTargetUid,
+    setProfileTargetUid
+  } = useOrderDetailsModal(isOpen, post);
 
   if (!isOpen || !post) return null;
 

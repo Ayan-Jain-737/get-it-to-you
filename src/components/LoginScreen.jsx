@@ -1,22 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import React from 'react';
+import { useLoginScreen } from '../hooks/useLoginScreen';
 import styles from './LoginScreen.module.css';
 
 const LoginScreen = () => {
-  const navigate = useNavigate();
-  const { signInWithGoogle } = useAppContext();
-  const [error, setError] = useState('');
-
-  const handleGoogleLogin = async () => {
-    setError('');
-    const success = await signInWithGoogle();
-    if (success) {
-      navigate('/dashboard');
-    } else {
-      setError('Google Sign-In failed.');
-    }
-  };
+  const { error, handleGoogleLogin } = useLoginScreen();
 
   return (
     <div className={styles.container}>

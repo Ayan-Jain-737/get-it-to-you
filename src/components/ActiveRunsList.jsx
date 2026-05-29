@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
+import React from 'react';
 import { PackageX } from 'lucide-react';
 import ActiveJourney from './ActiveJourney';
 import OrderDetailsModal from './OrderDetailsModal';
+import { useActiveRunsList } from '../hooks/useActiveRunsList';
 
 const ActiveRunsList = () => {
-  const { activeJourney, currentUser, feedData, trackJourney } = useAppContext();
-  const [selectedPost, setSelectedPost] = useState(null);
+  const {
+    activeJourney,
+    currentUser,
+    selectedPost,
+    setSelectedPost,
+    showMap,
+    setShowMap,
+    handleTrack,
+    history,
+    myActiveRuns
+  } = useActiveRunsList();
 
-  const [showMap, setShowMap] = useState(false);
 
-  const handleTrack = async (postId) => {
-    await trackJourney(postId);
-    setShowMap(true);
-  };
 
   // If there's an active run and user is the runner and they requested to show it
   if (showMap && activeJourney && activeJourney.runnerId === currentUser?.uid) {
@@ -30,11 +34,6 @@ const ActiveRunsList = () => {
       </div>
     );
   }
-
-  const history = feedData.filter(p => p.runnerId === currentUser?.uid && p.status === 'completed');
-  const myActiveRuns = feedData.filter(p => p.runnerId === currentUser?.uid && p.status === 'accepted');
-
-
 
   return (
     <main className="max-w-screen-2xl mx-auto px-6 py-12 md:py-16">

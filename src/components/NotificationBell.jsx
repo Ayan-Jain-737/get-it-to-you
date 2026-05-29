@@ -1,36 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import React from 'react';
+import { useNotificationBell } from '../hooks/useNotificationBell';
 import styles from './NotificationBell.module.css';
 
 const NotificationBell = () => {
-  const { unreadNotifications, markAsRead } = useAppContext();
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const navigate = useNavigate();
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
-
-  const handleNotificationClick = async (notification) => {
-    await markAsRead(notification.id);
-    setIsOpen(false);
-    if (notification.linkTo) {
-      navigate(notification.linkTo);
-    }
-  };
-
-  const unreadCount = unreadNotifications?.length || 0;
+  const {
+    isOpen,
+    setIsOpen,
+    dropdownRef,
+    unreadNotifications,
+    unreadCount,
+    handleNotificationClick
+  } = useNotificationBell();
 
   return (
     <div className={styles.bellContainer} ref={dropdownRef}>
