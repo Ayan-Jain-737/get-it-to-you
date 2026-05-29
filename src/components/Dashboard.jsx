@@ -1,12 +1,16 @@
 import React from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import PublicProfileModal from './PublicProfileModal';
+import ConfirmModal from './ConfirmModal';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { feedData, acceptRequest, deletePost, currentUser } = useAppContext();
   const { openModal } = useOutletContext();
+  const [profileTargetUid, setProfileTargetUid] = React.useState(null);
+  const [postToDelete, setPostToDelete] = React.useState(null);
 
   const handleAccept = async (postId, type) => {
     await acceptRequest(postId, type);
@@ -17,14 +21,37 @@ const Dashboard = () => {
     }
   };
 
-  const handleDelete = async (postId) => {
-    if(window.confirm('Are you sure you want to remove this post?')) {
-      await deletePost(postId);
+  const handleDelete = (postId) => {
+    setPostToDelete(postId);
+  };
+  
+  const confirmDelete = async () => {
+    if (postToDelete) {
+      await deletePost(postToDelete);
+      setPostToDelete(null);
     }
   };
 
   const pickups = feedData.filter(post => post.type === 'request' && post.status === 'open');
   const offers = feedData.filter(post => post.type === 'offer' && post.status === 'open');
+
+  const getTimeAgo = (timestamp) => {
+    if (!timestamp) return 'Just now';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + "y ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + "mo ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + "d ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + "h ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + "m ago";
+    return Math.floor(seconds) + "s ago";
+  };
 
   return (
     <main className={styles.mainFeed}>
@@ -63,8 +90,21 @@ const Dashboard = () => {
                       {post.requesterName[0].toUpperCase()}
                     </div>
                     <div className={styles.nameBlock}>
-                      <h3>{post.requesterName}</h3>
-                      <p className={styles.timeLabel}>Requested recently</p>
+                      <h3 style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span 
+                          onClick={() => setProfileTargetUid(post.requesterId)}
+                          style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: 900 }}
+                        >
+                          {post.requesterName}
+                        </span>
+                        {post.requesterScore && (
+                          <span title={`Reliability Score: ${post.requesterScore}`} style={{ fontSize: '0.75rem', backgroundColor: '#e3f2fd', color: '#1976d2', padding: '2px 6px', borderRadius: '12px', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>verified</span>
+                            {post.requesterScore}%
+                          </span>
+                        )}
+                      </h3>
+                      <p className={styles.timeLabel}>{getTimeAgo(post.createdAt)}</p>
                     </div>
                   </div>
                   {post.isUrgent && <span className={styles.urgentBadge}>Urgent</span>}
@@ -93,7 +133,13 @@ const Dashboard = () => {
                     <span className="material-symbols-outlined">package_2</span>
                     <span>{post.details || 'Large Box (Textbooks)'}</span>
                   </div>
-                  <span className={styles.price}>{post.type === 'request' ? `Reward: ${post.runnerReward || 50} GC` : (post.price && post.price !== 'Free' ? post.price : 'Good Karma')}</span>
+                  <span className={styles.price}>
+                    {post.type === 'request' ? (
+                      currentUser && post.requesterId === currentUser.uid ? `Cost: ${post.cost || 75} GC` : `Reward: ${post.runnerReward || 50} GC`
+                    ) : (
+                      currentUser && post.requesterId === currentUser.uid ? `Reward: ${post.runnerReward || 50} GC` : `Cost: ${post.cost || 75} GC`
+                    )}
+                  </span>
                 </div>
 
                 {(!currentUser || post.requesterId !== currentUser.uid) ? (
@@ -140,8 +186,21 @@ const Dashboard = () => {
                     {post.requesterName[0].toUpperCase()}
                   </div>
                   <div className={styles.supplyMeta}>
-                    <h4>{post.requesterName}</h4>
-                    <p>Ready to move</p>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span 
+                        onClick={() => setProfileTargetUid(post.requesterId)}
+                        style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: 900 }}
+                      >
+                        {post.requesterName}
+                      </span>
+                      {post.requesterScore && (
+                        <span title={`Reliability Score: ${post.requesterScore}`} style={{ fontSize: '0.75rem', backgroundColor: '#e3f2fd', color: '#1976d2', padding: '2px 6px', borderRadius: '12px', fontWeight: 'bold', display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>verified</span>
+                          {post.requesterScore}%
+                        </span>
+                      )}
+                    </h4>
+                    <p>{getTimeAgo(post.createdAt)}</p>
                   </div>
                 </div>
                 <div className={styles.supplyRoute}>
@@ -151,7 +210,7 @@ const Dashboard = () => {
                     <p className={styles.supplyDestText}>{post.destination}</p>
                   </div>
                   <div style={{ marginLeft: 'auto', fontWeight: 700, color: 'var(--primary)' }}>
-                    Reward/Offer: {post.price && post.price !== 'Free' ? post.price : 'Good Karma'}
+                    {currentUser && post.requesterId === currentUser.uid ? `Reward: ${post.runnerReward || 50} GC` : `Cost: ${post.cost || 75} GC`}
                   </div>
                 </div>
                 {post.details && (
@@ -195,6 +254,22 @@ const Dashboard = () => {
           </div>
         </section>
       </div>
+
+      <PublicProfileModal 
+        isOpen={!!profileTargetUid} 
+        targetUid={profileTargetUid} 
+        onClose={() => setProfileTargetUid(null)} 
+      />
+
+      <ConfirmModal
+        isOpen={!!postToDelete}
+        title="Remove Post"
+        message="Are you sure you want to remove this post? This action cannot be undone."
+        confirmText="Remove"
+        isDestructive={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setPostToDelete(null)}
+      />
     </main>
   );
 };

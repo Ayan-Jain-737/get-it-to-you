@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { toast } from 'react-hot-toast';
 import ReportModal from './ReportModal';
+import PublicProfileModal from './PublicProfileModal';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -87,6 +88,7 @@ const ActiveJourney = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
+  const [profileTargetUid, setProfileTargetUid] = useState(null);
   const navigate = useNavigate();
 
   const isRunner = activeJourney?.runnerId === currentUser?.uid;
@@ -121,7 +123,7 @@ const ActiveJourney = () => {
         }
       },
       (err) => console.warn('Geolocation error:', err),
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
     return () => navigator.geolocation.clearWatch(watchId);
   }, [isRunner, activeJourney?.id, isSimulating, updateRunnerLocation]);
@@ -411,7 +413,13 @@ const ActiveJourney = () => {
               </div>
               <div>
                 <p className="text-label-sm text-primary font-bold uppercase tracking-wider mb-0.5">{isRunner ? 'Requester' : 'Your Runner'}</p>
-                <h2 className="text-xl font-bold text-on-surface font-headline">{isRunner ? requesterName : runnerName}</h2>
+                <h2 
+                  className="text-xl font-bold text-on-surface font-headline"
+                  onClick={() => setProfileTargetUid(isRunner ? activeJourney?.requesterId : activeJourney?.runnerId)}
+                  style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  {isRunner ? requesterName : runnerName}
+                </h2>
                 <p className="text-xs text-on-surface-variant font-medium mt-1">
                   {isRunner ? `Pickup: ${postInfo.location}` : `Heading to ${postInfo.destination || 'you'}`}
                 </p>

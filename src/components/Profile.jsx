@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import OrderDetailsModal from './OrderDetailsModal';
 
 const Profile = () => {
-  const { userProfile, updateProfile, currentUser, getUserStats, claimQuestFromBoard } = useAppContext();
+  const { userProfile, updateProfile, currentUser, getUserStats, claimQuestFromBoard, withdrawFromOverflow } = useAppContext();
   
   const [activeTab, setActiveTab] = useState('daily');
   
@@ -13,6 +13,8 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [selectedRun, setSelectedRun] = useState(null);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
   const [stats, setStats] = useState({ tasksCompleted: 0, requestsCompleted: 0, cancelled: 0, pastRuns: [] });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
@@ -140,6 +142,62 @@ const Profile = () => {
               </div>
             </div>
           </div>
+          
+          {userProfile?.overflowBalance > 0 && (
+            <div className="bg-[#fff9c4] p-8 rounded-xl flex flex-col" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined text-on-surface text-3xl">account_balance</span>
+                <h2 className="text-2xl font-bold font-headline text-on-surface">Reserve Bank</h2>
+              </div>
+              <p className="text-sm font-bold text-on-surface-variant mb-6">
+                Your wallet exceeded the 500 GC cap. Your extra payouts are stored here.
+              </p>
+              
+              <div className="flex items-center justify-between bg-[#fff] p-4 rounded-xl border-2 border-black mb-6">
+                <span className="font-bold uppercase tracking-wider text-xs">Overflow Balance</span>
+                <span className="font-black text-xl">{userProfile.overflowBalance} GC</span>
+              </div>
+              
+              <div className="flex gap-2">
+                <input 
+                  type="number" 
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  placeholder="Amount"
+                  max={userProfile.overflowBalance}
+                  className="flex-1 px-4 py-3 border-2 border-black rounded-xl font-bold focus:outline-none"
+                  disabled={userProfile.gcBalance >= 500}
+                />
+                <button 
+                  onClick={async () => {
+                    try {
+                      setIsWithdrawing(true);
+                      await withdrawFromOverflow(withdrawAmount);
+                      setWithdrawAmount('');
+                    } catch (e) {
+                      // context handles toast
+                    } finally {
+                      setIsWithdrawing(false);
+                    }
+                  }}
+                  disabled={userProfile.gcBalance >= 500 || isWithdrawing || !withdrawAmount || parseInt(withdrawAmount) <= 0 || parseInt(withdrawAmount) > userProfile.overflowBalance || userProfile.gcBalance + parseInt(withdrawAmount) > 500}
+                  className="bg-black text-white font-bold px-6 py-3 rounded-xl hover:-translate-y-1 active:translate-y-0 transition-transform shadow-[4px_4px_0px_#9795ff] disabled:opacity-50 disabled:pointer-events-none disabled:shadow-none"
+                >
+                  {isWithdrawing ? '...' : 'Withdraw'}
+                </button>
+              </div>
+              {userProfile.gcBalance >= 500 && (
+                <p className="text-error text-xs font-bold mt-3 text-center">
+                  Main wallet maxed out. Spend GC to withdraw.
+                </p>
+              )}
+              {userProfile.gcBalance < 500 && parseInt(withdrawAmount) > 0 && (userProfile.gcBalance + parseInt(withdrawAmount) > 500) && (
+                <p className="text-error text-xs font-bold mt-3 text-center">
+                  Cannot withdraw {withdrawAmount} GC. Wallet would exceed 500 GC.
+                </p>
+              )}
+            </div>
+          )}
           
 
           <div className="bg-surface-container-lowest p-8 rounded-xl" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
@@ -281,19 +339,7 @@ const Profile = () => {
                   );
                 };
 
-                const mockTrustFall = () => {
-                  if (!questState.trustFall || questState.trustFall !== 'claimed') {
-                    updateProfile({ questState: { ...questState, trustFall: true } });
-                    toast.success("Trust Fall Mocked as Completed!");
-                  }
-                };
 
-                const mockAmbassador = () => {
-                  if (!questState.ambassador || questState.ambassador !== 'claimed') {
-                    updateProfile({ questState: { ...questState, ambassador: true } });
-                    toast.success("Ambassador Mocked as Completed!");
-                  }
-                };
                 
                 const TabButton = ({ id, label }) => {
                   const isActive = activeTab === id;
@@ -369,8 +415,8 @@ const Profile = () => {
                           <h3 className="text-lg font-bold uppercase tracking-widest text-[#000]">Onboarding</h3>
                         </div>
                         <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="50" icon="sports_martial_arts" bg="#fff8e1" accent="#ff8f00" completed={questState.icebreaker} progress={runs} total={1} />
-                        <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture (Click to mock)" reward="30" icon="verified_user" bg="#e8f5e9" accent="#2e7d32" completed={questState.trustFall} onClick={mockTrustFall} />
-                        <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile (Click to mock)" reward="40" icon="share" bg="#e3f2fd" accent="#1565c0" completed={questState.ambassador} onClick={mockAmbassador} />
+                        <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture" reward="30" icon="verified_user" bg="#e8f5e9" accent="#2e7d32" completed={questState.trustFall} />
+                        <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile" reward="40" icon="share" bg="#e3f2fd" accent="#1565c0" completed={questState.ambassador} />
                         <QuestCard id="wingman" title="The Wingman" desc="Refer a friend who completes a run." reward="25" icon="handshake" bg="#fce4ec" accent="#c2185b" completed={questState.wingman} progress={0} total={1} />
                         
                         <div className="flex justify-between items-center mb-3 pt-4">

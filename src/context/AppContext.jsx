@@ -12,10 +12,7 @@ export const useAppContext = () => useContext(AppContext);
 // Force true if Firebase is not setup
 const DISABLE_FIREBASE = false; 
 
-const MOCK_DATA = [
-  { id: '1', type: 'request', requesterId: 'user1', requesterName: 'Karthik S.', location: 'Main Gate', destination: 'Block Q', status: 'open', details: 'Large Pizza Box from Domino\'s. Please handle with care!', createdAt: new Date() },
-  { id: '2', type: 'offer', requesterId: 'user2', requesterName: 'Arjun Reddy', location: 'Block L', destination: 'Main Gate', status: 'open', details: 'Leaving in 15 mins. Can pick up any small packages.', createdAt: new Date() }
-];
+
 
 export const AppProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -116,8 +113,9 @@ export const AppProvider = ({ children }) => {
   // Listen to 'posts' collection
   useEffect(() => {
     if (DISABLE_FIREBASE) {
-      setFeedData(MOCK_DATA);
-      return;
+      // Mock data removed for production purge
+      setFeedData([]);
+      setLoading(false);
     }
 
     let timeoutId;
@@ -293,12 +291,18 @@ export const AppProvider = ({ children }) => {
           transaction.update(userRef, { gcBalance: newBalance, stats: newStats });
         }
         
+        const s = userData.stats || {};
+        const completedRuns = (s.tasksCompleted || 0) + (s.requestsCompleted || 0);
+        const totalRuns = completedRuns + (s.cancelled || 0);
+        const reliabilityScore = totalRuns === 0 ? 100 : Math.round((completedRuns / totalRuns) * 100);
+        
         transaction.set(postRef, {
           ...postData,
           cost: dynamicCost,
           runnerReward: runnerReward,
           requesterId: currentUser.uid,
           requesterName: userData.name || 'Student',
+          requesterScore: reliabilityScore,
           status: 'open',
           createdAt: serverTimestamp()
         });
@@ -332,6 +336,7 @@ export const AppProvider = ({ children }) => {
       const postRef = doc(db, 'posts', postId);
       const userRef = doc(db, 'users', currentUser.uid);
 
+      let actualRefund = 0;
       await runTransaction(db, async (transaction) => {
         const postSnap = await transaction.get(postRef);
         if (!postSnap.exists()) return;
@@ -342,14 +347,38 @@ export const AppProvider = ({ children }) => {
         if (postData.type === 'request' && postData.status === 'open' && postData.requesterId === currentUser.uid) {
            const userSnap = await transaction.get(userRef);
            if (userSnap.exists()) {
-             let newBalance = userSnap.data().gcBalance || 0;
+             const userData = userSnap.data();
+             let currentBalance = userData.gcBalance || 0;
+             let overflowBalance = userData.overflowBalance || 0;
              const refundAmount = postData.cost || 75;
-             newBalance = Math.min(500, newBalance + refundAmount);
-             transaction.update(userRef, { gcBalance: newBalance });
+             
+             actualRefund = refundAmount; // Pass total refund amount
+             let projectedBalance = currentBalance + refundAmount;
+             let newBalance = projectedBalance;
+             
+             if (projectedBalance > 500) {
+                const overflow = projectedBalance - 500;
+                newBalance = 500;
+                overflowBalance += overflow;
+             }
+             
+             transaction.update(userRef, { gcBalance: newBalance, overflowBalance });
            }
         }
         transaction.delete(postRef);
       });
+      
+      if (actualRefund > 0) {
+        setUserProfile(prev => {
+          let projected = prev.gcBalance + actualRefund;
+          return {
+            ...prev,
+            gcBalance: projected > 500 ? 500 : projected,
+            overflowBalance: projected > 500 ? (prev.overflowBalance || 0) + (projected - 500) : (prev.overflowBalance || 0)
+          };
+        });
+      }
+      setFeedData(prev => prev.filter(post => post.id !== postId));
     } catch (err) {
       console.error("Error deleting post:", err);
     }
@@ -404,26 +433,54 @@ export const AppProvider = ({ children }) => {
         return;
       }
       
-      // Fetch post to get original creator
-      const postSnap = await getDoc(doc(db, 'posts', postId));
-      if (!postSnap.exists()) return;
-      const originalRequesterId = postSnap.data().requesterId;
+      const postRef = doc(db, 'posts', postId);
+      let runnerId, requesterId, originalRequesterId, postCost;
       
-      const runnerId = postType === 'request' ? currentUser.uid : originalRequesterId;
-      const requesterId = postType === 'offer' ? currentUser.uid : originalRequesterId;
-      
-      await updateDoc(doc(db, 'posts', postId), { 
-        status: 'accepted',
-        acceptedBy: userProfile?.name || 'A Student',
-        runnerId,
-        requesterId
+      await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (!postSnap.exists()) throw new Error("Post no longer exists.");
+        
+        const postData = postSnap.data();
+        if (postData.status !== 'open') throw new Error("Post is no longer open.");
+        
+        originalRequesterId = postData.requesterId;
+        postCost = postData.cost || 75;
+        
+        runnerId = postType === 'request' ? currentUser.uid : originalRequesterId;
+        requesterId = postType === 'offer' ? currentUser.uid : originalRequesterId;
+        
+        if (postType === 'offer') {
+          // Requester accepting Runner's offer -> Deduct GC from Requester
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await transaction.get(userRef);
+          if (!userSnap.exists()) throw new Error("User does not exist.");
+          const userData = userSnap.data();
+          
+          if ((userData.gcBalance || 0) < postCost) {
+             throw new Error(`Insufficient GC balance (requires ${postCost} GC)`);
+          }
+          const newBalance = (userData.gcBalance || 0) - postCost;
+          transaction.update(userRef, { gcBalance: newBalance });
+        }
+        
+        transaction.update(postRef, { 
+          status: 'accepted',
+          acceptedBy: userProfile?.name || 'A Student',
+          runnerId,
+          requesterId
+        });
       });
+      
+      if (postType === 'offer' && postCost) {
+        setUserProfile(prev => ({ ...prev, gcBalance: prev.gcBalance - postCost }));
+      }
+
       const journeyRef = await addDoc(collection(db, 'journeys'), {
         postId,
         status: 'Accepted',
         postType,
-        runnerId: postType === 'request' ? currentUser.uid : originalRequesterId,
-        requesterId: postType === 'offer' ? currentUser.uid : originalRequesterId,
+        runnerId,
+        requesterId,
         otpCode: null,
         runnerLocation: { lat: null, lng: null },
         cancellationReason: null,
@@ -431,15 +488,22 @@ export const AppProvider = ({ children }) => {
       });
       listenToJourney(journeyRef.id);
 
+      const title = postType === 'offer' ? 'Wants a favor!' : 'Run Accepted';
+      const message = postType === 'offer' 
+        ? `${userProfile?.name || 'A requester'} wants you to deliver this.` 
+        : `${userProfile?.name || 'A runner'} has accepted your run.`;
+      const link = postType === 'offer' ? '/active-runs' : '/deliveries';
+      
       await createNotification(
         originalRequesterId,
-        'Run Accepted',
-        `${userProfile?.name || 'A runner'} has accepted your run.`,
+        title,
+        message,
         'journey_update',
-        '/deliveries'
+        link
       );
     } catch (err) {
       console.error("Error accepting request:", err);
+      toast.error(err.message || "Error accepting request");
     }
   };
 
@@ -573,11 +637,18 @@ export const AppProvider = ({ children }) => {
           const runnerRef = doc(db, 'users', journeyData.runnerId);
           const runnerData = runnerSnap.data();
           let newBalance = runnerData.gcBalance || 0;
+          let overflowBalance = runnerData.overflowBalance || 0;
           let stats = runnerData.stats || { lifetimeTasksCompleted: 0 };
           let claimInbox = runnerData.claimInbox || [];
           let questState = runnerData.questState || {};
           
-          newBalance = Math.min(500, newBalance + runnerReward);
+          let projectedBalance = newBalance + runnerReward;
+          if (projectedBalance > 500) {
+            overflowBalance += (projectedBalance - 500);
+            newBalance = 500;
+          } else {
+            newBalance = projectedBalance;
+          }
           
           stats.lifetimeTasksCompleted = (stats.lifetimeTasksCompleted || 0) + 1;
           const runs = stats.lifetimeTasksCompleted;
@@ -634,10 +705,10 @@ export const AppProvider = ({ children }) => {
           if (runs >= 75 && !questState.milestone75) questState.milestone75 = true;
           if (runs >= 100 && !questState.milestone100) questState.milestone100 = true;
           
-          transaction.update(runnerRef, { gcBalance: newBalance, stats, questState });
+          transaction.update(runnerRef, { gcBalance: newBalance, overflowBalance, stats, questState });
           
           if (currentUser && currentUser.uid === journeyData.runnerId) {
-            updatedRunnerData = { gcBalance: newBalance, stats, questState };
+            updatedRunnerData = { gcBalance: newBalance, overflowBalance, stats, questState };
           }
         }
       });
@@ -663,6 +734,7 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const journeyRef = doc(db, 'journeys', journeyId);
+      let actualRefund = 0;
       
       await runTransaction(db, async (transaction) => {
         // --- 1. ALL READS ---
@@ -683,7 +755,7 @@ export const AppProvider = ({ children }) => {
           
           if (postSnap.exists()) {
              const postData = postSnap.data();
-             if (postData.type === 'request' && journeyData.requesterId) {
+             if (journeyData.requesterId) {
                requesterRef = doc(db, 'users', journeyData.requesterId);
                reqSnap = await transaction.get(requesterRef);
              }
@@ -697,16 +769,45 @@ export const AppProvider = ({ children }) => {
         });
         
         if (postSnap && postSnap.exists()) {
+             const postData = postSnap.data();
              if (reqSnap && reqSnap.exists()) {
-                 let newBalance = reqSnap.data().gcBalance || 0;
+                 const userData = reqSnap.data();
+                 let currentBalance = userData.gcBalance || 0;
+                 let overflowBalance = userData.overflowBalance || 0;
                  const refundAmount = postData.cost || 75;
-                 newBalance = Math.min(500, newBalance + refundAmount); // Dynamic Refund
-                 transaction.update(requesterRef, { gcBalance: newBalance });
+                 
+                 if (currentUser.uid === journeyData.requesterId) {
+                    actualRefund = refundAmount;
+                 }
+                 
+                 let projectedBalance = currentBalance + refundAmount;
+                 let newBalance = projectedBalance;
+                 
+                 if (projectedBalance > 500) {
+                    const overflow = projectedBalance - 500;
+                    newBalance = 500;
+                    overflowBalance += overflow;
+                 }
+                 
+                 transaction.update(requesterRef, { gcBalance: newBalance, overflowBalance });
              }
              transaction.update(postRef, { status: 'cancelled' });
         }
       });
       setActiveJourney(null);
+      if (actualRefund > 0) {
+        setUserProfile(prev => {
+          let projected = prev.gcBalance + actualRefund;
+          return {
+            ...prev,
+            gcBalance: projected > 500 ? 500 : projected,
+            overflowBalance: projected > 500 ? (prev.overflowBalance || 0) + (projected - 500) : (prev.overflowBalance || 0)
+          };
+        });
+      }
+      if (originalPostId) {
+        setFeedData(prev => prev.filter(post => post.id !== originalPostId));
+      }
     } catch (err) {
       console.error("Error cancelling journey", err);
       throw err;
@@ -841,27 +942,107 @@ export const AppProvider = ({ children }) => {
         const snap = await transaction.get(userRef);
         if (!snap.exists()) return;
         const data = snap.data();
+        let questState = data.questState || {};
         
-        let newBalance = (data.gcBalance || 0) + parsedReward;
-        if (newBalance > 500) {
-          throw new Error("Wallet limit reached. Spend GC before claiming.");
+        if (questState[questId] === 'claimed') {
+            throw new Error("Already claimed");
         }
         
-        let questState = data.questState || {};
+        let projectedBalance = (data.gcBalance || 0) + parsedReward;
+        let newBalance = projectedBalance;
+        let overflowBalance = data.overflowBalance || 0;
+        
+        if (projectedBalance > 500) {
+          overflowBalance += (projectedBalance - 500);
+          newBalance = 500;
+        }
+        
         questState[questId] = 'claimed';
         
-        transaction.update(userRef, { gcBalance: newBalance, questState });
+        transaction.update(userRef, { gcBalance: newBalance, overflowBalance, questState });
       });
       
-      setUserProfile(prev => ({
-        ...prev,
-        gcBalance: prev.gcBalance + parsedReward,
-        questState: { ...prev.questState, [questId]: 'claimed' }
-      }));
+      setUserProfile(prev => {
+        let projected = prev.gcBalance + parsedReward;
+        return {
+          ...prev,
+          gcBalance: projected > 500 ? 500 : projected,
+          overflowBalance: projected > 500 ? (prev.overflowBalance || 0) + (projected - 500) : (prev.overflowBalance || 0),
+          questState: { ...prev.questState, [questId]: 'claimed' }
+        };
+      });
       
     } catch(err) {
       console.error(err);
       throw err;
+    }
+  };
+
+  const withdrawFromOverflow = async (amountToWithdraw) => {
+    if (DISABLE_FIREBASE) return;
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      const parsedAmount = parseInt(amountToWithdraw, 10);
+      if (isNaN(parsedAmount) || parsedAmount <= 0) throw new Error("Invalid amount.");
+
+      await runTransaction(db, async (transaction) => {
+        const snap = await transaction.get(userRef);
+        if (!snap.exists()) throw new Error("User not found");
+        
+        const data = snap.data();
+        const currentBalance = data.gcBalance || 0;
+        const currentOverflow = data.overflowBalance || 0;
+
+        if (parsedAmount > currentOverflow) {
+          throw new Error("Withdrawal amount exceeds overflow balance.");
+        }
+        if (currentBalance + parsedAmount > 500) {
+          throw new Error("Withdrawal would exceed 500 GC wallet cap.");
+        }
+
+        const newBalance = currentBalance + parsedAmount;
+        const newOverflow = currentOverflow - parsedAmount;
+
+        transaction.update(userRef, { gcBalance: newBalance, overflowBalance: newOverflow });
+      });
+
+      setUserProfile(prev => ({
+        ...prev,
+        gcBalance: prev.gcBalance + parsedAmount,
+        overflowBalance: prev.overflowBalance - parsedAmount
+      }));
+
+      toast.success(`Successfully withdrew ${parsedAmount} GC from overflow tank!`);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Error withdrawing GC");
+      throw err;
+    }
+  };
+
+  const fetchPublicProfile = async (targetUid) => {
+    if (!targetUid || DISABLE_FIREBASE) return null;
+    try {
+      const userRef = doc(db, 'users', targetUid);
+      const snap = await getDoc(userRef);
+      if (!snap.exists()) return null;
+      
+      const data = snap.data();
+      const s = data.stats || {};
+      const completedRuns = (s.tasksCompleted || 0) + (s.requestsCompleted || 0);
+      const totalRuns = completedRuns + (s.cancelled || 0);
+      const reliabilityScore = totalRuns === 0 ? 100 : Math.round((completedRuns / totalRuns) * 100);
+      
+      return {
+        name: data.name || 'Student',
+        reliabilityScore,
+        stats: s,
+        avatar: data.avatar || null,
+        questState: data.questState || {}
+      };
+    } catch (err) {
+      console.error("Error fetching public profile:", err);
+      return null;
     }
   };
 
@@ -890,7 +1071,9 @@ export const AppProvider = ({ children }) => {
     submitReport,
     getUserStats,
     getJourneyHistory,
-    claimQuestFromBoard
+    claimQuestFromBoard,
+    withdrawFromOverflow,
+    fetchPublicProfile
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

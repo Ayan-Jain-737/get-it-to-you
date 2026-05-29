@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { X, CheckCircle, Clock } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import PublicProfileModal from './PublicProfileModal';
 
 const OrderDetailsModal = ({ isOpen, onClose, post }) => {
   const { getJourneyHistory, currentUser } = useAppContext();
   const [history, setHistory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profileTargetUid, setProfileTargetUid] = useState(null);
 
   useEffect(() => {
     if (!isOpen || !post) return;
@@ -58,8 +60,20 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                 <h3 className="font-bold text-lg">{post.item || post.description || post.details || 'Campus Pick-up'}</h3>
               </div>
               <div className="text-right">
-                <p className="text-xs uppercase font-bold text-gray-600 mb-1">Reward</p>
-                <p className="font-bold">{post.price && post.price !== 'Free' ? post.price : 'Good Karma'}</p>
+                <p className="text-xs uppercase font-bold text-gray-600 mb-1">
+                  {post.type === 'request' ? (
+                    currentUser && post.requesterId === currentUser.uid ? 'Cost' : 'Reward'
+                  ) : (
+                    currentUser && post.requesterId === currentUser.uid ? 'Reward' : 'Cost'
+                  )}
+                </p>
+                <p className="font-bold">
+                  {post.type === 'request' ? (
+                    currentUser && post.requesterId === currentUser.uid ? `${post.cost || 75} GC` : `${post.runnerReward || 50} GC`
+                  ) : (
+                    currentUser && post.requesterId === currentUser.uid ? `${post.runnerReward || 50} GC` : `${post.cost || 75} GC`
+                  )}
+                </p>
               </div>
             </div>
             
@@ -73,6 +87,22 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                 <p className="font-bold">{post.destination || 'Campus'}</p>
               </div>
             </div>
+
+            {history?.journey && (
+              <div className="pt-4 border-t-2 border-dashed border-black mt-4">
+                <div className="flex justify-between items-center">
+                  <p className="text-xs uppercase font-bold text-gray-600">
+                    {currentUser.uid === post.requesterId ? 'DELIVERED BY:' : 'REQUESTED BY:'}
+                  </p>
+                  <p 
+                    className="font-bold uppercase tracking-wider cursor-pointer border-b-2 border-dashed border-black hover:text-primary transition-colors"
+                    onClick={() => setProfileTargetUid(currentUser.uid === post.requesterId ? history.journey.runnerId : post.requesterId)}
+                  >
+                    {currentUser.uid === post.requesterId ? (history.journey.runnerName || 'Runner') : (post.requesterName || 'Requester')}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Timestamps & Status */}
@@ -124,21 +154,30 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                   <span className="material-symbols-outlined text-xl">account_balance_wallet</span> GC Transaction
                 </h4>
                 <div className="p-4 border-2 border-black bg-white shadow-[4px_4px_0px_#000]">
-                  {post.requesterId === currentUser?.uid ? (
-                    <div className="flex justify-between items-center text-red-600 font-bold">
-                      <span>Requester Escrow</span>
-                      <span className="text-xl">-{post.cost || 75} GC</span>
-                    </div>
-                  ) : history?.journey?.runnerId === currentUser?.uid ? (
-                    <div className="flex justify-between items-center text-green-600 font-bold">
-                      <span>Runner Reward</span>
-                      <span className="text-xl">+{post.runnerReward || 50} GC</span>
-                    </div>
+                  {post.type === 'request' ? (
+                    post.requesterId === currentUser?.uid ? (
+                      <div className="flex justify-between items-center text-red-600 font-bold">
+                        <span>Requester Escrow</span>
+                        <span className="text-xl">-{post.cost || 75} GC</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center text-green-600 font-bold">
+                        <span>Runner Reward</span>
+                        <span className="text-xl">+{post.runnerReward || 50} GC</span>
+                      </div>
+                    )
                   ) : (
-                    <div className="flex justify-between items-center font-bold">
-                      <span>Network Transfer</span>
-                      <span>Processing...</span>
-                    </div>
+                    post.requesterId === currentUser?.uid ? (
+                      <div className="flex justify-between items-center text-green-600 font-bold">
+                        <span>Runner Reward</span>
+                        <span className="text-xl">+{post.runnerReward || 50} GC</span>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center text-red-600 font-bold">
+                        <span>Requester Escrow</span>
+                        <span className="text-xl">-{post.cost || 75} GC</span>
+                      </div>
+                    )
                   )}
                 </div>
               </div>
@@ -182,6 +221,12 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
           </div>
         </div>
       </div>
+
+      <PublicProfileModal
+        isOpen={!!profileTargetUid}
+        targetUid={profileTargetUid}
+        onClose={() => setProfileTargetUid(null)}
+      />
     </div>
   );
 };

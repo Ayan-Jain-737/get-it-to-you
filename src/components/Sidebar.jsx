@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import NotificationBell from './NotificationBell';
+import ConfirmModal from './ConfirmModal';
 import styles from './Sidebar.module.css';
 
 const Sidebar = ({ onOpenPostModal }) => {
   const { logout, userProfile } = useAppContext();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   return (
     <>
@@ -59,7 +61,7 @@ const Sidebar = ({ onOpenPostModal }) => {
             <button className={styles.iconBtn} onClick={onOpenPostModal} title="Create Post">
              <span className="material-symbols-outlined">add_circle</span>
             </button>
-            <button className={styles.iconBtn} onClick={logout} title="Logout">
+            <button className={styles.iconBtn} onClick={() => setIsLogoutModalOpen(true)} title="Logout">
               <span className="material-symbols-outlined">logout</span>
             </button>
           </div>
@@ -101,6 +103,19 @@ const Sidebar = ({ onOpenPostModal }) => {
           </NavLink>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        title="Logging Out"
+        message="Are you sure you want to log out?"
+        confirmText="Log Out"
+        isDestructive={true}
+        onConfirm={() => {
+          setIsLogoutModalOpen(false);
+          logout();
+        }}
+        onCancel={() => setIsLogoutModalOpen(false)}
+      />
     </>
   );
 };
