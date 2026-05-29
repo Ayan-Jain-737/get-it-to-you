@@ -8,17 +8,33 @@ const ActiveRunsList = () => {
   const { activeJourney, currentUser, feedData, trackJourney } = useAppContext();
   const [selectedPost, setSelectedPost] = useState(null);
 
-  // If there's an active run and user is the runner, show the details directly
-  if (activeJourney && activeJourney.runnerId === currentUser?.uid) {
-    return <ActiveJourney />;
+  const [showMap, setShowMap] = useState(false);
+
+  const handleTrack = async (postId) => {
+    await trackJourney(postId);
+    setShowMap(true);
+  };
+
+  // If there's an active run and user is the runner and they requested to show it
+  if (showMap && activeJourney && activeJourney.runnerId === currentUser?.uid) {
+    return (
+      <div className="relative w-full h-[calc(100vh-80px)]">
+        <button 
+          onClick={() => setShowMap(false)}
+          className="absolute top-4 left-4 z-[9999] bg-white border-2 border-black shadow-[4px_4px_0px_#000] px-4 py-2 font-bold flex items-center gap-2 hover:-translate-y-1 transition-transform cursor-pointer"
+        >
+          <span className="material-symbols-outlined">arrow_back</span>
+          Back to Tasks List
+        </button>
+        <ActiveJourney />
+      </div>
+    );
   }
 
   const history = feedData.filter(p => p.runnerId === currentUser?.uid && p.status === 'completed');
   const myActiveRuns = feedData.filter(p => p.runnerId === currentUser?.uid && p.status === 'accepted');
 
-  const handleTrack = async (postId) => {
-    await trackJourney(postId);
-  };
+
 
   return (
     <main className="max-w-screen-2xl mx-auto px-6 py-12 md:py-16">
@@ -107,7 +123,7 @@ const ActiveRunsList = () => {
                            <span className="text-xs bg-surface-variant text-on-surface-variant px-2 py-1 rounded-md font-medium truncate max-w-[120px]">{post.destination}</span>
                          </div>
                          <div className="bg-[#ffc5aa]/20 px-2 py-1 rounded-md">
-                           <span className="text-xs font-bold text-[#9b3f00]">{post.price && post.price !== 'Free' ? post.price : 'Good Karma'}</span>
+                           <span className="text-xs font-bold text-[#9b3f00]">{post.type === 'request' || post.postType === 'request' ? 'Reward: 50 GC' : (post.price && post.price !== 'Free' ? post.price : 'Good Karma')}</span>
                          </div>
                       </div>
                     </div>

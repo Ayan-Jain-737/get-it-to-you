@@ -3,7 +3,15 @@ import { useAppContext } from '../context/AppContext';
 import OrderDetailsModal from './OrderDetailsModal';
 
 const Profile = () => {
-  const { userProfile, updateProfile, currentUser, getUserStats } = useAppContext();
+  const { userProfile, updateProfile, currentUser, getUserStats, claimReward } = useAppContext();
+  
+  const handleClaim = async (rewardId) => {
+    try {
+      await claimReward(rewardId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   
   const [name, setName] = useState(userProfile?.name || '');
   const [dorm, setDorm] = useState(userProfile?.dorm || "Main Gate");
@@ -55,7 +63,7 @@ const Profile = () => {
         
         {/* Left Column: Stats & Reliability */}
         <section className="lg:col-span-5 space-y-6">
-          <div className="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_12px_32px_rgba(50,41,79,0.06)] flex flex-col items-center justify-center text-center">
+          <div className="bg-surface-container-lowest p-8 rounded-xl flex flex-col items-center justify-center text-center" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
             <div className="relative w-32 h-32 mb-6">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                 {/* Background circle */}
@@ -108,7 +116,41 @@ const Profile = () => {
             </div>
           </div>
           
-          <div className="bg-surface-container p-8 rounded-[2rem]">
+
+          {/* CLAIM INBOX */}
+          <div className="bg-surface-container-lowest p-8 rounded-xl" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
+            <h2 className="text-xl font-bold text-on-surface font-headline mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary">redeem</span>
+              Quest Rewards
+            </h2>
+            <div className="space-y-3">
+              {userProfile?.claimInbox?.length === 0 ? (
+                <p className="text-sm text-on-surface-variant text-center py-4">No rewards to claim right now. Complete some tasks!</p>
+              ) : (
+                userProfile?.claimInbox?.map(reward => {
+                  const isFull = (userProfile?.gcBalance || 0) + reward.amount > 500;
+                  return (
+                    <div key={reward.id} className="flex justify-between items-center p-3 rounded-xl" style={{ border: '2px dashed #000', background: '#f4f4f0' }}>
+                      <div>
+                        <h4 className="font-bold text-sm text-on-surface">{reward.title}</h4>
+                        <span className="text-xs font-bold text-tertiary">+{reward.amount} GC</span>
+                      </div>
+                      <button 
+                        onClick={() => handleClaim(reward.id)} 
+                        disabled={isFull}
+                        className="btn-primary py-2 px-4 text-xs"
+                        style={{ padding: '8px 16px', background: isFull ? '#ccc' : 'var(--primary)', color: isFull ? '#666' : '#fff' }}
+                      >
+                        {isFull ? 'Wallet Full' : 'Claim'}
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          <div className="bg-surface-container-lowest p-8 rounded-xl" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
             <h2 className="text-xl font-bold text-on-surface font-headline mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">settings</span>
               Preferences
@@ -160,7 +202,7 @@ const Profile = () => {
 
         {/* Right Column: Trust Evidence */}
         <section className="lg:col-span-7">
-          <div className="bg-surface-container-lowest border border-outline-variant/20 p-8 rounded-[2rem] min-h-full">
+          <div className="bg-surface-container-lowest p-8 rounded-xl min-h-full" style={{ border: '2px solid #000', boxShadow: '4px 4px 0px #000' }}>
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-xl font-bold text-on-surface font-headline flex items-center gap-2">
@@ -186,8 +228,8 @@ const Profile = () => {
                 </div>
               ) : (
                 stats.pastRuns?.map((run, idx) => (
-                  <div key={run.id || idx} onClick={() => setSelectedRun(run)} className="flex items-start gap-4 p-4 rounded-2xl border border-outline-variant/10 hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    <div className="w-12 h-12 bg-tertiary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div key={run.id || idx} onClick={() => setSelectedRun(run)} className="flex items-start gap-4 p-4 rounded-xl cursor-pointer hover:-translate-y-1 transition-transform" style={{ border: '2px solid #000', boxShadow: '2px 2px 0px #000', background: '#fff' }}>
+                    <div className="w-12 h-12 bg-tertiary/10 rounded-full flex items-center justify-center flex-shrink-0 border-2 border-black">
                       <span className="material-symbols-outlined text-tertiary text-xl">task_alt</span>
                     </div>
                     <div className="flex-1">

@@ -14,12 +14,26 @@ const MyDeliveries = () => {
   const [reportData, setReportData] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
 
+  const [showMap, setShowMap] = useState(false);
+
   const handleTrack = async (postId) => {
     await trackJourney(postId);
+    setShowMap(true);
   };
 
-  if (activeJourney && activeJourney.requesterId === currentUser?.uid) {
-    return <ActiveJourney />;
+  if (showMap && activeJourney && activeJourney.requesterId === currentUser?.uid) {
+    return (
+      <div className="relative w-full h-[calc(100vh-80px)]">
+        <button 
+          onClick={() => setShowMap(false)}
+          className="absolute top-4 left-4 z-[9999] bg-white border-2 border-black shadow-[4px_4px_0px_#000] px-4 py-2 font-bold flex items-center gap-2 hover:-translate-y-1 transition-transform cursor-pointer"
+        >
+          <span className="material-symbols-outlined">arrow_back</span>
+          Back to Requests List
+        </button>
+        <ActiveJourney />
+      </div>
+    );
   }
 
   const myAcceptedRequests = feedData.filter(

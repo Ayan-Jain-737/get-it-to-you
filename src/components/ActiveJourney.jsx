@@ -81,6 +81,8 @@ const ActiveJourney = () => {
   const [cancelReason, setCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
   const [enteredOTP, setEnteredOTP] = useState('');
+  const [otpError, setOtpError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
@@ -318,15 +320,25 @@ const ActiveJourney = () => {
   const handleVerifyOTP = async () => {
     if (enteredOTP.length !== 4) return;
     setIsVerifying(true);
+    setOtpError(false);
+    setErrorMessage("");
     try {
       await verifyOTPAndComplete(activeJourney.id, enteredOTP);
       toast.success("Delivery completed!", { style: { borderRadius: 'var(--radius-md)' } });
       navigate('/dashboard');
     } catch (err) {
+      setOtpError(true);
+      setErrorMessage("Incorrect OTP. Please try again.");
       toast.error("Incorrect OTP", { style: { borderRadius: 'var(--radius-md)' } });
     } finally {
       setIsVerifying(false);
     }
+  };
+
+  const handleOtpInput = (value) => {
+    setOtpError(false); // Force clear the boolean error state
+    setErrorMessage(""); // Force clear any error text
+    setEnteredOTP(value.replace(/\D/g, '')); // Update the state, strip non-digits
   };
 
   let distanceToTarget = null;
@@ -343,7 +355,8 @@ const ActiveJourney = () => {
       distanceToTarget = getDistanceFromLatLonInM(activeJourney.runnerLocation.lat, activeJourney.runnerLocation.lng, targetCoords.lat, targetCoords.lng);
     }
   }
-  const isTooFar = distanceToTarget !== null && distanceToTarget > 200;
+  const isTooFar = distanceToTarget !== null && distanceToTarget > 10;
+  const isAtDestination = currentStepIndex === 2 && distanceToTarget !== null && distanceToTarget <= 10;
 
   // Prepare map coordinates
   const pickupArr = getSafeCoords(postInfo?.locationCoords || postInfo?.location);
@@ -424,7 +437,7 @@ const ActiveJourney = () => {
             <div className="bg-[#ffc5aa]/20 border border-[#ffc5aa]/30 p-4 rounded-2xl flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[#9b3f00] opacity-80">Reward</p>
-                <p className="text-[#9b3f00] font-bold text-lg">{postInfo.price && postInfo.price !== 'Free' ? postInfo.price : 'Good Karma'}</p>
+                <p className="text-[#9b3f00] font-bold text-lg">{postInfo.type === 'request' || activeJourney.postType === 'request' ? '50 GC' : (postInfo.price && postInfo.price !== 'Free' ? postInfo.price : 'Good Karma')}</p>
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[#9b3f00] opacity-80">Deliver To</p>
@@ -510,17 +523,26 @@ const ActiveJourney = () => {
               <button 
                 onClick={handleNextStatus} 
                 disabled={isTooFar && !isSimulating}
-                className="w-full bg-primary text-white font-bold py-4 rounded-[1.5rem] flex items-center justify-center gap-3 active:scale-95 transition-all outline-none shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full font-bold py-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all outline-none disabled:cursor-not-allowed"
+                style={{
+                  border: '2px solid #000',
+                  boxShadow: (isTooFar && !isSimulating) ? 'none' : '4px 4px 0px #000',
+                  background: (isTooFar && !isSimulating) ? '#ccc' : 'var(--primary)',
+                  color: (isTooFar && !isSimulating) ? '#666' : '#fff'
+                }}
               >
-                <span className="material-symbols-outlined">where_to_vote</span>
-                Advance to {STATUS_STEPS[currentStepIndex + 1]}
+                {isTooFar && !isSimulating ? (
+                  <>
+                    <span className="material-symbols-outlined">lock</span>
+                    Locked ({Math.round(distanceToTarget)}m away)
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined">where_to_vote</span>
+                    Advance to {STATUS_STEPS[currentStepIndex + 1]}
+                  </>
+                )}
               </button>
-              {isTooFar && !isSimulating && (
-                <p className="text-error text-xs text-center font-medium mt-2">
-                  <span className="material-symbols-outlined text-[14px] align-middle mr-1">location_disabled</span>
-                  You must be within 200m to advance.
-                </p>
-              )}
             </div>
           )}
 
@@ -536,8 +558,9 @@ const ActiveJourney = () => {
                       type="text" 
                       maxLength="4" 
                       value={enteredOTP} 
-                      onChange={(e) => setEnteredOTP(e.target.value.replace(/\D/g, ''))}
-                      className="bg-surface-container-lowest text-center text-xl font-bold tracking-[0.5em] py-3 rounded-xl w-full border border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 text-on-surface"
+                      onChange={(e) => handleOtpInput(e.target.value)}
+                      className="bg-surface-container-lowest text-center text-xl font-bold tracking-[0.5em] py-3 rounded-xl w-full border focus:outline-none focus:ring-2 focus:ring-primary/50 text-on-surface"
+                      style={{ border: otpError ? '2px solid red' : '2px solid #000', boxShadow: '4px 4px 0px #000' }}
                       placeholder="0000"
                     />
                     <button 
@@ -548,6 +571,9 @@ const ActiveJourney = () => {
                       {isVerifying ? 'Verifying...' : 'Verify'}
                     </button>
                   </div>
+                  {errorMessage && (
+                    <p className="text-red-500 font-bold text-xs mt-2">{errorMessage}</p>
+                  )}
                 </>
               ) : (
                 <>
@@ -569,15 +595,22 @@ const ActiveJourney = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setShowReportModal(true)}
-              className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-xs text-on-surface-variant hover:bg-surface-container border border-outline-variant/20"
+              className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-xs hover:bg-surface-container"
+              style={{ border: '2px solid #000', background: '#fff', color: '#000', boxShadow: '2px 2px 0px #000' }}
             >
               <span className="material-symbols-outlined text-[14px]">flag</span>
               Report
             </button>
             <button
               onClick={() => setShowCancelModal(true)}
-              disabled={activeJourney.status === 'Arrived'}
-              className={`flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-xs border ${activeJourney.status === 'Arrived' ? 'border-outline-variant/30 text-on-surface-variant opacity-50 cursor-not-allowed' : 'border-error/30 text-error hover:bg-error/10'}`}
+              disabled={activeJourney.status === 'Arrived' || isAtDestination}
+              className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-error hover:text-white"
+              style={{
+                border: '2px solid #000',
+                background: (activeJourney.status === 'Arrived' || isAtDestination) ? '#eee' : '#fff',
+                color: (activeJourney.status === 'Arrived' || isAtDestination) ? '#999' : 'var(--error)',
+                boxShadow: (activeJourney.status === 'Arrived' || isAtDestination) ? 'none' : '2px 2px 0px #000'
+              }}
             >
               <span className="material-symbols-outlined text-[14px]">cancel</span>
               Cancel

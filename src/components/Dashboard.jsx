@@ -93,7 +93,7 @@ const Dashboard = () => {
                     <span className="material-symbols-outlined">package_2</span>
                     <span>{post.details || 'Large Box (Textbooks)'}</span>
                   </div>
-                  <span className={styles.price}>{post.price && post.price !== 'Free' ? post.price : 'Good Karma'}</span>
+                  <span className={styles.price}>{post.type === 'request' ? 'Reward: 50 GC' : (post.price && post.price !== 'Free' ? post.price : 'Good Karma')}</span>
                 </div>
 
                 {(!currentUser || post.requesterId !== currentUser.uid) ? (

@@ -1,32 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* GITY Kinetic Theme Colors */
-  --primary: #4F46E5; /* Override per instructions */
+  /* GITY Neo-Brutalist Theme Colors */
+  --primary: #4F46E5;
   --primary-dim: #3d30d4;
-  --primary-container: #9795ff;
+  --primary-container: #ffffff;
   
   --secondary: #FF6D00;
   --tertiary: #00C853;
+  --error: #FF3B30;
   
-  --background: #faf4ff;
+  --background: #f4f4f0;
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #f5eeff;
-  --surface-container: #ede4ff;
-  --surface-container-high: #e8deff;
+  --surface-container-low: #ffffff;
+  --surface-container: #ffffff;
+  --surface-container-high: #ffffff;
   
-  --on-background: #32294f;
-  --on-surface: #32294f;
-  --on-surface-variant: #5f557f;
+  --on-background: #000000;
+  --on-surface: #000000;
+  --on-surface-variant: #333333;
   
-  --outline-variant: rgba(178, 166, 213, 0.15); /* Ghost Border */
+  --outline-variant: #000000; /* Solid Black Ghost Border */
   
   /* Radii & Shadows */
-  --radius-md: 0.75rem;
-  --radius-xl: 1.5rem; /* 24px */
+  --radius-md: 4px;
+  --radius-xl: 8px;
   
-  --shadow-ambient: 0 12px 32px rgba(50, 41, 79, 0.06);
-  --shadow-lift: 0 4px 12px rgba(50, 41, 79, 0.04);
+  --shadow-ambient: 4px 4px 0px #000;
+  --shadow-lift: 2px 2px 0px #000;
 }
 
 * {
@@ -48,32 +49,36 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--on-surface);
 }
 
-/* Base Editorial Button */
+/* Neo-Brutalist Base Button */
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  background: var(--primary);
   color: #fff;
-  border: none;
+  border: 2px solid #000;
   border-radius: var(--radius-xl);
   padding: 14px 24px;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
   box-shadow: var(--shadow-ambient);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 36px rgba(50, 41, 79, 0.1);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
 }
 
 .btn-primary:active {
-  transform: scale(0.98);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
 }
 
 .btn-primary:disabled {
-  opacity: 0.6;
+  background: #ccc;
+  color: #666;
+  border: 2px solid #999;
+  box-shadow: none;
   cursor: not-allowed;
   transform: none;
 }

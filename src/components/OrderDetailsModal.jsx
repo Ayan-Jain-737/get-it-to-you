@@ -3,7 +3,7 @@ import { X, CheckCircle, Clock } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const OrderDetailsModal = ({ isOpen, onClose, post }) => {
-  const { getJourneyHistory } = useAppContext();
+  const { getJourneyHistory, currentUser } = useAppContext();
   const [history, setHistory] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,44 +27,50 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
   if (!isOpen || !post) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-sm">
-      <div className="bg-surface-container-lowest rounded-[2rem] w-full max-w-lg max-h-[90vh] flex flex-col shadow-xl overflow-hidden border border-outline-variant/30">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="bg-[#fffdf5] w-full max-w-md max-h-[90vh] flex flex-col shadow-[8px_8px_0px_#000] overflow-hidden border-2 border-black relative" style={{ fontFamily: '"Courier New", Courier, monospace' }}>
+        
+        {/* Receipt Jagged Edge Top (optional aesthetic) */}
+        <div style={{ width: '100%', height: '8px', backgroundImage: 'radial-gradient(circle, #fffdf5 4px, transparent 5px)', backgroundSize: '10px 10px', backgroundPosition: '-5px -5px', position: 'absolute', top: -4, borderTop: '2px dashed #000' }}></div>
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-outline-variant/20 bg-surface-container-highest">
-          <h2 className="text-xl font-bold font-headline text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">receipt_long</span>
-            Order Details
+        <div className="flex items-center justify-between p-6 border-b-2 border-dashed border-black">
+          <h2 className="text-2xl font-bold uppercase tracking-widest flex items-center gap-2">
+            *** GITY RECEIPT ***
           </h2>
-          <button onClick={onClose} className="p-2 bg-surface-container hover:bg-surface-variant rounded-full text-on-surface-variant transition-colors">
-            <X size={20} />
+          <button onClick={onClose} className="p-1 hover:bg-black hover:text-white transition-colors border-2 border-transparent hover:border-black rounded-full">
+            <X size={24} />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="p-6 overflow-y-auto space-y-6 bg-surface-container-lowest flex-1">
+        <div className="p-6 overflow-y-auto space-y-6 flex-1 text-black">
           
           {/* Summary Card */}
-          <div className="bg-surface-container p-5 rounded-2xl border border-outline-variant/30">
-            <div className="flex justify-between items-start mb-4">
+          <div className="space-y-4">
+            <div className="text-center mb-6">
+              <p className="uppercase text-sm font-bold tracking-widest border-b border-dashed border-black pb-2 inline-block">Order Details</p>
+            </div>
+            
+            <div className="flex justify-between items-end border-b-2 border-dashed border-black pb-2">
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">Item</p>
-                <h3 className="font-bold text-on-surface text-lg">{post.item || post.description || post.details || 'Campus Pick-up'}</h3>
+                <p className="text-xs uppercase font-bold text-gray-600 mb-1">Item</p>
+                <h3 className="font-bold text-lg">{post.item || post.description || post.details || 'Campus Pick-up'}</h3>
               </div>
               <div className="text-right">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">Reward</p>
-                <p className="font-bold text-primary">{post.price && post.price !== 'Free' ? post.price : 'Good Karma'}</p>
+                <p className="text-xs uppercase font-bold text-gray-600 mb-1">Reward</p>
+                <p className="font-bold">{post.price && post.price !== 'Free' ? post.price : 'Good Karma'}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-6 pt-4 border-t border-outline-variant/20">
+            <div className="flex items-center gap-6 pt-2 border-b-2 border-dashed border-black pb-4">
               <div className="flex-1">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">From</p>
-                <p className="font-bold text-on-surface text-sm">{post.pickupLocation || post.pickup || post.location || 'Campus Landmark'}</p>
+                <p className="text-xs uppercase font-bold text-gray-600 mb-1">From</p>
+                <p className="font-bold">{post.pickupLocation || post.pickup || post.location || 'Campus Landmark'}</p>
               </div>
               <div className="flex-1">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">To</p>
-                <p className="font-bold text-on-surface text-sm">{post.destination || 'Campus'}</p>
+                <p className="text-xs uppercase font-bold text-gray-600 mb-1">To</p>
+                <p className="font-bold">{post.destination || 'Campus'}</p>
               </div>
             </div>
           </div>
@@ -112,25 +118,50 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                 </div>
               </div>
 
-              {/* Chat History */}
-              <div className="space-y-4">
-                <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[18px]">chat</span> Chat Transcript
+              {/* Economic Summary */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 border-dashed border-black pb-2">
+                  <span className="material-symbols-outlined text-xl">account_balance_wallet</span> GC Transaction
                 </h4>
-                <div className="bg-surface-container p-5 rounded-2xl border border-outline-variant/30 max-h-60 overflow-y-auto space-y-3">
+                <div className="p-4 border-2 border-black bg-white shadow-[4px_4px_0px_#000]">
+                  {post.requesterId === currentUser?.uid ? (
+                    <div className="flex justify-between items-center text-red-600 font-bold">
+                      <span>Requester Escrow</span>
+                      <span className="text-xl">-75 GC</span>
+                    </div>
+                  ) : history?.journey?.runnerId === currentUser?.uid ? (
+                    <div className="flex justify-between items-center text-green-600 font-bold">
+                      <span>Runner Reward</span>
+                      <span className="text-xl">+50 GC</span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center font-bold">
+                      <span>Network Transfer</span>
+                      <span>Processing...</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Chat History */}
+              <div className="space-y-2 pt-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 border-b-2 border-dashed border-black pb-2">
+                  <span className="material-symbols-outlined text-xl">chat</span> Transcript
+                </h4>
+                <div className="p-4 border-2 border-black bg-white shadow-[4px_4px_0px_#000] max-h-40 overflow-y-auto space-y-4">
                   {history?.messages && history.messages.length > 0 ? (
                     history.messages.map(msg => (
                       <div key={msg.id} className="text-sm">
                         {msg.type === 'system' ? (
-                          <div className="text-center text-[10px] uppercase font-bold text-on-surface-variant my-2 tracking-wide">
+                          <div className="text-center text-xs uppercase font-bold text-gray-500 my-2 tracking-wide border-b border-dashed border-gray-300 pb-1">
                             {msg.text}
                           </div>
                         ) : (
                           <div className={`flex flex-col ${msg.senderId === post.requesterId ? 'items-end' : 'items-start'}`}>
-                            <span className="text-[10px] font-bold text-on-surface-variant mb-0.5">
+                            <span className="text-xs font-bold text-gray-600 mb-0.5">
                               {msg.senderId === post.requesterId ? post.requesterName : (post.acceptedBy || 'Runner')}
                             </span>
-                            <div className={`px-3 py-2 rounded-xl max-w-[80%] ${msg.senderId === post.requesterId ? 'bg-primary text-white' : 'bg-surface-container-highest text-on-surface'}`}>
+                            <div className={`px-3 py-2 border-2 border-black ${msg.senderId === post.requesterId ? 'bg-black text-white' : 'bg-white text-black'}`}>
                               {msg.text}
                             </div>
                           </div>
@@ -138,13 +169,17 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-sm text-on-surface-variant italic">No messages sent.</p>
+                    <p className="text-center text-sm italic">No messages sent.</p>
                   )}
                 </div>
               </div>
             </>
           )}
 
+          {/* Jagged Bottom Edge */}
+          <div className="text-center pt-8 opacity-50">
+            - - - END OF RECEIPT - - -
+          </div>
         </div>
       </div>
     </div>

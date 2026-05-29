@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { db, auth } from '../firebase/config';
-import { collection, addDoc, updateDoc, doc, onSnapshot, serverTimestamp, query, orderBy, setDoc, getDoc, where, getDocs, deleteField } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, onSnapshot, serverTimestamp, query, orderBy, setDoc, getDoc, where, getDocs, deleteField, runTransaction } from 'firebase/firestore';
 import { onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { toast } from 'react-hot-toast';
 
@@ -49,15 +49,33 @@ export const AppProvider = ({ children }) => {
           const profileRef = doc(db, 'users', user.uid);
           const profileSnap = await getDoc(profileRef);
           if (profileSnap.exists()) {
-            setUserProfile(profileSnap.data());
+            const data = profileSnap.data();
+            let updated = false;
+            if (data.gcBalance === undefined) { data.gcBalance = 200; updated = true; }
+            if (!data.stats) { data.stats = { lifetimeRequests: 0, lifetimeTasksCompleted: 0, flawlessTasksCount: 0 }; updated = true; }
+            if (!data.questState) { data.questState = { lastTaskDate: null }; updated = true; }
+            if (!data.claimInbox) { data.claimInbox = []; updated = true; }
+            
+            if (updated) {
+              await setDoc(profileRef, data, { merge: true });
+            }
+            setUserProfile(data);
           } else {
-            const newProfile = { phone: user.phoneNumber || null, name: user.displayName || 'Student', dorm: 'Main Gate' };
+            const newProfile = { 
+              phone: user.phoneNumber || null, 
+              name: user.displayName || 'Student', 
+              dorm: 'Main Gate',
+              gcBalance: 200,
+              stats: { lifetimeRequests: 0, lifetimeTasksCompleted: 0, flawlessTasksCount: 0 },
+              questState: { lastTaskDate: null },
+              claimInbox: []
+            };
             await setDoc(profileRef, newProfile);
             setUserProfile(newProfile);
           }
         } catch (err) {
           console.error("Firestore Rules blocking Profile fetch:", err);
-          setUserProfile({ name: user.displayName || 'Student', dorm: 'Locked Database' });
+          setUserProfile({ name: user.displayName || 'Student', dorm: 'Locked Database', gcBalance: 200, claimInbox: [] });
         }
       } else {
         setUserProfile(null);
@@ -210,15 +228,50 @@ export const AppProvider = ({ children }) => {
         setFeedData(prev => [{ ...postData, id: Date.now().toString(), requesterId: currentUser.uid, requesterName: userProfile?.name || 'Student', status: 'open', createdAt: new Date() }, ...prev]);
         return;
       }
-      await addDoc(collection(db, 'posts'), {
-        ...postData,
-        requesterId: currentUser.uid,
-        requesterName: userProfile?.name || 'Student',
-        status: 'open',
-        createdAt: serverTimestamp()
+      const userRef = doc(db, 'users', currentUser.uid);
+      const postRef = doc(collection(db, 'posts'));
+
+      await runTransaction(db, async (transaction) => {
+        const userSnap = await transaction.get(userRef);
+        if (!userSnap.exists()) throw new Error("User does not exist");
+        
+        const userData = userSnap.data();
+        let newBalance = userData.gcBalance || 0;
+        
+        if (postData.type === 'request') {
+          if (newBalance < 75) {
+            throw new Error("Insufficient GC balance (requires 75 GC)");
+          }
+          newBalance -= 75;
+          const newStats = { ...userData.stats, lifetimeRequests: (userData.stats?.lifetimeRequests || 0) + 1 };
+          transaction.update(userRef, { gcBalance: newBalance, stats: newStats });
+        }
+        
+        transaction.set(postRef, {
+          ...postData,
+          requesterId: currentUser.uid,
+          requesterName: userData.name || 'Student',
+          status: 'open',
+          createdAt: serverTimestamp()
+        });
       });
+      
+      if (postData.type === 'request') {
+        setUserProfile(prev => ({
+          ...prev,
+          gcBalance: prev.gcBalance - 75,
+          stats: {
+            ...prev.stats,
+            lifetimeRequests: (prev.stats?.lifetimeRequests || 0) + 1
+          }
+        }));
+      }
+      
+      return true;
     } catch (err) {
       console.error("Error adding post:", err);
+      toast.error(err.message || "Failed to create post.");
+      return false;
     }
   };
 
@@ -228,8 +281,26 @@ export const AppProvider = ({ children }) => {
         setFeedData(prev => prev.filter(post => post.id !== postId));
         return;
       }
-      const { deleteDoc } = await import('firebase/firestore');
-      await deleteDoc(doc(db, 'posts', postId));
+      const postRef = doc(db, 'posts', postId);
+      const userRef = doc(db, 'users', currentUser.uid);
+
+      await runTransaction(db, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (!postSnap.exists()) return;
+        
+        const postData = postSnap.data();
+        
+        // If it was a request and is still open, refund 75 GC
+        if (postData.type === 'request' && postData.status === 'open' && postData.requesterId === currentUser.uid) {
+           const userSnap = await transaction.get(userRef);
+           if (userSnap.exists()) {
+             let newBalance = userSnap.data().gcBalance || 0;
+             newBalance = Math.min(500, newBalance + 75);
+             transaction.update(userRef, { gcBalance: newBalance });
+           }
+        }
+        transaction.delete(postRef);
+      });
     } catch (err) {
       console.error("Error deleting post:", err);
     }
@@ -412,21 +483,82 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const journeyRef = doc(db, 'journeys', journeyId);
-      const journeySnap = await getDoc(journeyRef);
-      if (journeySnap.exists()) {
-        if (journeySnap.data().otpCode === enteredOTP) {
-          await updateDoc(journeyRef, { status: 'Completed' });
-          if (journeySnap.data().postId) {
-            await updateDoc(doc(db, 'posts', journeySnap.data().postId), { status: 'completed' });
-          }
-          setActiveJourney(null);
-          return true;
-        } else {
-          throw new Error("Invalid OTP");
+      let updatedRunnerData = null;
+      
+      await runTransaction(db, async (transaction) => {
+        // --- 1. ALL READS ---
+        const journeySnap = await transaction.get(journeyRef);
+        if (!journeySnap.exists()) throw new Error("Journey not found");
+        
+        const journeyData = journeySnap.data();
+        if (journeyData.otpCode !== enteredOTP) throw new Error("Invalid OTP");
+        if (journeyData.status === 'Completed') return; 
+        
+        let runnerSnap = null;
+        if (journeyData.runnerId) {
+          const runnerRef = doc(db, 'users', journeyData.runnerId);
+          runnerSnap = await transaction.get(runnerRef);
         }
-      } else {
-        throw new Error("Journey not found");
+
+        // --- 2. ALL MATH & LOGIC & WRITES ---
+        transaction.update(journeyRef, { status: 'Completed' });
+        
+        if (journeyData.postId) {
+          const postRef = doc(db, 'posts', journeyData.postId);
+          transaction.update(postRef, { status: 'completed' });
+        }
+        
+        // Gamification & Rewards
+        if (runnerSnap && runnerSnap.exists()) {
+          const runnerRef = doc(db, 'users', journeyData.runnerId);
+          const runnerData = runnerSnap.data();
+          let newBalance = runnerData.gcBalance || 0;
+          let stats = runnerData.stats || { lifetimeTasksCompleted: 0 };
+          let claimInbox = runnerData.claimInbox || [];
+          let questState = runnerData.questState || {};
+          
+          // Add 50 GC base reward (capped at 500)
+          newBalance = Math.min(500, newBalance + 50);
+          
+          // Increment stats
+          stats.lifetimeTasksCompleted = (stats.lifetimeTasksCompleted || 0) + 1;
+          const runs = stats.lifetimeTasksCompleted;
+          
+          // Milestones
+          if (runs === 25) claimInbox.push({ id: Date.now().toString() + '-25', title: '25 Runs Milestone', amount: 50 });
+          else if (runs === 50) claimInbox.push({ id: Date.now().toString() + '-50', title: '50 Runs Milestone', amount: 100 });
+          else if (runs === 75) claimInbox.push({ id: Date.now().toString() + '-75', title: '75 Runs Milestone', amount: 150 });
+          else if (runs === 100) claimInbox.push({ id: Date.now().toString() + '-100', title: '100 Runs Milestone', amount: 200 });
+          
+          const now = new Date();
+          const todayDateStr = now.toDateString();
+          const currentHour = now.getHours();
+          
+          if (questState.lastTaskDate !== todayDateStr) {
+            claimInbox.push({ id: Date.now().toString() + '-daily', title: 'The Daily Warmup', amount: 10 });
+            questState.lastTaskDate = todayDateStr;
+          }
+          
+          if (currentHour >= 18 && currentHour < 19) {
+            claimInbox.push({ id: Date.now().toString() + '-clutch', title: 'The Clutch Master', amount: 25 });
+          }
+          
+          transaction.update(runnerRef, { gcBalance: newBalance, stats, claimInbox, questState });
+          
+          if (currentUser && currentUser.uid === journeyData.runnerId) {
+            updatedRunnerData = { gcBalance: newBalance, stats, claimInbox, questState };
+          }
+        }
+      });
+      
+      setActiveJourney(null);
+      if (updatedRunnerData) {
+        setUserProfile(prev => ({
+          ...prev,
+          ...updatedRunnerData
+        }));
       }
+      return true;
     } catch (err) {
       console.error("Error verifying OTP and completing", err);
       throw err;
@@ -439,17 +571,49 @@ export const AppProvider = ({ children }) => {
       return;
     }
     try {
-      await updateDoc(doc(db, 'journeys', journeyId), {
-        status: 'Cancelled',
-        cancellationReason: reason
-      });
-      if (originalPostId) {
-        await updateDoc(doc(db, 'posts', originalPostId), {
-          status: 'open',
-          runnerId: deleteField(),
-          acceptedBy: deleteField()
+      const journeyRef = doc(db, 'journeys', journeyId);
+      
+      await runTransaction(db, async (transaction) => {
+        // --- 1. ALL READS ---
+        const journeySnap = await transaction.get(journeyRef);
+        if (!journeySnap.exists()) return;
+        
+        const journeyData = journeySnap.data();
+        if (journeyData.status === 'Cancelled' || journeyData.status === 'Completed') return;
+        
+        let postSnap = null;
+        let postRef = null;
+        let reqSnap = null;
+        let requesterRef = null;
+
+        if (originalPostId) {
+          postRef = doc(db, 'posts', originalPostId);
+          postSnap = await transaction.get(postRef);
+          
+          if (postSnap.exists()) {
+             const postData = postSnap.data();
+             if (postData.type === 'request' && journeyData.requesterId) {
+               requesterRef = doc(db, 'users', journeyData.requesterId);
+               reqSnap = await transaction.get(requesterRef);
+             }
+          }
+        }
+
+        // --- 2. ALL MATH & LOGIC & WRITES ---
+        transaction.update(journeyRef, {
+          status: 'Cancelled',
+          cancellationReason: reason
         });
-      }
+        
+        if (postSnap && postSnap.exists()) {
+             if (reqSnap && reqSnap.exists()) {
+                 let newBalance = reqSnap.data().gcBalance || 0;
+                 newBalance = Math.min(500, newBalance + 75); // Full 75 GC Refund
+                 transaction.update(requesterRef, { gcBalance: newBalance });
+             }
+             transaction.update(postRef, { status: 'cancelled' });
+        }
+      });
       setActiveJourney(null);
     } catch (err) {
       console.error("Error cancelling journey", err);
@@ -575,6 +739,34 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const claimReward = async (rewardId) => {
+    if (!currentUser || DISABLE_FIREBASE) return;
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      await runTransaction(db, async (transaction) => {
+        const snap = await transaction.get(userRef);
+        if (!snap.exists()) return;
+        const data = snap.data();
+        const claimInbox = data.claimInbox || [];
+        const rewardIndex = claimInbox.findIndex(r => r.id === rewardId);
+        
+        if (rewardIndex > -1) {
+          const reward = claimInbox[rewardIndex];
+          if ((data.gcBalance || 0) + reward.amount > 500) {
+            throw new Error("Wallet full! Cannot claim reward right now.");
+          }
+          
+          let newBalance = (data.gcBalance || 0) + reward.amount;
+          claimInbox.splice(rewardIndex, 1);
+          transaction.update(userRef, { gcBalance: newBalance, claimInbox });
+        }
+      });
+    } catch(err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
   const value = {
     currentUser,
     userProfile,
@@ -599,7 +791,8 @@ export const AppProvider = ({ children }) => {
     markAsRead,
     submitReport,
     getUserStats,
-    getJourneyHistory
+    getJourneyHistory,
+    claimReward
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
