@@ -29,7 +29,9 @@ const Profile = () => {
     handleSave,
     reliabilityScore,
     circumference,
-    strokeDashoffset
+    strokeDashoffset,
+    claimingQuestId,
+    setClaimingQuestId
   } = useProfile();
 
   return (
@@ -211,23 +213,29 @@ const Profile = () => {
                   const percent = isClaimed || isCompletedUnclaimed ? 100 : progress !== undefined ? (progress / total) * 100 : 0;
                   
                   const handleAction = async () => {
+                    if (claimingQuestId) return;
                     if (onClick) {
                       onClick();
                       return;
                     }
                     if (isCompletedUnclaimed) {
+                      setClaimingQuestId(id);
                       try {
                         await claimQuestFromBoard(id, reward);
                         toast.success(`Claimed ${reward} GC!`);
                       } catch (err) {
                         toast.error(err.message);
+                      } finally {
+                        setClaimingQuestId(null);
                       }
                     }
                   };
 
+                  const isLoading = claimingQuestId === id;
+
                   return (
                     <div 
-                      className={`p-4 border-2 border-on-surface flex flex-col justify-center transition-all mb-4 relative overflow-hidden ${isCompletedUnclaimed || onClick ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000000]' : ''}`}
+                      className={`p-4 border-2 border-on-surface flex flex-col justify-center transition-all mb-4 relative overflow-hidden ${isCompletedUnclaimed || onClick ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000000]' : ''} ${claimingQuestId ? 'opacity-75 pointer-events-none' : ''}`}
                       onClick={handleAction}
                       style={{ 
                         boxShadow: isClaimed ? 'none' : '4px 4px 0px 0px #000000', 
@@ -254,8 +262,8 @@ const Profile = () => {
                         </div>
                         <div className="text-right flex flex-col items-end justify-center">
                           {isClaimed ? null : isCompletedUnclaimed ? (
-                            <button className="font-black text-on-surface uppercase bg-primary-container px-3 py-1 border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000] text-xs">
-                              Claim {reward} GC
+                            <button disabled={isLoading} className="font-black text-on-surface uppercase bg-primary-container px-3 py-1 border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000] text-xs flex items-center justify-center gap-1 disabled:opacity-50 disabled:shadow-[2px_2px_0px_0px_#000000]">
+                              {isLoading ? <><span className="material-symbols-outlined text-[14px] animate-spin">refresh</span>...</> : `Claim ${reward} GC`}
                             </button>
                           ) : (
                             <span className="font-black font-label-mono text-xs" style={{ color: accent }}>{reward} GC</span>

@@ -4,13 +4,16 @@ import { useAppContext } from '../context/AppContext';
 
 export const useDashboard = () => {
   const navigate = useNavigate();
-  const { feedData, acceptRequest, deletePost, currentUser, userProfile } = useAppContext();
+  const { feedData, acceptRequest, deletePost, currentUser, userProfile, loading } = useAppContext();
   const { openModal } = useOutletContext();
   const [profileTargetUid, setProfileTargetUid] = useState(null);
   const [postToDelete, setPostToDelete] = useState(null);
+  const [actionLoadingId, setActionLoadingId] = useState(null);
 
   const handleAccept = async (postId, type) => {
+    setActionLoadingId(postId);
     await acceptRequest(postId, type);
+    setActionLoadingId(null);
     if (type === 'offer') {
       navigate('/deliveries');
     } else {
@@ -58,6 +61,8 @@ export const useDashboard = () => {
     setProfileTargetUid,
     postToDelete,
     setPostToDelete,
+    loading,
+    actionLoadingId,
     handleAccept,
     handleDelete,
     confirmDelete,

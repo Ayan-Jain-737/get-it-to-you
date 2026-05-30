@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PublicProfileModal from './PublicProfileModal';
 import ConfirmModal from './ConfirmModal';
+import SkeletonCard from './SkeletonCard';
 import { useDashboard } from '../hooks/useDashboard';
 
 const Dashboard = () => {
@@ -17,6 +18,8 @@ const Dashboard = () => {
     confirmDelete,
     pickups,
     offers,
+    loading,
+    actionLoadingId,
     getTimeAgo
   } = useDashboard();
 
@@ -52,7 +55,14 @@ const Dashboard = () => {
           </button>
 
           <div className="flex flex-col gap-stack-md mt-2">
-            {pickups.map(post => (
+            {loading && (
+              <>
+                <SkeletonCard />
+                <SkeletonCard />
+              </>
+            )}
+            
+            {!loading && pickups.map(post => (
               <article 
                 key={post.id} 
                 className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000]"
@@ -131,9 +141,16 @@ const Dashboard = () => {
                         }
                         handleAccept(post.id, 'request');
                       }}
-                      className={`w-full p-stack-sm border-none font-headline-md text-body-lg font-bold transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2 ${isMaxWallet ? 'bg-surface-variant text-on-surface-variant cursor-not-allowed' : 'bg-secondary-container hover:bg-secondary-fixed active:bg-secondary-fixed-dim'}`}
+                      disabled={actionLoadingId === post.id || isMaxWallet}
+                      className={`w-full p-stack-sm border-none font-headline-md text-body-lg font-bold transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2 ${(actionLoadingId === post.id || isMaxWallet) ? 'bg-surface-variant text-on-surface-variant cursor-not-allowed' : 'bg-secondary-container hover:bg-secondary-fixed active:bg-secondary-fixed-dim'}`}
                     >
-                      Accept Task <span className="material-symbols-outlined">arrow_forward</span>
+                      {actionLoadingId === post.id ? (
+                        <>
+                          <span className="material-symbols-outlined animate-spin">refresh</span> PROCESSING...
+                        </>
+                      ) : (
+                        <>Accept Task <span className="material-symbols-outlined">arrow_forward</span></>
+                      )}
                     </button>
                     {blockedActionId === post.id && (
                       <div className="absolute bottom-full mb-2 right-0 bg-surface-container-lowest border-2 border-on-surface p-3 shadow-[4px_4px_0px_0px_#000000] text-xs font-bold w-64 z-10 animate-in fade-in slide-in-from-bottom-2 text-on-surface">
@@ -153,7 +170,7 @@ const Dashboard = () => {
               </article>
             ))}
 
-            {pickups.length === 0 && (
+            {!loading && pickups.length === 0 && (
               <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-lg min-h-[250px] flex flex-col items-center justify-center relative">
                 <span className="material-symbols-outlined text-5xl text-outline mb-stack-md">assignment</span>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No Active Requests</h3>
@@ -192,7 +209,14 @@ const Dashboard = () => {
           </div>
 
           <div className="flex flex-col gap-stack-md mt-2">
-            {offers.map(post => (
+            {loading && (
+              <>
+                <SkeletonCard />
+                <SkeletonCard />
+              </>
+            )}
+            
+            {!loading && offers.map(post => (
               <article 
                 key={post.id} 
                 className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000]"
@@ -258,9 +282,16 @@ const Dashboard = () => {
                 {(!currentUser || post.requesterId !== currentUser.uid) ? (
                   <button 
                     onClick={() => handleAccept(post.id, 'offer')}
-                    className="w-full p-stack-sm bg-secondary-container hover:bg-secondary-fixed border-none font-headline-md text-body-lg font-bold active:bg-secondary-fixed-dim transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2"
+                    disabled={actionLoadingId === post.id}
+                    className={`w-full p-stack-sm border-none font-headline-md text-body-lg font-bold transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2 ${actionLoadingId === post.id ? 'bg-surface-variant text-on-surface-variant cursor-not-allowed' : 'bg-primary-container hover:bg-primary-fixed active:bg-primary-fixed-dim'}`}
                   >
-                    Ask for Pickup <span className="material-symbols-outlined">arrow_forward</span>
+                    {actionLoadingId === post.id ? (
+                      <>
+                        <span className="material-symbols-outlined animate-spin">refresh</span> PROCESSING...
+                      </>
+                    ) : (
+                      <>Ask for Pickup <span className="material-symbols-outlined">arrow_forward</span></>
+                    )}
                   </button>
                 ) : (
                   <button 
@@ -273,7 +304,7 @@ const Dashboard = () => {
               </article>
             ))}
 
-            {offers.length === 0 && (
+            {!loading && offers.length === 0 && (
               <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-lg min-h-[250px] flex flex-col items-center justify-center relative">
                 <span className="material-symbols-outlined text-5xl text-outline mb-stack-md">directions_walk</span>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No Active Offers</h3>

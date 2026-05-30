@@ -9,6 +9,7 @@ export const usePostModal = (initialType, onClose) => {
   const [destination, setDestination] = useState(VIT_LOCATIONS[5].id);
   const [details, setDetails] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const locObj = VIT_LOCATIONS.find(l => l.id === location);
   const destObj = VIT_LOCATIONS.find(l => l.id === destination);
@@ -33,6 +34,7 @@ export const usePostModal = (initialType, onClose) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const success = await createPost({
       type: postType,
       location,
@@ -43,6 +45,7 @@ export const usePostModal = (initialType, onClose) => {
     if (success) {
       onClose();
     }
+    setIsSubmitting(false);
   };
 
   return {
@@ -60,6 +63,7 @@ export const usePostModal = (initialType, onClose) => {
     runnerReward,
     zoneText,
     handleSubmit,
-    userProfile
+    userProfile,
+    isSubmitting
   };
 };

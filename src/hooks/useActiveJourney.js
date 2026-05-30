@@ -38,6 +38,7 @@ export const useActiveJourney = () => {
   const [otpError, setOtpError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
   const [isMapReady, setIsMapReady] = useState(false);
@@ -196,10 +197,17 @@ export const useActiveJourney = () => {
 
   const handleNextStatus = async () => {
     if (currentStepIndex < STATUS_STEPS.length - 1) {
+      setIsUpdatingStatus(true);
       const nextStatus = STATUS_STEPS[currentStepIndex + 1];
-      await updateJourneyStatus(nextStatus);
-      if (nextStatus === 'Arrived') {
-        await generateHandoffOTP(activeJourney.id);
+      try {
+        await updateJourneyStatus(nextStatus);
+        if (nextStatus === 'Arrived') {
+          await generateHandoffOTP(activeJourney.id);
+        }
+      } catch (err) {
+        console.error("Status update failed", err);
+      } finally {
+        setIsUpdatingStatus(false);
       }
     }
   };
@@ -269,6 +277,7 @@ export const useActiveJourney = () => {
     otpError,
     errorMessage,
     isVerifying,
+    isUpdatingStatus,
     showReportModal,
     setShowReportModal,
     isSimulating,

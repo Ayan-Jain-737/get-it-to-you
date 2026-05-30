@@ -25,7 +25,8 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
     runnerReward,
     zoneText,
     handleSubmit,
-    userProfile
+    userProfile,
+    isSubmitting
   } = usePostModal(initialType, onClose);
 
   return (
@@ -129,10 +130,16 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
           {/* Submit Button */}
           <button 
             type="submit" 
-            disabled={postType === 'request' && (userProfile?.gcBalance < dynamicCost)}
-            className="w-full p-stack-sm bg-primary-container hover:bg-primary-fixed-dim text-on-surface border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-body-lg font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting || (postType === 'request' && (userProfile?.gcBalance < dynamicCost))}
+            className="w-full p-stack-sm bg-primary-container hover:bg-primary-fixed-dim text-on-surface border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-body-lg font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {postType === 'request' ? `Post Request (${dynamicCost} GC)` : 'Post Availability'}
+            {isSubmitting ? (
+              <>
+                <span className="material-symbols-outlined animate-spin">refresh</span> PROCESSING...
+              </>
+            ) : (
+              postType === 'request' ? `Post Request (${dynamicCost} GC)` : 'Post Availability'
+            )}
           </button>
         </form>
       </div>

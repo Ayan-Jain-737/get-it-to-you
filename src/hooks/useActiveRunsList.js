@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 
 export const useActiveRunsList = () => {
-  const { activeJourney, currentUser, feedData, trackJourney } = useAppContext();
+  const { activeJourney, currentUser, feedData, trackJourney, loading } = useAppContext();
   const [selectedPost, setSelectedPost] = useState(null);
   const [showMap, setShowMap] = useState(false);
 
@@ -23,6 +23,7 @@ export const useActiveRunsList = () => {
     setShowMap,
     handleTrack,
     history,
-    myActiveRuns
+    myActiveRuns,
+    loading
   };
 };

@@ -14,6 +14,7 @@ export const useProfile = () => {
   const [selectedRun, setSelectedRun] = useState(null);
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [claimingQuestId, setClaimingQuestId] = useState(null);
 
   const [stats, setStats] = useState({ tasksCompleted: 0, requestsCompleted: 0, cancelled: 0, pastRuns: [] });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
@@ -101,6 +102,8 @@ export const useProfile = () => {
     handleSave,
     reliabilityScore,
     circumference,
-    strokeDashoffset
+    strokeDashoffset,
+    claimingQuestId,
+    setClaimingQuestId
   };
 };

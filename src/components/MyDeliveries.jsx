@@ -2,6 +2,7 @@ import React from 'react';
 import ActiveJourney from './ActiveJourney';
 import ReportModal from './ReportModal';
 import OrderDetailsModal from './OrderDetailsModal';
+import SkeletonCard from './SkeletonCard';
 import { useMyDeliveries } from '../hooks/useMyDeliveries';
 
 const MyDeliveries = () => {
@@ -17,7 +18,8 @@ const MyDeliveries = () => {
     showMap,
     setShowMap,
     handleTrack,
-    myAcceptedRequests
+    myAcceptedRequests,
+    loading
   } = useMyDeliveries();
 
   if (showMap && activeJourney && activeJourney.requesterId === currentUser?.uid) {
@@ -61,14 +63,17 @@ const MyDeliveries = () => {
           </div>
 
           <div className="flex flex-col gap-stack-md">
-            {myAcceptedRequests.length === 0 ? (
+            {loading && <SkeletonCard />}
+            
+            {!loading && myAcceptedRequests.length === 0 && (
               <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-lg min-h-[250px] flex flex-col items-center justify-center text-center">
                 <span className="material-symbols-outlined text-5xl text-outline mb-stack-md">package_2</span>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No Active Deliveries</h3>
                 <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">Your active pickup requests will appear here once accepted by a runner.</p>
               </div>
-            ) : (
-              myAcceptedRequests.map(post => (
+            )}
+            
+            {!loading && myAcceptedRequests.map(post => (
                 <div 
                   key={post.id} 
                   className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-md flex flex-col relative hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000000] transition-all cursor-pointer"
@@ -110,8 +115,7 @@ const MyDeliveries = () => {
                     </button>
                   </div>
                 </div>
-              ))
-            )}
+              ))}
           </div>
         </section>
 

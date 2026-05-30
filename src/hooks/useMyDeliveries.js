@@ -3,7 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 export const useMyDeliveries = () => {
-  const { feedData, currentUser, trackJourney, activeJourney } = useAppContext();
+  const { feedData, currentUser, trackJourney, activeJourney, loading } = useAppContext();
   const navigate = useNavigate();
   const { openModal } = useOutletContext();
   const [reportData, setReportData] = useState(null);
@@ -33,6 +33,7 @@ export const useMyDeliveries = () => {
     showMap,
     setShowMap,
     handleTrack,
-    myAcceptedRequests
+    myAcceptedRequests,
+    loading
   };
 };

@@ -62,6 +62,7 @@ const ActiveJourney = () => {
     otpError,
     errorMessage,
     isVerifying,
+    isUpdatingStatus,
     showReportModal,
     setShowReportModal,
     isSimulating,
@@ -336,7 +337,7 @@ const ActiveJourney = () => {
           {isRunner && currentStepIndex < STATUS_STEPS.length - 1 && (
             <button 
               onClick={handleNextStatus} 
-              disabled={isTooFar && !isSimulating}
+              disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
               className="w-full font-headline-md text-body-lg font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 boxShadow: (isTooFar && !isSimulating) ? 'none' : '4px 4px 0px #000',
@@ -344,7 +345,11 @@ const ActiveJourney = () => {
                 color: '#000'
               }}
             >
-              {isTooFar && !isSimulating ? (
+              {isUpdatingStatus ? (
+                <>
+                  <span className="material-symbols-outlined animate-spin">refresh</span> PROCESSING...
+                </>
+              ) : isTooFar && !isSimulating ? (
                 <>
                   <span className="material-symbols-outlined">lock</span>
                   Locked ({Math.round(distanceToTarget || 0)}m away)

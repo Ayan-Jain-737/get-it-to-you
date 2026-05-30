@@ -3,6 +3,7 @@ import { PackageX } from 'lucide-react';
 import ActiveJourney from './ActiveJourney';
 import OrderDetailsModal from './OrderDetailsModal';
 import ReportModal from './ReportModal';
+import SkeletonCard from './SkeletonCard';
 import { useActiveRunsList } from '../hooks/useActiveRunsList';
 
 const ActiveRunsList = () => {
@@ -16,7 +17,8 @@ const ActiveRunsList = () => {
     setShowMap,
     handleTrack,
     history,
-    myActiveRuns
+    myActiveRuns,
+    loading
   } = useActiveRunsList();
 
   if (showMap && activeJourney && activeJourney.runnerId === currentUser?.uid) {
@@ -55,14 +57,17 @@ const ActiveRunsList = () => {
           </div>
 
           <div className="flex flex-col gap-stack-md">
-            {myActiveRuns.length === 0 ? (
+            {loading && <SkeletonCard />}
+            
+            {!loading && myActiveRuns.length === 0 && (
               <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-lg min-h-[250px] flex flex-col items-center justify-center text-center">
                 <PackageX size={48} className="text-outline mb-stack-md" />
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No Active Deliveries</h3>
                 <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">Accept a request or route offer from the Marketplace to start running tasks!</p>
               </div>
-            ) : (
-              myActiveRuns.map(post => (
+            )}
+            
+            {!loading && myActiveRuns.map(post => (
                 <div 
                   key={`active-${post.id}`} 
                   className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-md flex flex-col relative hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#000000] transition-all cursor-pointer"
@@ -96,8 +101,7 @@ const ActiveRunsList = () => {
                     </button>
                   </div>
                 </div>
-              ))
-            )}
+              ))}
           </div>
         </section>
 
