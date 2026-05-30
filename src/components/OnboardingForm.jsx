@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { getAuth, signOut } from 'firebase/auth';
 import { useOnboarding } from '../hooks/useOnboarding';
 
 const OnboardingForm = ({ authUser, onComplete }) => {
@@ -24,11 +25,20 @@ const OnboardingForm = ({ authUser, onComplete }) => {
     }
   };
 
+  const handleChangeEmail = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-surface p-margin-page font-body-md text-on-surface flex flex-col items-center justify-center py-12">
       <div className="w-full max-w-2xl bg-surface-container-lowest border-[3px] border-on-surface shadow-[8px_8px_0px_0px_#000000] p-stack-lg">
         <div className="mb-stack-xl border-b-[3px] border-on-surface pb-stack-sm">
-          <h1 className="font-headline-xl text-headline-xl font-black uppercase tracking-tighter">DOSSIER CREATION</h1>
+          <h1 className="font-headline-xl text-headline-xl font-black uppercase tracking-tighter">ACCOUNT CREATION</h1>
           <p className="font-label-mono text-label-tag uppercase font-bold text-on-surface-variant">Initialize Your Identity Profile</p>
         </div>
 
@@ -106,7 +116,10 @@ const OnboardingForm = ({ authUser, onComplete }) => {
 
             {/* EMAIL (Read Only) */}
             <div className="flex flex-col gap-1">
-              <label className="font-label-mono font-bold uppercase">Institutional Email</label>
+              <div className="flex justify-between items-end">
+                <label className="font-label-mono font-bold uppercase">Institutional Email</label>
+                <button type="button" onClick={handleChangeEmail} className="font-label-mono text-[10px] text-primary underline font-bold uppercase hover:text-on-surface transition-colors">Change Email</button>
+              </div>
               <input 
                 type="email" 
                 value={email}
@@ -128,18 +141,6 @@ const OnboardingForm = ({ authUser, onComplete }) => {
               />
             </div>
 
-            {/* REGISTRATION NUMBER */}
-            <div className="flex flex-col gap-1">
-              <label className="font-label-mono font-bold uppercase">Registration No.</label>
-              <input 
-                type="text" 
-                value={regNumber}
-                onChange={(e) => setRegNumber(e.target.value)}
-                placeholder="e.g. 21BCE1234"
-                required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors"
-              />
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
@@ -238,7 +239,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
             type="submit" 
             className="w-full mt-stack-md bg-primary text-on-primary py-4 border-[3px] border-on-surface font-headline-xl text-headline-sm uppercase tracking-widest font-black shadow-[8px_8px_0px_0px_#000000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[4px_4px_0px_0px_#000000] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
           >
-            SEAL MY DOSSIER
+            SEAL MY INFORMATION
           </button>
         </form>
       </div>
