@@ -160,6 +160,7 @@ const ActiveRunsList = () => {
         onClose={() => setReportData(null)}
         reportedUserId={reportData?.reportedUserId}
         journeyId={reportData?.journeyId}
+        reporterRole="runner"
       />
     </main>
   );

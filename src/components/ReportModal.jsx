@@ -2,7 +2,24 @@ import React from 'react';
 import { useReportModal } from '../hooks/useReportModal';
 import { X } from 'lucide-react';
 
-const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId }) => {
+const REQUESTER_REASONS = [
+  "Runner never arrived",
+  "Runner asked for more GC",
+  "Runner marked as completed without delivery",
+  "Unprofessional behavior",
+  "Other"
+];
+
+const RUNNER_REASONS = [
+  "Requester is unreachable",
+  "Requester provided wrong location",
+  "Package was unsafe/prohibited",
+  "Requester refused to provide OTP",
+  "Unprofessional behavior",
+  "Other"
+];
+
+const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId, reporterRole }) => {
   const {
     reason,
     setReason,
@@ -10,9 +27,11 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId }) => {
     setDetails,
     isSubmitting,
     handleSubmit
-  } = useReportModal(onClose, reportedUserId, journeyId);
+  } = useReportModal(onClose, reportedUserId, journeyId, reporterRole === 'runner' ? RUNNER_REASONS[0] : REQUESTER_REASONS[0]);
 
   if (!isOpen) return null;
+
+  const reasonsList = reporterRole === 'runner' ? RUNNER_REASONS : REQUESTER_REASONS;
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-margin-page bg-on-surface/85 backdrop-blur-sm font-body-md animate-in fade-in duration-100">
@@ -24,7 +43,9 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId }) => {
       <div className="bg-surface-container-lowest w-full max-w-md border-border-width border-on-surface shadow-[8px_8px_0px_0px_#000000] relative z-10 overflow-hidden animate-in zoom-in-95 duration-150 p-6 flex flex-col gap-4">
         <div className="flex justify-between items-center border-b-2 border-on-surface pb-3">
           <div>
-            <h2 className="font-headline-lg text-headline-md uppercase tracking-tight text-error leading-none">Report Issue</h2>
+            <h2 className="font-headline-lg text-headline-md uppercase tracking-tight text-error leading-none">
+              Report {reporterRole === 'runner' ? 'Requester' : 'Runner'}
+            </h2>
             <p className="text-xs font-bold text-on-surface-variant mt-1.5">Help us understand the issue with this run.</p>
           </div>
           <button 
@@ -43,11 +64,9 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId }) => {
               onChange={(e) => setReason(e.target.value)}
               className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md focus:bg-primary-container outline-none transition-colors"
             >
-              <option value="Never showed up">Never showed up</option>
-              <option value="Item damaged or missing">Item damaged or missing</option>
-              <option value="Inappropriate behavior">Inappropriate behavior</option>
-              <option value="Late delivery">Late delivery</option>
-              <option value="Other">Other</option>
+              {reasonsList.map((r, i) => (
+                <option key={i} value={r}>{r}</option>
+              ))}
             </select>
           </div>
 

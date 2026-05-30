@@ -26,29 +26,29 @@ export const VIT_LOCATIONS = [
   { id: "mh-q", label: "Men's Hostel - Q Block", category: "Men's Hostels", lat: 12.9902, lng: 79.1789 },
   { id: "mh-r", label: "Men's Hostel - R Block", category: "Men's Hostels", lat: 12.9912, lng: 79.1799 },
   { id: "mh-t", label: "Men's Hostel - T Block", category: "Men's Hostels", lat: 12.9922, lng: 79.1809 },
-  { id: "wh-a", label: "Women's Hostel - A Block", category: "Women's Hostels", lat: 12.9682, lng: 79.1549 },
-  { id: "wh-b", label: "Women's Hostel - B Block", category: "Women's Hostels", lat: 12.9672, lng: 79.1539 },
-  { id: "wh-c", label: "Women's Hostel - C Block", category: "Women's Hostels", lat: 12.9662, lng: 79.1529 },
-  { id: "wh-d", label: "Women's Hostel - D Block", category: "Women's Hostels", lat: 12.9652, lng: 79.1519 },
-  { id: "wh-e", label: "Women's Hostel - E Block", category: "Women's Hostels", lat: 12.9642, lng: 79.1509 },
-  { id: "wh-f", label: "Women's Hostel - F Block", category: "Women's Hostels", lat: 12.9632, lng: 79.1499 },
-  { id: "wh-g", label: "Women's Hostel - G Block", category: "Women's Hostels", lat: 12.9622, lng: 79.1489 },
-  { id: "wh-h", label: "Women's Hostel - H Block", category: "Women's Hostels", lat: 12.9612, lng: 79.1479 },
-  { id: "wh-j", label: "Women's Hostel - J Block", category: "Women's Hostels", lat: 12.9602, lng: 79.1469 },
-  { id: "wh-s", label: "Women's Hostel - S Block", category: "Women's Hostels", lat: 12.9592, lng: 79.1459 }
+  { id: "lh-a", label: "Ladies' Hostel - A Block", category: "Ladies' Hostels", lat: 12.9682, lng: 79.1549 },
+  { id: "lh-b", label: "Ladies' Hostel - B Block", category: "Ladies' Hostels", lat: 12.9672, lng: 79.1539 },
+  { id: "lh-c", label: "Ladies' Hostel - C Block", category: "Ladies' Hostels", lat: 12.9662, lng: 79.1529 },
+  { id: "lh-d", label: "Ladies' Hostel - D Block", category: "Ladies' Hostels", lat: 12.9652, lng: 79.1519 },
+  { id: "lh-e", label: "Ladies' Hostel - E Block", category: "Ladies' Hostels", lat: 12.9642, lng: 79.1509 },
+  { id: "lh-f", label: "Ladies' Hostel - F Block", category: "Ladies' Hostels", lat: 12.9632, lng: 79.1499 },
+  { id: "lh-g", label: "Ladies' Hostel - G Block", category: "Ladies' Hostels", lat: 12.9622, lng: 79.1489 },
+  { id: "lh-h", label: "Ladies' Hostel - H Block", category: "Ladies' Hostels", lat: 12.9612, lng: 79.1479 },
+  { id: "lh-j", label: "Ladies' Hostel - J Block", category: "Ladies' Hostels", lat: 12.9602, lng: 79.1469 },
+  { id: "lh-s", label: "Ladies' Hostel - S Block", category: "Ladies' Hostels", lat: 12.9592, lng: 79.1459 }
 ];
 
 export const getHaversineDistance = (lat1, lon1, lat2, lon2) => {
   if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return 0;
   const R = 6371e3; // metres
-  const φ1 = lat1 * Math.PI/180;
-  const φ2 = lat2 * Math.PI/180;
-  const Δφ = (lat2-lat1) * Math.PI/180;
-  const Δλ = (lon2-lon1) * Math.PI/180;
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; // in metres
 };

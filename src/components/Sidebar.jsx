@@ -36,10 +36,10 @@ const Sidebar = ({ onOpenPostModal }) => {
         <div className="mb-stack-lg flex flex-col p-2 border-2 border-on-surface bg-surface-container-lowest shadow-[3px_3px_0px_#000000]">
           <span className="text-[10px] font-black uppercase tracking-wider text-on-surface">Wallet Capacity</span>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs font-bold font-mono text-on-surface">{userProfile?.gcBalance || 0}/500 GC</span>
+            <span className="text-xs font-bold font-mono text-on-surface">{userProfile?.gcBalance || 0}/300 GC</span>
             <div className="flex-1 h-3 bg-surface-container border border-on-surface relative overflow-hidden">
               <div 
-                style={{ width: `${Math.min(100, ((userProfile?.gcBalance || 0) / 500) * 100)}%` }} 
+                style={{ width: `${Math.min(100, ((userProfile?.gcBalance || 0) / 300) * 100)}%` }} 
                 className="h-full transition-all duration-300 bg-secondary-container"
               ></div>
             </div>
@@ -71,10 +71,13 @@ const Sidebar = ({ onOpenPostModal }) => {
           </NavLink>
           <NavLink 
             to="/profile" 
-            className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#000000] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#000000] ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
+            className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#000000] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#000000] relative ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
           >
-            <span className="material-symbols-outlined font-bold">person</span>
+            <span className="material-symbols-outlined font-black">person</span>
             <span>Profile</span>
+            {(Object.values(userProfile?.questState || {}).includes(true) || (!!userProfile?.avatar && userProfile?.questState?.photogenic !== 'claimed')) && (
+              <span className="absolute top-2 right-2 w-3 h-3 bg-error rounded-full animate-pulse border-2 border-on-surface"></span>
+            )}
           </NavLink>
 
           <NotificationBell isDesktopMenu={true} />
@@ -135,10 +138,13 @@ const Sidebar = ({ onOpenPostModal }) => {
         </NavLink>
         <NavLink 
           to="/profile" 
-          className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000]' : 'text-on-surface-variant'}`}
+          className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform relative ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000]' : 'text-on-surface-variant'}`}
         >
           <span className="material-symbols-outlined">person</span>
           <span className="font-label-mono text-[10px] font-bold mt-1">Profile</span>
+          {(Object.values(userProfile?.questState || {}).includes(true) || (!!userProfile?.avatar && userProfile?.questState?.photogenic !== 'claimed')) && (
+            <span className="absolute top-1 right-2 w-2 h-2 bg-error rounded-full animate-pulse border border-on-surface"></span>
+          )}
         </NavLink>
       </nav>
 

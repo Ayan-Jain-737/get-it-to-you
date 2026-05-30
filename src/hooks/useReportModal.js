@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { toast } from 'react-hot-toast';
 
-export const useReportModal = (onClose, reportedUserId, journeyId) => {
+export const useReportModal = (onClose, reportedUserId, journeyId, initialReason = 'Other') => {
   const { submitReport } = useAppContext();
-  const [reason, setReason] = useState('Never showed up');
+  const [reason, setReason] = useState(initialReason);
   const [details, setDetails] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Reset reason when initialReason changes (if modal is opened with different role)
+  useEffect(() => {
+    setReason(initialReason);
+  }, [initialReason]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

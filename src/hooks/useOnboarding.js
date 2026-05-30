@@ -16,8 +16,8 @@ export const useOnboarding = (authUser, onComplete) => {
   const [availableBlocks, setAvailableBlocks] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const menBlocks = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'T'];
-  const womenBlocks = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'S'];
+  const menBlocks = ['A', 'B', 'C', 'D', 'D Annex', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'M Annex', 'N', 'P', 'Q', 'R', 'T'];
+  const womenBlocks = ['A', 'B', 'C', 'D', 'E', 'E Annex', 'F', 'G', 'G Annex', 'H', 'J', 'S', 'RGT'];
 
   useEffect(() => {
     if (authUser) {

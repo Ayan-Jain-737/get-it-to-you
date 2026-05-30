@@ -3,9 +3,56 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet, useOutletContext, useNa
 import { AppProvider, useAppContext } from './context/AppContext';
 import { Toaster, toast } from 'react-hot-toast';
 
+const QuestToastContent = ({ runs, prevRuns, visible }) => {
+  const [animatedRuns, setAnimatedRuns] = useState(prevRuns);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedRuns(runs);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [runs]);
+
+  const currentWeekend = animatedRuns % 5 === 0 && animatedRuns > 0 ? 5 : animatedRuns % 5;
+  const weekendTarget = 5;
+  const milestoneTarget = runs <= 25 ? 25 : runs <= 50 ? 50 : runs <= 75 ? 75 : 100;
+
+  return (
+    <div className={`${visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-[90vw] md:w-[400px] bg-surface-container-lowest shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] border-4 border-on-surface flex flex-col p-4`}>
+      <div className="flex items-center gap-2 mb-2 border-b-2 border-on-surface pb-2">
+        <span className="material-symbols-outlined text-primary text-2xl animate-bounce">military_tech</span>
+        <h3 className="font-black text-lg uppercase text-on-surface tracking-wider">Quest Progress!</h3>
+      </div>
+      
+      <div className="flex flex-col gap-3 mt-2">
+        <div className="flex flex-col">
+          <div className="flex justify-between font-bold text-xs uppercase mb-1">
+            <span>Weekend Warrior</span>
+            <span>{currentWeekend} / {weekendTarget}</span>
+          </div>
+          <div className="w-full h-3 border-2 border-on-surface bg-surface-container relative overflow-hidden">
+            <div className="absolute top-0 left-0 h-full bg-primary transition-all duration-1000 ease-out" style={{ width: `${(currentWeekend / weekendTarget) * 100}%` }}></div>
+          </div>
+        </div>
+        
+        <div className="flex flex-col">
+          <div className="flex justify-between font-bold text-xs uppercase mb-1">
+            <span>Milestone {milestoneTarget}</span>
+            <span>{animatedRuns} / {milestoneTarget}</span>
+          </div>
+          <div className="w-full h-3 border-2 border-on-surface bg-surface-container relative overflow-hidden">
+            <div className="absolute top-0 left-0 h-full bg-tertiary transition-all duration-1000 ease-out" style={{ width: `${(animatedRuns / milestoneTarget) * 100}%` }}></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const NotificationManager = () => {
-  const { activeJourney } = useAppContext();
+  const { activeJourney, userProfile, currentUser } = useAppContext();
   const prevStatusRef = useRef(null);
+  const prevTasksRef = useRef(userProfile?.stats?.lifetimeTasksCompleted || 0);
 
   useEffect(() => {
     if (activeJourney && activeJourney.status !== prevStatusRef.current) {
@@ -32,6 +79,23 @@ const NotificationManager = () => {
       prevStatusRef.current = null;
     }
   }, [activeJourney]);
+
+  useEffect(() => {
+    if (!userProfile?.stats || !currentUser) return;
+    const currentTasks = userProfile.stats.lifetimeTasksCompleted || 0;
+    
+    if (currentTasks > prevTasksRef.current && prevTasksRef.current > 0) {
+       const runs = currentTasks;
+       const prevRuns = prevTasksRef.current;
+       
+       toast.custom((t) => (
+         <QuestToastContent runs={runs} prevRuns={prevRuns} visible={t.visible} />
+       ), { duration: 6000, position: 'top-center' });
+    }
+    
+    // Always update ref to current so we only catch true increments
+    prevTasksRef.current = currentTasks;
+  }, [userProfile?.stats?.lifetimeTasksCompleted, currentUser]);
 
   return <Toaster position="top-center" />;
 };
@@ -93,6 +157,7 @@ const JourneyRedirector = () => {
   const { activeJourney, currentUser } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const redirectedJourneyIdRef = useRef(null);
 
   useEffect(() => {
     if (
@@ -100,8 +165,10 @@ const JourneyRedirector = () => {
       activeJourney.status === 'Accepted' &&
       currentUser &&
       activeJourney.requesterId === currentUser.uid &&
-      location.pathname !== '/deliveries'
+      location.pathname !== '/deliveries' &&
+      redirectedJourneyIdRef.current !== activeJourney.id
     ) {
+      redirectedJourneyIdRef.current = activeJourney.id;
       toast.success('Your request was accepted! Redirecting...', {
         icon: '🚀',
         style: {

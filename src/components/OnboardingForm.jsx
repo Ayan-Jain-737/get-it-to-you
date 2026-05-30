@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { getAuth, signOut } from 'firebase/auth';
 import { useOnboarding } from '../hooks/useOnboarding';
 
@@ -18,6 +18,22 @@ const OnboardingForm = ({ authUser, onComplete }) => {
   } = useOnboarding(authUser, onComplete);
 
   const fileInputRef = useRef(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredBlocks = availableBlocks.filter(block => 
+    (block + " Block").toLowerCase().includes(hostelBlock.toLowerCase())
+  );
 
   const triggerFileUpload = () => {
     if (fileInputRef.current) {
@@ -146,7 +162,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
             {/* GENDER */}
             <div className="flex flex-col gap-1">
-              <label className="font-label-mono font-bold uppercase">Gender</label>
+              <label className="font-label-mono font-bold uppercase">Gender / Hostel Type</label>
               <select 
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
@@ -154,8 +170,8 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors cursor-pointer"
               >
                 <option value="" disabled>Select Classification</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="Male">Male (Men's Hostel)</option>
+                <option value="Female">Female (Ladies' Hostel - LH)</option>
               </select>
             </div>
 
@@ -194,22 +210,48 @@ const OnboardingForm = ({ authUser, onComplete }) => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md mt-2">
               {/* HOSTEL BLOCK */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 relative" ref={dropdownRef}>
                 <label className="font-label-mono font-bold uppercase">Hostel Block</label>
-                <select 
-                  value={hostelBlock}
-                  onChange={(e) => setHostelBlock(e.target.value)}
-                  disabled={!gender}
-                  required
-                  className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors disabled:bg-surface-container-highest disabled:cursor-not-allowed cursor-pointer"
+                <div 
+                  className={`border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus-within:bg-primary-container transition-colors ${!gender ? 'bg-surface-container-highest opacity-50 pointer-events-none' : ''}`}
                 >
-                  <option value="" disabled>
-                    {!gender ? 'Select Gender First' : 'Select Block'}
-                  </option>
-                  {availableBlocks.map(block => (
-                    <option key={block} value={block}>{block} Block</option>
-                  ))}
-                </select>
+                  <input 
+                    type="text"
+                    value={hostelBlock}
+                    onChange={(e) => {
+                      setHostelBlock(e.target.value);
+                      setIsDropdownOpen(true);
+                    }}
+                    onFocus={() => setIsDropdownOpen(true)}
+                    placeholder={!gender ? 'Select Gender First' : 'Type to search blocks'}
+                    disabled={!gender}
+                    required
+                    className="w-full p-3 bg-transparent focus:outline-none"
+                  />
+                </div>
+                
+                {isDropdownOpen && gender && (
+                  <div className="absolute top-[100%] left-0 w-full mt-2 bg-surface-container-lowest border-[3px] border-on-surface shadow-[4px_4px_0px_0px_#000000] max-h-48 overflow-y-auto z-50">
+                    {filteredBlocks.length > 0 ? (
+                      filteredBlocks.map((block) => (
+                        <div
+                          key={block}
+                          className="p-3 font-body-md font-bold uppercase cursor-pointer hover:bg-primary-container border-b-[1px] border-on-surface/20 last:border-0"
+                          onClick={() => {
+                            setHostelBlock(`${block} Block`);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          {block} Block
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 font-body-md font-bold uppercase text-on-surface-variant">
+                        No match found
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* ROOM NUMBER */}

@@ -434,6 +434,7 @@ const ActiveJourney = () => {
         onClose={() => setShowReportModal(false)}
         reportedUserId={isRunner ? activeJourney.requesterId : activeJourney.runnerId}
         journeyId={activeJourney.id}
+        reporterRole={isRunner ? 'runner' : 'requester'}
       />
 
       <PublicProfileModal 

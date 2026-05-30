@@ -49,7 +49,7 @@ export const AppProvider = ({ children }) => {
           if (profileSnap.exists()) {
             const data = profileSnap.data();
             let updated = false;
-            if (data.gcBalance === undefined) { data.gcBalance = 200; updated = true; }
+            if (data.gcBalance === undefined) { data.gcBalance = 100; updated = true; }
             if (!data.stats) { data.stats = { lifetimeRequests: 0, lifetimeTasksCompleted: 0, flawlessTasksCount: 0 }; updated = true; }
             if (!data.questState) { data.questState = { lastTaskDate: null }; updated = true; }
             if (!data.claimInbox) { data.claimInbox = []; updated = true; }
@@ -78,6 +78,7 @@ export const AppProvider = ({ children }) => {
                delete data.questState.weekendWarrior;
                delete data.questState.ironStreakCompleted;
                data.questState.lastWeeklyReset = currentWeekString;
+               data.stats.weeklyTasksCompleted = 0;
                updated = true;
             }
             
@@ -100,7 +101,7 @@ export const AppProvider = ({ children }) => {
               phone: user.phoneNumber || null, 
               name: user.displayName || 'Student', 
               dorm: 'Main Gate',
-              gcBalance: 200,
+              gcBalance: 100,
               stats: { lifetimeRequests: 0, lifetimeTasksCompleted: 0, flawlessTasksCount: 0 },
               questState: { lastTaskDate: null },
               claimInbox: []
@@ -110,7 +111,7 @@ export const AppProvider = ({ children }) => {
           }
         } catch (err) {
           console.error("Firestore Rules blocking Profile fetch:", err);
-          setUserProfile({ name: user.displayName || 'Student', dorm: 'Locked Database', gcBalance: 200, claimInbox: [] });
+          setUserProfile({ name: user.displayName || 'Student', dorm: 'Locked Database', gcBalance: 100, claimInbox: [] });
         }
       } else {
         setUserProfile(null);
@@ -368,9 +369,9 @@ export const AppProvider = ({ children }) => {
              let projectedBalance = currentBalance + refundAmount;
              let newBalance = projectedBalance;
              
-             if (projectedBalance > 500) {
-                const overflow = projectedBalance - 500;
-                newBalance = 500;
+             if (projectedBalance > 300) {
+                const overflow = projectedBalance - 300;
+                newBalance = 300;
                 overflowBalance += overflow;
              }
              
@@ -385,8 +386,8 @@ export const AppProvider = ({ children }) => {
           let projected = prev.gcBalance + actualRefund;
           return {
             ...prev,
-            gcBalance: projected > 500 ? 500 : projected,
-            overflowBalance: projected > 500 ? (prev.overflowBalance || 0) + (projected - 500) : (prev.overflowBalance || 0)
+            gcBalance: projected > 300 ? 300 : projected,
+            overflowBalance: projected > 300 ? (prev.overflowBalance || 0) + (projected - 300) : (prev.overflowBalance || 0)
           };
         });
       }
@@ -656,9 +657,9 @@ export const AppProvider = ({ children }) => {
           let questState = runnerData.questState || {};
           
           let projectedBalance = newBalance + runnerReward;
-          if (projectedBalance > 500) {
-            overflowBalance += (projectedBalance - 500);
-            newBalance = 500;
+          if (projectedBalance > 300) {
+            overflowBalance += (projectedBalance - 300);
+            newBalance = 300;
           } else {
             newBalance = projectedBalance;
           }
@@ -710,6 +711,12 @@ export const AppProvider = ({ children }) => {
              if (questState.currentStreak >= 5) {
                  questState.ironStreakCompleted = true;
              }
+          }
+          
+          // Weekend Warrior
+          stats.weeklyTasksCompleted = (stats.weeklyTasksCompleted || 0) + 1;
+          if (stats.weeklyTasksCompleted >= 5 && !questState.weekendWarrior) {
+             questState.weekendWarrior = true;
           }
           
           // 4. Milestones
@@ -797,9 +804,9 @@ export const AppProvider = ({ children }) => {
                  let projectedBalance = currentBalance + refundAmount;
                  let newBalance = projectedBalance;
                  
-                 if (projectedBalance > 500) {
-                    const overflow = projectedBalance - 500;
-                    newBalance = 500;
+                 if (projectedBalance > 300) {
+                    const overflow = projectedBalance - 300;
+                    newBalance = 300;
                     overflowBalance += overflow;
                  }
                  
@@ -814,8 +821,8 @@ export const AppProvider = ({ children }) => {
           let projected = prev.gcBalance + actualRefund;
           return {
             ...prev,
-            gcBalance: projected > 500 ? 500 : projected,
-            overflowBalance: projected > 500 ? (prev.overflowBalance || 0) + (projected - 500) : (prev.overflowBalance || 0)
+            gcBalance: projected > 300 ? 300 : projected,
+            overflowBalance: projected > 300 ? (prev.overflowBalance || 0) + (projected - 300) : (prev.overflowBalance || 0)
           };
         });
       }
@@ -963,25 +970,21 @@ export const AppProvider = ({ children }) => {
         }
         
         let projectedBalance = (data.gcBalance || 0) + parsedReward;
-        let newBalance = projectedBalance;
-        let overflowBalance = data.overflowBalance || 0;
         
-        if (projectedBalance > 500) {
-          overflowBalance += (projectedBalance - 500);
-          newBalance = 500;
+        if (projectedBalance > 300) {
+          throw new Error("Wallet is full! Spend some GC before claiming this reward.");
         }
         
         questState[questId] = 'claimed';
         
-        transaction.update(userRef, { gcBalance: newBalance, overflowBalance, questState });
+        transaction.update(userRef, { gcBalance: projectedBalance, overflowBalance: data.overflowBalance || 0, questState });
       });
       
       setUserProfile(prev => {
         let projected = prev.gcBalance + parsedReward;
         return {
           ...prev,
-          gcBalance: projected > 500 ? 500 : projected,
-          overflowBalance: projected > 500 ? (prev.overflowBalance || 0) + (projected - 500) : (prev.overflowBalance || 0),
+          gcBalance: projected,
           questState: { ...prev.questState, [questId]: 'claimed' }
         };
       });
@@ -1010,8 +1013,8 @@ export const AppProvider = ({ children }) => {
         if (parsedAmount > currentOverflow) {
           throw new Error("Withdrawal amount exceeds overflow balance.");
         }
-        if (currentBalance + parsedAmount > 500) {
-          throw new Error("Withdrawal would exceed 500 GC wallet cap.");
+        if (currentBalance + parsedAmount > 300) {
+          throw new Error("Withdrawal would exceed 300 GC wallet cap.");
         }
 
         const newBalance = currentBalance + parsedAmount;

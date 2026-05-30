@@ -165,6 +165,7 @@ const MyDeliveries = () => {
         onClose={() => setReportData(null)}
         reportedUserId={reportData?.reportedUserId}
         journeyId={reportData?.journeyId}
+        reporterRole="requester"
       />
       <OrderDetailsModal 
         isOpen={!!selectedPost}

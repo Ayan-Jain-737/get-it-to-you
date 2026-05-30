@@ -53,22 +53,20 @@ const Profile = () => {
           {/* Main Wallet Cap display */}
           <div className="bg-surface-container-lowest border-border-width border-on-surface neo-shadow p-stack-lg relative overflow-hidden group">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]"></div>
-            <div className="relative z-10 text-center">
+            <div className="bg-surface-container-lowest border-[3px] border-on-surface shadow-[6px_6px_0px_0px_#000000] p-6 mb-6">
               <div className="font-label-mono text-body-md uppercase mb-2 tracking-widest text-on-surface-variant">GITY Coins (GC) Available</div>
-              <div className="font-headline-xl text-[48px] md:text-[64px] leading-none font-black flex items-center justify-center gap-4 text-on-surface">
-                {userProfile?.gcBalance || 0} <span className="text-[24px] text-surface-tint">/ 500</span>
+              <div className="font-headline-xl text-headline-xl font-black text-on-surface mb-2">
+                {userProfile?.gcBalance || 0} <span className="text-[24px] text-surface-tint">/ 300</span>
               </div>
-              <div className="mt-stack-md flex justify-center">
-                <div className="w-full max-w-md h-6 border-2 border-on-surface bg-surface-container-highest rounded-none overflow-hidden neo-shadow relative">
-                  <div 
-                    style={{ width: `${Math.min(100, ((userProfile?.gcBalance || 0) / 500) * 100)}%` }} 
-                    className="absolute top-0 left-0 h-full bg-primary-container border-r-2 border-on-surface flex items-center justify-end px-2"
-                  >
-                    <span className="font-label-mono text-[10px] font-bold text-on-surface">
-                      {Math.round(Math.min(100, ((userProfile?.gcBalance || 0) / 500) * 100))}%
-                    </span>
-                  </div>
-                </div>
+              <div className="w-full h-4 bg-surface-container-highest border-[3px] border-on-surface relative overflow-hidden mb-2">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-primary transition-all duration-500 ease-out" 
+                  style={{ width: `${Math.min(100, ((userProfile?.gcBalance || 0) / 300) * 100)}%` }} 
+                />
+              </div>
+              <div className="flex justify-between text-[11px] font-label-mono font-bold uppercase text-on-surface-variant">
+                <span>Capacity</span>
+                <span>{Math.round(Math.min(100, ((userProfile?.gcBalance || 0) / 300) * 100))}%</span>
               </div>
             </div>
           </div>
@@ -133,7 +131,7 @@ const Profile = () => {
                 <h2 className="text-lg font-bold font-headline text-on-surface uppercase">Reserve Vault</h2>
               </div>
               <p className="text-xs font-bold text-on-surface-variant mb-4">
-                Credits exceeded the 500 GC maximum limits. Held securely here.
+                Credits exceeded the 300 GC maximum limits. Held securely here.
               </p>
               
               <div className="flex items-center justify-between bg-surface-container-lowest p-3 border-2 border-on-surface mb-4">
@@ -149,7 +147,7 @@ const Profile = () => {
                   placeholder="Amount"
                   max={userProfile?.overflowBalance || 0}
                   className="flex-grow px-3 py-2 border-2 border-on-surface bg-surface-container-lowest font-bold focus:outline-none text-sm"
-                  disabled={(userProfile?.gcBalance || 0) >= 500 || (userProfile?.overflowBalance || 0) === 0}
+                  disabled={(userProfile?.gcBalance || 0) >= 300 || (userProfile?.overflowBalance || 0) === 0}
                 />
                 <button 
                   onClick={async () => {
@@ -163,13 +161,13 @@ const Profile = () => {
                       setIsWithdrawing(false);
                     }
                   }}
-                  disabled={(userProfile?.gcBalance || 0) >= 500 || isWithdrawing || !withdrawAmount || parseInt(withdrawAmount) <= 0 || parseInt(withdrawAmount) > (userProfile?.overflowBalance || 0) || (userProfile?.gcBalance || 0) + parseInt(withdrawAmount) > 500}
+                  disabled={(userProfile?.gcBalance || 0) >= 300 || isWithdrawing || !withdrawAmount || parseInt(withdrawAmount) <= 0 || parseInt(withdrawAmount) > (userProfile?.overflowBalance || 0) || (userProfile?.gcBalance || 0) + parseInt(withdrawAmount) > 300}
                   className="bg-surface-container-lowest text-on-surface border-2 border-on-surface font-bold px-4 py-2 hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:pointer-events-none uppercase text-xs shadow-[2px_2px_0px_0px_#000000]"
                 >
                   {isWithdrawing ? '...' : 'Withdraw'}
                 </button>
               </div>
-              {(userProfile?.gcBalance || 0) >= 500 && (
+              {(userProfile?.gcBalance || 0) >= 300 && (
                 <p className="text-error text-[10px] font-bold mt-2 text-center">
                   Wallet full. Spend GC to withdraw.
                 </p>
@@ -283,14 +281,24 @@ const Profile = () => {
                   );
                 };
 
-                const TabButton = ({ id, label }) => {
+                const hasDailyClaimable = questState.daily === true || questState.sprinter === true || questState.rescuer === true || questState.lastorder === true;
+                const hasWeeklyClaimable = questState.weekendWarrior === true || questState.ironStreakCompleted === true;
+                const hasMilestonesClaimable = [
+                  questState.icebreaker, questState.trustFall, questState.ambassador, 
+                  questState.milestone25, questState.milestone50, questState.milestone75, questState.milestone100
+                ].includes(true) || (!!userProfile?.avatar && questState.photogenic !== 'claimed');
+
+                const TabButton = ({ id, label, hasClaimable }) => {
                   const isActive = activeTab === id;
                   return (
                     <button
                       onClick={() => setActiveTab(id)}
-                      className={`flex-1 py-2 text-center font-bold uppercase tracking-widest text-[11px] transition-all border-2 border-on-surface ${isActive ? 'bg-primary-container text-on-surface shadow-none translate-x-[2px] translate-y-[2px]' : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low shadow-[3px_3px_0px_0px_#000000]'}`}
+                      className={`relative flex-1 py-2 text-center font-bold uppercase tracking-widest text-[11px] transition-all border-2 border-on-surface ${isActive ? 'bg-primary-container text-on-surface shadow-none translate-x-[2px] translate-y-[2px]' : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low shadow-[3px_3px_0px_0px_#000000]'}`}
                     >
                       {label}
+                      {hasClaimable && (
+                        <span className="absolute top-1.5 right-2 w-2 h-2 bg-error rounded-full animate-pulse border border-on-surface"></span>
+                      )}
                     </button>
                   );
                 };
@@ -299,9 +307,9 @@ const Profile = () => {
                   <>
                     {/* Tab Navigation */}
                     <div className="flex gap-2 mb-6">
-                      <TabButton id="daily" label="Daily" />
-                      <TabButton id="weekly" label="Weekly" />
-                      <TabButton id="milestones" label="Milestones" />
+                      <TabButton id="daily" label="Daily" hasClaimable={hasDailyClaimable} />
+                      <TabButton id="weekly" label="Weekly" hasClaimable={hasWeeklyClaimable} />
+                      <TabButton id="milestones" label="Milestones" hasClaimable={hasMilestonesClaimable} />
                     </div>
 
                     {activeTab === 'daily' && (
@@ -312,10 +320,10 @@ const Profile = () => {
                             Resets in {dailyTimeLeft || getDailyTimeLeft()}
                           </span>
                         </div>
-                        <QuestCard id="daily" title="The Daily Warmup" desc="Complete 1 delivery today." reward="10" icon="directions_run" bg="#fffdf5" accent="#626200" completed={questState.daily} progress={questState.daily ? 1 : 0} total={1} />
-                        <QuestCard id="sprinter" title="The Sprinter" desc="Complete a run in < 15 minutes." reward="30" icon="timer" bg="#fdf5ff" accent="#626200" completed={questState.sprinter} />
-                        <QuestCard id="rescuer" title="The Rescuer" desc="Accept a request sitting for > 25 minutes." reward="20" icon="healing" bg="#fff5f5" accent="#ba1a1a" completed={questState.rescuer} />
-                        <QuestCard id="lastorder" title="The Last Order" desc="Complete a delivery requested between 6:30 PM - 7:00 PM." reward="15" icon="dark_mode" bg="#f5faff" accent="#006e20" completed={questState.lastorder} />
+                        <QuestCard id="daily" title="The Daily Warmup" desc="Complete 1 delivery today." reward="3" icon="directions_run" bg="#fffdf5" accent="#626200" completed={questState.daily} progress={questState.daily ? 1 : 0} total={1} />
+                        <QuestCard id="sprinter" title="The Sprinter" desc="Complete a run in < 15 minutes." reward="8" icon="timer" bg="#fdf5ff" accent="#626200" completed={questState.sprinter} />
+                        <QuestCard id="rescuer" title="The Rescuer" desc="Accept a request sitting for > 25 minutes." reward="5" icon="healing" bg="#fff5f5" accent="#ba1a1a" completed={questState.rescuer} />
+                        <QuestCard id="lastorder" title="The Last Order" desc="Complete a delivery requested between 6:30 PM - 7:00 PM." reward="5" icon="dark_mode" bg="#f5faff" accent="#006e20" completed={questState.lastorder} />
                       </div>
                     )}
 
@@ -327,8 +335,8 @@ const Profile = () => {
                             Ends in {weeklyTimeLeft || getWeeklyTimeLeft()}
                           </span>
                         </div>
-                        <QuestCard id="weekendWarrior" title="Weekend Warrior" desc="Complete 5 deliveries this week." reward="50" icon="workspace_premium" bg="#f5fffa" accent="#006e20" completed={isWeekendWarriorDone} progress={weeklyCount} total={5} />
-                        <QuestCard id="ironStreak" title="The Iron Streak" desc="Hit 5 concurrent weekly active streaks." reward="50" icon="local_fire_department" bg="#fff9f5" accent="#c00100" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
+                        <QuestCard id="weekendWarrior" title="Weekend Warrior" desc="Complete 5 deliveries this week." reward="15" icon="workspace_premium" bg="#f5fffa" accent="#006e20" completed={isWeekendWarriorDone || questState.weekendWarrior === true || questState.weekendWarrior === 'claimed'} progress={weeklyCount || userProfile?.stats?.weeklyTasksCompleted || 0} total={5} />
+                        <QuestCard id="ironStreak" title="The Iron Streak" desc="Hit 5 concurrent weekly active streaks." reward="15" icon="local_fire_department" bg="#fff9f5" accent="#c00100" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
                       </div>
                     )}
 
@@ -337,18 +345,18 @@ const Profile = () => {
                         <div className="flex justify-between items-center mb-2">
                           <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Onboarding</h3>
                         </div>
-                        <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="50" icon="sports_martial_arts" bg="#fffdf5" accent="#626200" completed={questState.icebreaker} progress={runs} total={1} />
-                        <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture" reward="30" icon="verified_user" bg="#f5fffa" accent="#006e20" completed={questState.trustFall} />
-                        <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile" reward="40" icon="share" bg="#f5faff" accent="#006e20" completed={questState.ambassador} />
-                        <QuestCard id="photogenic" title="Photogenic" desc="Upload a profile photo to stand out." reward="50" icon="add_a_photo" bg="#f4f0ef" accent="#9c4146" completed={!!userProfile?.avatar || questState.photogenic === 'claimed'} progress={userProfile?.avatar ? 1 : 0} total={1} />
+                        <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="25" icon="sports_martial_arts" bg="#fffdf5" accent="#626200" completed={questState.icebreaker} progress={runs} total={1} />
+                        <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture" reward="15" icon="verified_user" bg="#f5fffa" accent="#006e20" completed={questState.trustFall} />
+                        <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile" reward="20" icon="share" bg="#f5faff" accent="#006e20" completed={questState.ambassador} />
+                        <QuestCard id="photogenic" title="Photogenic" desc="Upload a profile photo to stand out." reward="25" icon="add_a_photo" bg="#f4f0ef" accent="#9c4146" completed={!!userProfile?.avatar || questState.photogenic === 'claimed'} progress={userProfile?.avatar ? 1 : 0} total={1} />
                         
                         <div className="flex justify-between items-center mb-2 pt-4 border-t-2 border-dashed border-on-surface">
-                          <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Milestones</h3>
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Lifetime Milestones</h3>
                         </div>
-                        <QuestCard id="milestone25" title="25 Deliveries" desc="Milestone reward" reward="50" icon="military_tech" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone25} progress={runs} total={25} />
-                        <QuestCard id="milestone50" title="50 Deliveries" desc="Milestone reward" reward="100" icon="workspace_premium" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone50} progress={runs} total={50} />
-                        <QuestCard id="milestone75" title="75 Deliveries" desc="Milestone reward" reward="150" icon="diamond" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone75} progress={runs} total={75} />
-                        <QuestCard id="milestone100" title="The Centurion" desc="100 Lifetime Deliveries" reward="200" icon="stars" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone100} progress={runs} total={100} />
+                        <QuestCard id="milestone25" title="25 Deliveries" desc="Milestone reward" reward="30" icon="military_tech" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone25} progress={runs} total={25} />
+                        <QuestCard id="milestone50" title="50 Deliveries" desc="Milestone reward" reward="50" icon="workspace_premium" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone50} progress={runs} total={50} />
+                        <QuestCard id="milestone75" title="75 Deliveries" desc="Milestone reward" reward="75" icon="diamond" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone75} progress={runs} total={75} />
+                        <QuestCard id="milestone100" title="The Centurion" desc="100 Lifetime Deliveries" reward="100" icon="stars" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone100} progress={runs} total={100} />
                       </div>
                     )}
                   </>
