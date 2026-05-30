@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PublicProfileModal from './PublicProfileModal';
 import ConfirmModal from './ConfirmModal';
 import { useDashboard } from '../hooks/useDashboard';
@@ -6,6 +6,7 @@ import { useDashboard } from '../hooks/useDashboard';
 const Dashboard = () => {
   const {
     currentUser,
+    userProfile,
     openModal,
     profileTargetUid,
     setProfileTargetUid,
@@ -18,6 +19,9 @@ const Dashboard = () => {
     offers,
     getTimeAgo
   } = useDashboard();
+
+  const [blockedActionId, setBlockedActionId] = useState(null);
+  const isMaxWallet = (userProfile?.gcBalance || 0) >= 500;
 
   return (
     <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-surface-container-low">
@@ -35,10 +39,17 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
         {/* Left Column: Need a Pickup */}
         <section className="flex flex-col gap-stack-md">
-          <div className="flex justify-between items-center bg-primary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] rotate-[-1deg]">
+          <div className="flex justify-between items-center bg-primary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] rotate-[-1deg] mb-2">
             <h2 className="font-headline-lg text-headline-md font-black uppercase tracking-tight">Need a Pickup</h2>
             <span className="font-label-mono text-label-tag bg-surface-container-lowest border-2 border-on-surface px-2 py-0.5">{pickups.length} ACTIVE</span>
           </div>
+
+          <button 
+            onClick={() => openModal('request')}
+            className="w-full p-stack-md bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase flex items-center justify-center gap-2 hover:bg-primary-fixed-dim"
+          >
+            <span className="material-symbols-outlined font-black">add_circle</span> Post Request
+          </button>
 
           <div className="flex flex-col gap-stack-md mt-2">
             {pickups.map(post => (
@@ -58,8 +69,12 @@ const Dashboard = () => {
 
                 <div className="p-stack-md flex-1 flex flex-col gap-stack-md border-b-border-width border-on-surface">
                   <div className="flex items-center gap-stack-sm pr-24">
-                    <div className="w-10 h-10 border-border-width border-on-surface bg-secondary-container flex items-center justify-center font-headline-md font-bold uppercase text-on-surface flex-shrink-0">
-                      {post.requesterName[0].toUpperCase()}
+                    <div className="w-10 h-10 border-border-width border-on-surface bg-secondary-container flex items-center justify-center font-headline-md font-bold uppercase text-on-surface flex-shrink-0 overflow-hidden">
+                      {post.requesterAvatar ? (
+                         <img src={post.requesterAvatar} alt={post.requesterName} className="w-full h-full object-cover" />
+                      ) : (
+                         post.requesterName[0].toUpperCase()
+                      )}
                     </div>
                     <div className="min-w-0">
                       <div className="font-headline-md text-body-lg font-bold leading-tight truncate">
@@ -107,12 +122,26 @@ const Dashboard = () => {
                 </div>
 
                 {(!currentUser || post.requesterId !== currentUser.uid) ? (
-                  <button 
-                    onClick={() => handleAccept(post.id, 'request')}
-                    className="w-full p-stack-sm bg-secondary-container hover:bg-secondary-fixed border-none font-headline-md text-body-lg font-bold active:bg-secondary-fixed-dim transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2"
-                  >
-                    Accept Task <span className="material-symbols-outlined">arrow_forward</span>
-                  </button>
+                  <div className="relative">
+                    <button 
+                      onClick={() => {
+                        if (isMaxWallet) {
+                          setBlockedActionId(post.id);
+                          return;
+                        }
+                        handleAccept(post.id, 'request');
+                      }}
+                      className={`w-full p-stack-sm border-none font-headline-md text-body-lg font-bold transition-colors text-center uppercase tracking-widest flex items-center justify-center gap-2 ${isMaxWallet ? 'bg-surface-variant text-on-surface-variant cursor-not-allowed' : 'bg-secondary-container hover:bg-secondary-fixed active:bg-secondary-fixed-dim'}`}
+                    >
+                      Accept Task <span className="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                    {blockedActionId === post.id && (
+                      <div className="absolute bottom-full mb-2 right-0 bg-surface-container-lowest border-2 border-on-surface p-3 shadow-[4px_4px_0px_0px_#000000] text-xs font-bold w-64 z-10 animate-in fade-in slide-in-from-bottom-2 text-on-surface">
+                        <span className="material-symbols-outlined text-error mb-1 block">warning</span>
+                        You are already at max Wallet Balance. Sit down and let someone else Handle this time.
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <button 
                     onClick={() => handleDelete(post.id)}
@@ -131,21 +160,35 @@ const Dashboard = () => {
                 <p className="font-body-md text-body-md text-on-surface-variant text-center max-w-sm">There are no current pickup requests. Be the first to broadcast a need!</p>
               </div>
             )}
-
-            <button 
-              onClick={() => openModal('request')}
-              className="w-full p-stack-md bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase flex items-center justify-center gap-2 mt-2 hover:bg-primary-fixed-dim"
-            >
-              <span className="material-symbols-outlined font-black">add_circle</span> Post Request
-            </button>
           </div>
         </section>
 
         {/* Right Column: Ready for Pickup */}
         <section className="flex flex-col gap-stack-md">
-          <div className="flex justify-between items-center bg-secondary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] rotate-[1deg]">
+          <div className="flex justify-between items-center bg-secondary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] rotate-[1deg] mb-2">
             <h2 className="font-headline-lg text-headline-md font-black uppercase tracking-tight">Ready for Pickup</h2>
             <span className="font-label-mono text-label-tag bg-surface-container-lowest border-2 border-on-surface px-2 py-0.5">{offers.length} ACTIVE</span>
+          </div>
+
+          <div className="relative">
+            <button 
+              onClick={() => {
+                if (isMaxWallet) {
+                  setBlockedActionId('postOffer');
+                  return;
+                }
+                openModal('offer');
+              }}
+              className={`w-full p-stack-md border-border-width border-on-surface font-headline-md text-headline-md font-bold uppercase flex items-center justify-center gap-2 transition-all ${isMaxWallet ? 'bg-surface-variant text-on-surface-variant cursor-not-allowed opacity-75' : 'bg-primary-container shadow-[4px_4px_0px_0px_#000000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-primary-fixed-dim'}`}
+            >
+              <span className="material-symbols-outlined">local_shipping</span> I'm Ready for Pickup
+            </button>
+            {blockedActionId === 'postOffer' && (
+              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface-container-lowest border-2 border-on-surface p-3 shadow-[4px_4px_0px_0px_#000000] text-xs font-bold w-64 z-10 animate-in fade-in slide-in-from-top-2 text-on-surface">
+                <span className="material-symbols-outlined text-error mb-1 block">warning</span>
+                You are already at max Wallet Balance. Sit down and let someone else Handle this time.
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-stack-md mt-2">
@@ -160,8 +203,12 @@ const Dashboard = () => {
 
                 <div className="p-stack-md flex-1 flex flex-col gap-stack-md border-b-border-width border-on-surface">
                   <div className="flex items-center gap-stack-sm pr-24">
-                    <div className="w-10 h-10 border-border-width border-on-surface bg-primary-container flex items-center justify-center font-headline-md font-bold uppercase text-on-surface flex-shrink-0">
-                      {post.requesterName[0].toUpperCase()}
+                    <div className="w-10 h-10 border-border-width border-on-surface bg-primary-container flex items-center justify-center font-headline-md font-bold uppercase text-on-surface flex-shrink-0 overflow-hidden">
+                      {post.requesterAvatar ? (
+                         <img src={post.requesterAvatar} alt={post.requesterName} className="w-full h-full object-cover" />
+                      ) : (
+                         post.requesterName[0].toUpperCase()
+                      )}
                     </div>
                     <div className="min-w-0">
                       <div className="font-headline-md text-body-lg font-bold leading-tight truncate">
@@ -184,8 +231,18 @@ const Dashboard = () => {
                     <div className="absolute -right-4 -bottom-4 opacity-10 pointer-events-none text-on-surface">
                       <span className="material-symbols-outlined text-9xl">directions_walk</span>
                     </div>
-                    <h3 className="font-headline-md text-body-lg font-bold mb-2 break-words">Heading to: {post.destination}</h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">{post.details}</p>
+                    <h3 className="font-headline-md text-body-lg font-bold mb-2 break-words">{post.details || 'Available for Pickup'}</h3>
+                    <div className="font-body-md text-body-md flex flex-col gap-2 relative z-10">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 bg-on-surface block flex-shrink-0"></span>
+                        <span className="truncate">I am going to: {post.location}</span>
+                      </div>
+                      <div className="w-1 h-3 bg-on-surface ml-1"></div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 border-2 border-on-surface block bg-surface-container-lowest flex-shrink-0"></span>
+                        <span className="truncate">I will return to: {post.destination}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -223,13 +280,6 @@ const Dashboard = () => {
                 <p className="font-body-md text-body-md text-on-surface-variant text-center max-w-sm">No runners are broadcasting their routes right now. Check back shortly!</p>
               </div>
             )}
-
-            <button 
-              onClick={() => openModal('offer')}
-              className="w-full p-stack-md bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase flex items-center justify-center gap-2 mt-2 hover:bg-primary-fixed-dim"
-            >
-              <span className="material-symbols-outlined">local_shipping</span> I'm Ready for Pickup
-            </button>
           </div>
         </section>
       </div>

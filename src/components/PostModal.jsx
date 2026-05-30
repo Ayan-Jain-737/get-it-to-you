@@ -42,27 +42,12 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-stack-md">
-          {/* Post Type Selector Toggle */}
-          <div className="grid grid-cols-2 border-2 border-on-surface shadow-[4px_4px_0px_0px_#000000] mb-2">
-            <button
-              type="button"
-              onClick={() => setPostType('request')}
-              className={`py-3 font-headline-md text-body-lg uppercase tracking-wider font-bold transition-colors ${postType === 'request' ? 'bg-primary-container text-on-surface border-r-2 border-on-surface' : 'bg-surface-container-lowest text-on-surface-variant border-r-2 border-on-surface'}`}
-            >
-              Need a Pickup
-            </button>
-            <button
-              type="button"
-              onClick={() => setPostType('offer')}
-              className={`py-3 font-headline-md text-body-lg uppercase tracking-wider font-bold transition-colors ${postType === 'offer' ? 'bg-primary-container text-on-surface' : 'bg-surface-container-lowest text-on-surface-variant'}`}
-            >
-              Ready for Pickup
-            </button>
-          </div>
 
           {/* Pickup Selection */}
           <div className="flex flex-col gap-1">
-            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">Pickup From</label>
+            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">
+              {postType === 'offer' ? 'I Am Going To' : 'Pickup From'}
+            </label>
             <select 
               value={location} 
               onChange={(e) => setLocation(e.target.value)}
@@ -80,7 +65,9 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
 
           {/* Dropoff Selection */}
           <div className="flex flex-col gap-1">
-            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">Drop-off At</label>
+            <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">
+              {postType === 'offer' ? 'I Will Return To' : 'Drop-off At'}
+            </label>
             <select 
               value={destination} 
               onChange={(e) => setDestination(e.target.value)}

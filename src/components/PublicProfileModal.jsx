@@ -7,27 +7,7 @@ const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
 
   if (!isOpen) return null;
 
-  const renderBadges = (questState) => {
-    const claimedQuests = Object.keys(questState || {}).filter(k => questState[k] === 'claimed');
-    if (claimedQuests.length === 0) {
-      return <p className="text-xs text-on-surface-variant italic text-center w-full col-span-2 py-4">No public badges yet.</p>;
-    }
-    return (
-      <div className="grid grid-cols-2 gap-3 w-full">
-        {claimedQuests.map(questId => (
-          <div 
-            key={questId} 
-            className="flex flex-col items-center justify-center p-3 border-2 border-on-surface bg-primary-container shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-center group"
-          >
-            <span className="material-symbols-outlined text-[32px] text-on-surface mb-2">military_tech</span>
-            <span className="font-label-tag text-[10px] text-on-surface uppercase font-bold break-words w-full">
-              {questId.replace(/-/g, ' ')}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  };
+
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-margin-page bg-on-surface/85 backdrop-blur-sm font-body-md animate-in fade-in duration-100">
@@ -56,8 +36,12 @@ const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
           ) : (
             <div className="w-full flex flex-col items-center gap-4">
               {/* Avatar Icon */}
-              <div className="w-20 h-20 border-border-width border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-primary-container flex items-center justify-center font-headline-xl text-3xl font-black text-on-surface">
-                {(profileData.name || 'S')[0].toUpperCase()}
+              <div className="w-24 h-24 border-border-width border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-primary-container flex items-center justify-center font-headline-xl text-4xl font-black text-on-surface overflow-hidden">
+                {profileData.avatar ? (
+                  <img src={profileData.avatar} alt={profileData.name} className="w-full h-full object-cover" />
+                ) : (
+                  (profileData.name || 'S')[0].toUpperCase()
+                )}
               </div>
 
               {/* Name and reliability score */}
@@ -65,10 +49,9 @@ const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
                 {profileData.name}
               </h1>
 
-              <div className="flex items-center gap-2 bg-secondary-container border-2 border-on-surface px-4 py-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mt-2">
-                <span className="material-symbols-outlined text-on-secondary-container" style={{ fontVariationSettings: "'FILL' 1" }}>shield</span>
-                <span className="font-label-mono text-xs font-bold text-on-secondary-container uppercase">
-                  Reliability Score: {profileData.reliabilityScore}%
+              <div className={`flex items-center gap-2 border-2 border-on-surface px-4 py-1.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mt-2 ${profileData.reliabilityScore >= 80 ? 'bg-secondary-container text-on-secondary-container' : profileData.reliabilityScore >= 50 ? 'bg-primary-container text-on-primary-container' : 'bg-error text-on-error'}`}>
+                <span className="font-label-mono text-xs font-bold uppercase tracking-wider">
+                  Trust Score: {profileData.reliabilityScore}%
                 </span>
               </div>
 
@@ -88,12 +71,26 @@ const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
                 </div>
               </div>
 
-              {/* Badges Trophy Room */}
-              <div className="w-full mt-4">
-                <h3 className="font-headline-md text-xs font-black text-on-surface uppercase mb-3 border-b-2 border-on-surface pb-1 flex items-center gap-1.5">
-                  <Award size={14} /> Trophy Room
-                </h3>
-                {renderBadges(profileData.questState)}
+              {/* Extra Details */}
+              <div className="grid grid-cols-2 gap-4 border-2 border-on-surface p-3 shadow-[3px_3px_0px_0px_#000000] bg-surface-container w-full mt-2">
+                <div className="text-center border-r-2 border-on-surface border-dashed">
+                  <p className="font-label-mono text-[9px] uppercase text-on-surface-variant font-bold">Grad Year</p>
+                  <p className="font-headline-md text-sm font-black mt-1">
+                    {profileData.gradYear || 'N/A'}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="font-label-mono text-[9px] uppercase text-on-surface-variant font-bold">Gender</p>
+                  <p className="font-headline-md text-sm font-black mt-1 capitalize">
+                    {profileData.gender || 'N/A'}
+                  </p>
+                </div>
+                <div className="text-center col-span-2 border-t-2 border-on-surface border-dashed pt-3 mt-1">
+                  <p className="font-label-mono text-[9px] uppercase text-on-surface-variant font-bold">Hostel Block</p>
+                  <p className="font-headline-md text-sm font-black mt-1">
+                    {profileData.hostelBlock || 'N/A'}
+                  </p>
+                </div>
               </div>
             </div>
           )}

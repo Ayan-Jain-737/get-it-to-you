@@ -76,8 +76,12 @@ const MyDeliveries = () => {
                 >
                   <div className="flex items-start justify-between border-b-2 border-on-surface pb-4 mb-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 border-border-width border-on-surface bg-secondary-container flex items-center justify-center font-headline-md font-bold uppercase text-on-surface">
-                        {(post.acceptedBy || 'R')[0].toUpperCase()}
+                      <div className="w-12 h-12 border-border-width border-on-surface bg-secondary-container flex items-center justify-center font-headline-md font-bold uppercase text-on-surface overflow-hidden">
+                        {post.acceptedByAvatar ? (
+                           <img src={post.acceptedByAvatar} alt={post.acceptedBy} className="w-full h-full object-cover mix-blend-luminosity" />
+                        ) : (
+                           (post.acceptedBy || 'R')[0].toUpperCase()
+                        )}
                       </div>
                       <div>
                         <p className="font-label-mono text-label-tag text-on-surface-variant uppercase font-bold">Runner Assigned</p>

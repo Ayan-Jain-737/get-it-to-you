@@ -9,7 +9,9 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
     history,
     loading,
     profileTargetUid,
-    setProfileTargetUid
+    setProfileTargetUid,
+    counterpartyName,
+    counterpartyUid
   } = useOrderDetailsModal(isOpen, post);
 
   if (!isOpen || !post) return null;
@@ -69,26 +71,30 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
             
             <div className="flex items-start gap-4 border-b border-dashed border-on-surface pb-3">
               <div className="flex-1 min-w-0">
-                <p className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">From</p>
+                <p className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">
+                  {post.type === 'offer' ? 'I Am Going To' : 'From'}
+                </p>
                 <p className="font-bold text-xs truncate">{post.pickupLocation || post.pickup || post.location || 'Campus Landmark'}</p>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">To</p>
+                <p className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant mb-0.5">
+                  {post.type === 'offer' ? 'I Will Return To' : 'To'}
+                </p>
                 <p className="font-bold text-xs truncate">{post.destination || 'Campus'}</p>
               </div>
             </div>
 
             {/* Counterparty wiring logic */}
-            {history?.journey && (
+            {history?.journey && counterpartyUid && (
               <div className="flex justify-between items-center border-b border-dashed border-on-surface pb-3 pt-1">
                 <span className="font-label-mono text-[10px] uppercase font-bold text-on-surface-variant">
-                  {currentUser.uid === post.requesterId ? 'DELIVERED BY:' : 'REQUESTED BY:'}
+                  {currentUser.uid === history.journey.runnerId ? 'DELIVERY FOR:' : 'DELIVERY BY:'}
                 </span>
                 <span 
                   className="font-bold text-xs uppercase underline cursor-pointer hover:text-primary transition-all"
-                  onClick={() => setProfileTargetUid(currentUser.uid === post.requesterId ? history.journey.runnerId : post.requesterId)}
+                  onClick={() => setProfileTargetUid(counterpartyUid)}
                 >
-                  {currentUser.uid === post.requesterId ? (history.journey.runnerName || 'Runner') : (post.requesterName || 'Requester')}
+                  {counterpartyName}
                 </span>
               </div>
             )}

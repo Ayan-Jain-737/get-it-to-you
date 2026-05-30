@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 
 export const useDashboard = () => {
   const navigate = useNavigate();
-  const { feedData, acceptRequest, deletePost, currentUser } = useAppContext();
+  const { feedData, acceptRequest, deletePost, currentUser, userProfile } = useAppContext();
   const { openModal } = useOutletContext();
   const [profileTargetUid, setProfileTargetUid] = useState(null);
   const [postToDelete, setPostToDelete] = useState(null);
@@ -52,6 +52,7 @@ export const useDashboard = () => {
 
   return {
     currentUser,
+    userProfile,
     openModal,
     profileTargetUid,
     setProfileTargetUid,

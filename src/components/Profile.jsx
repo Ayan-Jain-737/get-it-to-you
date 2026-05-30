@@ -88,7 +88,7 @@ const Profile = () => {
                   stroke="currentColor" 
                   strokeWidth="8" 
                   strokeLinecap="round"
-                  className={reliabilityScore >= 80 ? 'text-secondary' : reliabilityScore >= 50 ? 'text-primary' : 'text-error'}
+                  className={reliabilityScore >= 80 ? 'text-secondary-container' : reliabilityScore >= 50 ? 'text-primary' : 'text-error'}
                   strokeDasharray={circumference}
                   strokeDashoffset={isLoadingStats ? circumference : strokeDashoffset}
                   style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
@@ -124,107 +124,55 @@ const Profile = () => {
           </div>
 
           {/* Reserve Bank / Overflow Tank */}
-          {userProfile?.overflowBalance > 0 && (
-            <div className="bg-primary-container p-6 border-border-width border-on-surface neo-shadow flex flex-col relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(45deg,#000,#000_10px,transparent_10px,transparent_20px)] pointer-events-none"></div>
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="material-symbols-outlined text-on-surface text-2xl">account_balance</span>
-                  <h2 className="text-lg font-bold font-headline text-on-surface uppercase">Reserve Vault</h2>
-                </div>
-                <p className="text-xs font-bold text-on-surface-variant mb-4">
-                  Credits exceeded the 500 GC maximum limits. Held securely here.
-                </p>
-                
-                <div className="flex items-center justify-between bg-surface-container-lowest p-3 border-2 border-on-surface mb-4">
-                  <span className="font-bold uppercase tracking-wider text-[10px]">Reserve Balance</span>
-                  <span className="font-black text-lg">{userProfile.overflowBalance} GC</span>
-                </div>
-                
-                <div className="flex gap-2">
-                  <input 
-                    type="number" 
-                    value={withdrawAmount}
-                    onChange={(e) => setWithdrawAmount(e.target.value)}
-                    placeholder="Amount"
-                    max={userProfile.overflowBalance}
-                    className="flex-grow px-3 py-2 border-2 border-on-surface bg-surface-container-lowest font-bold focus:outline-none text-sm"
-                    disabled={userProfile.gcBalance >= 500}
-                  />
-                  <button 
-                    onClick={async () => {
-                      try {
-                        setIsWithdrawing(true);
-                        await withdrawFromOverflow(withdrawAmount);
-                        setWithdrawAmount('');
-                      } catch (e) {
-                        // handled by context toast
-                      } finally {
-                        setIsWithdrawing(false);
-                      }
-                    }}
-                    disabled={userProfile.gcBalance >= 500 || isWithdrawing || !withdrawAmount || parseInt(withdrawAmount) <= 0 || parseInt(withdrawAmount) > userProfile.overflowBalance || userProfile.gcBalance + parseInt(withdrawAmount) > 500}
-                    className="bg-surface-container-lowest text-on-surface border-2 border-on-surface font-bold px-4 py-2 hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:pointer-events-none uppercase text-xs shadow-[2px_2px_0px_0px_#000000]"
-                  >
-                    {isWithdrawing ? '...' : 'Withdraw'}
-                  </button>
-                </div>
-                {userProfile.gcBalance >= 500 && (
-                  <p className="text-error text-[10px] font-bold mt-2 text-center">
-                    Wallet full. Spend GC to withdraw.
-                  </p>
-                )}
+          <div className="bg-primary-container p-6 border-border-width border-on-surface neo-shadow flex flex-col relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="material-symbols-outlined text-on-surface text-2xl">account_balance</span>
+                <h2 className="text-lg font-bold font-headline text-on-surface uppercase">Reserve Vault</h2>
               </div>
-            </div>
-          )}
-
-          {/* Preferences Settings */}
-          <div className="bg-surface-container-lowest p-6 border-border-width border-on-surface neo-shadow">
-            <h2 className="text-lg font-bold text-on-surface font-headline mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">settings</span> Preferences
-            </h2>
-            <form onSubmit={handleSave} className="space-y-4">
-              <div>
-                <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-wide">Full Name</label>
-                <input 
-                  type="text" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Scholar Name"
-                  required
-                  className="w-full bg-surface-container-lowest border-2 border-on-surface px-3 py-2 text-sm focus:outline-none focus:bg-primary-container transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-wide">Location / Dorm</label>
-                <select 
-                  value={dorm} 
-                  onChange={(e) => setDorm(e.target.value)}
-                  className="w-full bg-surface-container-lowest border-2 border-on-surface px-3 py-2 text-sm focus:outline-none focus:bg-primary-container transition-all"
-                >
-                  <option disabled value="">Select Core Landmark</option>
-                  <option value="Main Gate">Main Gate</option>
-                  <option value="Food Court">Food Court</option>
-                  <option value="SJT">SJT</option>
-                  <option value="TT">TT</option>
-                  <option value="Library">Library</option>
-                  <option value="Hostels">Hostels</option>
-                </select>
-              </div>
-
-              <div className="pt-2">
-                <button 
-                  type="submit" 
-                  disabled={saving}
-                  className="w-full py-3 bg-primary-container hover:bg-primary-fixed-dim text-on-surface border-2 border-on-surface shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase tracking-wider text-xs transition-all disabled:opacity-50"
-                >
-                  {saving ? 'Saving...' : 'Save Preferences'}
-                </button>
+              <p className="text-xs font-bold text-on-surface-variant mb-4">
+                Credits exceeded the 500 GC maximum limits. Held securely here.
+              </p>
+              
+              <div className="flex items-center justify-between bg-surface-container-lowest p-3 border-2 border-on-surface mb-4">
+                <span className="font-bold uppercase tracking-wider text-[10px]">Reserve Balance</span>
+                <span className="font-black text-lg">{userProfile?.overflowBalance || 0} GC</span>
               </div>
               
-              {saved && <p className="text-xs font-bold text-secondary text-center animate-pulse">Changes saved successfully!</p>}
-            </form>
+              <div className="flex gap-2">
+                <input 
+                  type="number" 
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  placeholder="Amount"
+                  max={userProfile?.overflowBalance || 0}
+                  className="flex-grow px-3 py-2 border-2 border-on-surface bg-surface-container-lowest font-bold focus:outline-none text-sm"
+                  disabled={(userProfile?.gcBalance || 0) >= 500 || (userProfile?.overflowBalance || 0) === 0}
+                />
+                <button 
+                  onClick={async () => {
+                    try {
+                      setIsWithdrawing(true);
+                      await withdrawFromOverflow(withdrawAmount);
+                      setWithdrawAmount('');
+                    } catch (e) {
+                      // handled by context toast
+                    } finally {
+                      setIsWithdrawing(false);
+                    }
+                  }}
+                  disabled={(userProfile?.gcBalance || 0) >= 500 || isWithdrawing || !withdrawAmount || parseInt(withdrawAmount) <= 0 || parseInt(withdrawAmount) > (userProfile?.overflowBalance || 0) || (userProfile?.gcBalance || 0) + parseInt(withdrawAmount) > 500}
+                  className="bg-surface-container-lowest text-on-surface border-2 border-on-surface font-bold px-4 py-2 hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:pointer-events-none uppercase text-xs shadow-[2px_2px_0px_0px_#000000]"
+                >
+                  {isWithdrawing ? '...' : 'Withdraw'}
+                </button>
+              </div>
+              {(userProfile?.gcBalance || 0) >= 500 && (
+                <p className="text-error text-[10px] font-bold mt-2 text-center">
+                  Wallet full. Spend GC to withdraw.
+                </p>
+              )}
+            </div>
           </div>
         </section>
 
@@ -384,7 +332,7 @@ const Profile = () => {
                         <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="50" icon="sports_martial_arts" bg="#fffdf5" accent="#626200" completed={questState.icebreaker} progress={runs} total={1} />
                         <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture" reward="30" icon="verified_user" bg="#f5fffa" accent="#006e20" completed={questState.trustFall} />
                         <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile" reward="40" icon="share" bg="#f5faff" accent="#006e20" completed={questState.ambassador} />
-                        <QuestCard id="wingman" title="The Wingman" desc="Refer a friend who completes a run." reward="25" icon="handshake" bg="#fff5fa" accent="#ba1a1a" completed={questState.wingman} progress={0} total={1} />
+                        <QuestCard id="photogenic" title="Photogenic" desc="Upload a profile photo to stand out." reward="50" icon="add_a_photo" bg="#f4f0ef" accent="#9c4146" completed={!!userProfile?.avatar || questState.photogenic === 'claimed'} progress={userProfile?.avatar ? 1 : 0} total={1} />
                         
                         <div className="flex justify-between items-center mb-2 pt-4 border-t-2 border-dashed border-on-surface">
                           <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Milestones</h3>

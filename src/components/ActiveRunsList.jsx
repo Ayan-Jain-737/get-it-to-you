@@ -134,7 +134,7 @@ const ActiveRunsList = () => {
                           <span className="material-symbols-outlined text-[12px]">flag</span> Report
                         </button>
                         <span className="text-[10px] font-label-mono bg-primary-container text-on-surface px-2 py-0.5 border border-on-surface">
-                          {post.type === 'request' || post.postType === 'request' ? `Reward: ${post.runnerReward || 50} GC` : (post.price && post.price !== 'Free' ? post.price : 'Good Karma')}
+                          {`Reward: ${post.runnerReward || 50} GC`}
                         </span>
                       </div>
                     </div>

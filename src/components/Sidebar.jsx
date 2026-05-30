@@ -22,7 +22,7 @@ const Sidebar = ({ onOpenPostModal }) => {
           <div className="w-12 h-12 border-border-width border-on-surface bg-primary-container overflow-hidden flex-shrink-0">
             <img 
               alt="User Avatar" 
-              className="w-full h-full object-cover mix-blend-luminosity" 
+              className="w-full h-full object-cover" 
               src={userProfile?.avatar || "https://lh3.googleusercontent.com/aida-public/AB6AXuAt0I1vk-sBxfBJdaUo4X51s6ZLeV-mP_Mcak0war2-3gRdOV2Dozr4MfX5hHYwMU3_LtqNkrMYVR7dkhXenn_ISo3WFRZbOVPMVCt4bMe1cGXqbiF830ZCZgk9xPYGHRMrmpTYUlLbVvxLgHW_2EoikTf090wo11KtK__n15pk_JqN_lnqCwP7hsmeY6j2A1JtWKG-duIs7azPsOlmPGVl4RzMxCHgNJ3Yy9KOyC-3dzwUr5sR4pSY-KHjRKwdINwKaGH40rB1LQQ"} 
             />
           </div>
@@ -40,7 +40,7 @@ const Sidebar = ({ onOpenPostModal }) => {
             <div className="flex-1 h-3 bg-surface-container border border-on-surface relative overflow-hidden">
               <div 
                 style={{ width: `${Math.min(100, ((userProfile?.gcBalance || 0) / 500) * 100)}%` }} 
-                className={`h-full transition-all duration-300 ${(userProfile?.gcBalance || 0) >= 75 ? 'bg-tertiary' : 'bg-error'}`}
+                className="h-full transition-all duration-300 bg-secondary-container"
               ></div>
             </div>
           </div>
@@ -77,25 +77,19 @@ const Sidebar = ({ onOpenPostModal }) => {
             <span>Profile</span>
           </NavLink>
 
-          <button 
-            onClick={() => setIsLogoutModalOpen(true)} 
-            className="flex items-center gap-stack-sm p-stack-sm text-on-surface hover:bg-surface-variant mb-2 font-body-lg text-body-lg active:translate-x-0 active:shadow-none transition-all hover:translate-x-1 border-border-width border-transparent hover:border-on-surface text-left"
-          >
-            <span className="material-symbols-outlined font-bold">logout</span>
-            <span>Logout</span>
-          </button>
+          <NotificationBell isDesktopMenu={true} />
         </div>
 
         <div className="mt-auto flex flex-col gap-4">
           <div className="flex justify-center">
-            <NotificationBell />
+            <button 
+              onClick={() => setIsLogoutModalOpen(true)} 
+              className="border-2 border-on-surface p-2 shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:bg-primary-container bg-surface-container-lowest transition-all flex items-center justify-center"
+              title="Logout"
+            >
+              <span className="material-symbols-outlined font-bold text-error">logout</span>
+            </button>
           </div>
-          <button 
-            onClick={onOpenPostModal} 
-            className="w-full p-stack-sm bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all hover:bg-primary-fixed-dim uppercase"
-          >
-            Post a New Gig
-          </button>
         </div>
       </nav>
 
@@ -106,13 +100,6 @@ const Sidebar = ({ onOpenPostModal }) => {
         </NavLink>
         <div className="flex gap-3 items-center">
           <NotificationBell />
-          <button 
-            onClick={onOpenPostModal} 
-            className="border-2 border-on-surface p-2 shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:bg-primary-container bg-surface-container-lowest transition-all flex items-center justify-center"
-            title="Post a New Gig"
-          >
-            <span className="material-symbols-outlined text-primary">add_circle</span>
-          </button>
           <button 
             onClick={() => setIsLogoutModalOpen(true)} 
             className="border-2 border-on-surface p-2 shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:bg-primary-container bg-surface-container-lowest transition-all flex items-center justify-center"

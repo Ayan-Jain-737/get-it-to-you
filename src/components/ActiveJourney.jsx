@@ -117,9 +117,19 @@ const ActiveJourney = () => {
               className="w-full bg-surface-container-lowest border-2 border-on-surface p-3 font-bold focus:outline-none text-sm"
             >
               <option value="">Select a reason...</option>
-              <option value="Runner unavailable">Runner unavailable</option>
-              <option value="Requester cancelled">Requester cancelled</option>
-              <option value="Emergency">Emergency</option>
+              {isRunner ? (
+                <>
+                  <option value="Runner unavailable">I am no longer available</option>
+                  <option value="Item not found">Cannot find the item/location</option>
+                  <option value="Emergency">Emergency</option>
+                </>
+              ) : (
+                <>
+                  <option value="No longer needed">No longer needed</option>
+                  <option value="Runner unresponsive">Runner is unresponsive</option>
+                  <option value="Emergency">Emergency</option>
+                </>
+              )}
               <option value="Other">Other</option>
             </select>
             {cancelReason === 'Other' && (
@@ -228,7 +238,7 @@ const ActiveJourney = () => {
             <div>
               <p className="font-label-mono text-[9px] font-bold uppercase text-[#9b3f00]">Reward</p>
               <p className="text-[#9b3f00] font-black text-base">
-                {postInfo.type === 'request' || activeJourney.postType === 'request' ? `${postInfo.runnerReward || 50} GC` : (postInfo.price && postInfo.price !== 'Free' ? postInfo.price : 'Good Karma')}
+                {`${postInfo.runnerReward || 50} GC`}
               </p>
             </div>
             <div className="text-right">

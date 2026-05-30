@@ -84,7 +84,17 @@ export const AppProvider = ({ children }) => {
             if (updated) {
               await setDoc(profileRef, data, { merge: true });
             }
-            setUserProfile(data);
+            
+            // Format current user profile correctly
+            const formattedProfile = {
+              ...data,
+              name: data?.publicData?.displayName || data.name || 'Student',
+              avatar: data?.publicData?.photoURL || data.avatar || null,
+              gradYear: data?.publicData?.gradYear || data.gradYear || null,
+              hostelBlock: data?.publicData?.zone || data?.privateData?.hostelBlock || data.hostelBlock || null,
+              gender: data?.privateData?.gender || data.gender || null
+            };
+            setUserProfile(formattedProfile);
           } else {
             const newProfile = { 
               phone: user.phoneNumber || null, 
@@ -302,7 +312,8 @@ export const AppProvider = ({ children }) => {
           cost: dynamicCost,
           runnerReward: runnerReward,
           requesterId: currentUser.uid,
-          requesterName: userData.name || 'Student',
+          requesterName: userData?.publicData?.displayName || userData.name || 'Student',
+          requesterAvatar: userData?.publicData?.photoURL || userData.avatar || null,
           requesterScore: reliabilityScore,
           status: 'open',
           createdAt: serverTimestamp()
@@ -467,6 +478,7 @@ export const AppProvider = ({ children }) => {
         transaction.update(postRef, { 
           status: 'accepted',
           acceptedBy: userProfile?.name || 'A Student',
+          acceptedByAvatar: userProfile?.avatar || null,
           runnerId,
           requesterId
         });
@@ -766,7 +778,8 @@ export const AppProvider = ({ children }) => {
         // --- 2. ALL MATH & LOGIC & WRITES ---
         transaction.update(journeyRef, {
           status: 'Cancelled',
-          cancellationReason: reason
+          cancellationReason: reason,
+          cancelledBy: currentUser.uid
         });
         
         if (postSnap && postSnap.exists()) {
@@ -883,7 +896,7 @@ export const AppProvider = ({ children }) => {
         if (data.status === 'Completed') {
           tasksCompleted++;
           pastRuns.push({ id: doc.id, ...data });
-        } else if (data.status === 'Cancelled') {
+        } else if (data.status === 'Cancelled' && data.cancelledBy === userId) {
           cancelled++;
         }
       });
@@ -893,7 +906,7 @@ export const AppProvider = ({ children }) => {
         if (data.status === 'Completed') {
           requestsCompleted++;
           pastRuns.push({ id: doc.id, ...data });
-        } else if (data.status === 'Cancelled') {
+        } else if (data.status === 'Cancelled' && data.cancelledBy === userId) {
           cancelled++;
         }
       });
@@ -1035,11 +1048,14 @@ export const AppProvider = ({ children }) => {
       const reliabilityScore = totalRuns === 0 ? 100 : Math.round((completedRuns / totalRuns) * 100);
       
       return {
-        name: data.name || 'Student',
+        name: data?.publicData?.displayName || data.name || 'Student',
         reliabilityScore,
         stats: s,
-        avatar: data.avatar || null,
-        questState: data.questState || {}
+        avatar: data?.publicData?.photoURL || data.avatar || null,
+        questState: data.questState || {},
+        gradYear: data?.publicData?.gradYear || data.gradYear || null,
+        hostelBlock: data?.publicData?.zone || data?.privateData?.hostelBlock || data.hostelBlock || null,
+        gender: data?.privateData?.gender || data.gender || null
       };
     } catch (err) {
       console.error("Error fetching public profile:", err);

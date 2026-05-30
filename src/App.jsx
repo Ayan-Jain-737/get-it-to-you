@@ -43,6 +43,8 @@ import ActiveRunsList from './components/ActiveRunsList';
 import MyDeliveries from './components/MyDeliveries';
 import Sidebar from './components/Sidebar';
 import PostModal from './components/PostModal';
+import ProtectedRoute from './components/ProtectedRoute';
+import OnboardingForm from './components/OnboardingForm';
 import './App.css';
 
 const LoadingSpinner = () => (
@@ -52,14 +54,6 @@ const LoadingSpinner = () => (
   </div>
 );
 
-const ProtectedRoute = ({ children }) => {
-  const { currentUser, loading } = useAppContext();
-  
-  if (loading) return <LoadingSpinner />;
-  if (!currentUser) return <Navigate to="/login" replace />;
-  
-  return children;
-};
 
 const PublicRoute = ({ children }) => {
   const { currentUser, loading } = useAppContext();
@@ -131,6 +125,10 @@ const JourneyRedirector = () => {
 };
 
 const AppRoutes = () => {
+  const { currentUser, userProfile, loading } = useAppContext();
+
+  if (loading) return <LoadingSpinner />;
+
   return (
     <Routes>
       <Route 
@@ -142,9 +140,15 @@ const AppRoutes = () => {
         } 
       />
       <Route 
+        path="/onboarding" 
+        element={
+          currentUser ? <OnboardingForm authUser={currentUser} onComplete={() => window.location.href = '/'} /> : <Navigate to="/login" />
+        } 
+      />
+      <Route 
         path="/" 
         element={
-          <ProtectedRoute>
+          <ProtectedRoute user={currentUser} userData={userProfile}>
             <SharedLayout />
           </ProtectedRoute>
         }
