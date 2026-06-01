@@ -122,6 +122,7 @@ import LoginScreen from './components/LoginScreen';
 import Dashboard from './components/Dashboard';
 import ActiveJourney from './components/ActiveJourney';
 import Profile from './components/Profile';
+import Account from './components/Account';
 import ActiveRunsList from './components/ActiveRunsList';
 import MyDeliveries from './components/MyDeliveries';
 import Sidebar from './components/Sidebar';
@@ -237,7 +238,8 @@ const AppRoutes = () => {
       >
         <Route index element={<Navigate to="/dashboard" />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="profile" element={<Profile />} />
+        <Route path="economy" element={<Profile />} />
+        <Route path="account" element={<Account />} />
         <Route path="active-runs" element={<ActiveRunsList />} />
         <Route path="deliveries" element={<MyDeliveries />} />
         

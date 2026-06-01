@@ -70,11 +70,11 @@ const Sidebar = ({ onOpenPostModal }) => {
             <span>My Requests</span>
           </NavLink>
           <NavLink 
-            to="/profile" 
+            to="/economy" 
             className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#000000] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#000000] relative ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
           >
-            <span className="material-symbols-outlined font-black">person</span>
-            <span>Profile</span>
+            <span className="material-symbols-outlined font-black">account_balance_wallet</span>
+            <span>Economy</span>
             {(() => {
               const claimableQuests = ['daily', 'sprinter', 'rescuer', 'lastorder', 'weekendWarrior', 'ironStreakCompleted', 'icebreaker', 'trustFall', 'ambassador', 'milestone25', 'milestone50', 'milestone75', 'milestone100'];
               const hasClaimable = claimableQuests.some(q => userProfile?.questState?.[q] === true) || (!!userProfile?.avatar && userProfile?.questState?.photogenic !== 'claimed');
@@ -82,6 +82,14 @@ const Sidebar = ({ onOpenPostModal }) => {
                 <span className="absolute top-2 right-2 w-3 h-3 bg-error rounded-full animate-pulse border-2 border-on-surface"></span>
               );
             })()}
+          </NavLink>
+          
+          <NavLink 
+            to="/account" 
+            className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#000000] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#000000] relative ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
+          >
+            <span className="material-symbols-outlined font-black">person</span>
+            <span>Profile</span>
           </NavLink>
 
           <NotificationBell isDesktopMenu={true} />
@@ -141,11 +149,11 @@ const Sidebar = ({ onOpenPostModal }) => {
           <span className="font-label-mono text-[10px] font-bold mt-1">Requests</span>
         </NavLink>
         <NavLink 
-          to="/profile" 
+          to="/economy" 
           className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform relative ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000]' : 'text-on-surface-variant'}`}
         >
-          <span className="material-symbols-outlined">person</span>
-          <span className="font-label-mono text-[10px] font-bold mt-1">Profile</span>
+          <span className="material-symbols-outlined">account_balance_wallet</span>
+          <span className="font-label-mono text-[10px] font-bold mt-1">Economy</span>
           {(() => {
             const claimableQuests = ['daily', 'sprinter', 'rescuer', 'lastorder', 'weekendWarrior', 'ironStreakCompleted', 'icebreaker', 'trustFall', 'ambassador', 'milestone25', 'milestone50', 'milestone75', 'milestone100'];
             const hasClaimable = claimableQuests.some(q => userProfile?.questState?.[q] === true) || (!!userProfile?.avatar && userProfile?.questState?.photogenic !== 'claimed');
@@ -153,6 +161,14 @@ const Sidebar = ({ onOpenPostModal }) => {
               <span className="absolute top-1 right-2 w-2 h-2 bg-error rounded-full animate-pulse border border-on-surface"></span>
             );
           })()}
+        </NavLink>
+
+        <NavLink 
+          to="/account" 
+          className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform relative ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000]' : 'text-on-surface-variant'}`}
+        >
+          <span className="material-symbols-outlined">person</span>
+          <span className="font-label-mono text-[10px] font-bold mt-1">Profile</span>
         </NavLink>
       </nav>
 

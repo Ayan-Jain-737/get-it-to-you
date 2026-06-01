@@ -39,6 +39,16 @@ export const AppProvider = ({ children }) => {
     }
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+        const isAllowed = email.endsWith('@vitstudent.ac.in') || email === 'ayanjain737@gmail.com' || email === 'trumpsaab@gmail.com';
+        if (!isAllowed) {
+          await auth.signOut();
+          return; // Ignore this user, let signInWithGoogle throw the error
+        }
+      }
+      
+      setLoading(true); // ensure router waits for profile load
       setCurrentUser(user);
       if (user) {
         sessionStartTime.current = Date.now();
@@ -234,11 +244,20 @@ export const AppProvider = ({ children }) => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      const email = result.user.email;
+      
+      const isAllowed = email.endsWith('@vitstudent.ac.in') || email === 'ayanjain737@gmail.com' || email === 'trumpsaab@gmail.com';
+      
+      if (!isAllowed) {
+        await auth.signOut();
+        throw new Error("Please enter with VIT Email only.");
+      }
+      
       setCurrentUser(result.user);
       return true;
     } catch (error) {
       console.error("Error signing in with Google:", error);
-      return false;
+      throw error;
     }
   };
 
@@ -1077,6 +1096,7 @@ export const AppProvider = ({ children }) => {
   const value = {
     currentUser,
     userProfile,
+    setUserProfile,
     feedData,
     activeJourney,
     loading,

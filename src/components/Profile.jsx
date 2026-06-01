@@ -41,7 +41,7 @@ const Profile = () => {
         <div>
           <h1 className="font-headline-xl text-headline-lg-mobile md:text-headline-xl font-black uppercase tracking-tighter text-on-surface">Economy Vault</h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant mt-2 border-l-border-width border-on-surface pl-stack-sm">
-            Manage your credentials, preferences, and claim earnings.
+            Manage your finances and claim earnings.
           </p>
         </div>
       </header>

@@ -175,18 +175,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
               </select>
             </div>
 
-            {/* REGISTRATION NUMBER */}
-            <div className="flex flex-col gap-1">
-              <label className="font-label-mono font-bold uppercase">Registration Number</label>
-              <input 
-                type="text" 
-                value={regNumber}
-                onChange={(e) => setRegNumber(e.target.value.toUpperCase())}
-                placeholder="e.g. 21BCE0000"
-                required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors uppercase"
-              />
-            </div>
+            {/* REGISTRATION NUMBER (Removed from UI per user request, auto-filled) */}
 
             {/* GRADUATION YEAR */}
             <div className="flex flex-col gap-1">
@@ -195,11 +184,17 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 type="number" 
                 value={gradYear}
                 onChange={(e) => setGradYear(e.target.value)}
-                placeholder="e.g. 2025"
-                min="2020" max="2030"
+                placeholder="e.g. 2027"
+                min={regNumber ? 2000 + parseInt(regNumber.substring(0, 2)) + 3 : 2020} 
+                max={regNumber ? 2000 + parseInt(regNumber.substring(0, 2)) + 5 : 2030}
                 required
                 className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors"
               />
+              {regNumber && (
+                <span className="text-xs text-on-surface-variant font-label-mono">
+                  Allowed: {2000 + parseInt(regNumber.substring(0, 2)) + 3} - {2000 + parseInt(regNumber.substring(0, 2)) + 5}
+                </span>
+              )}
             </div>
           </div>
 

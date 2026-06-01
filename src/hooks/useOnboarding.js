@@ -22,7 +22,13 @@ export const useOnboarding = (authUser, onComplete) => {
   useEffect(() => {
     if (authUser) {
       if (authUser.email) setEmail(authUser.email);
-      if (authUser.displayName) setFullName(authUser.displayName);
+      if (authUser.displayName) {
+        setFullName(authUser.displayName.split(' ')[0]);
+        const regNoMatch = authUser.displayName.match(/2[1-9][BM][A-Z]{2}\d{4}/i);
+        if (regNoMatch) {
+          setRegNumber(regNoMatch[0].toUpperCase());
+        }
+      }
       if (authUser.dob) setDob(authUser.dob);
     }
   }, [authUser]);

@@ -9,11 +9,13 @@ export const useLoginScreen = () => {
 
   const handleGoogleLogin = async () => {
     setError('');
-    const success = await signInWithGoogle();
-    if (success) {
-      navigate('/dashboard');
-    } else {
-      setError('Google Sign-In failed.');
+    try {
+      const success = await signInWithGoogle();
+      if (success) {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Google Sign-In failed.');
     }
   };
 
