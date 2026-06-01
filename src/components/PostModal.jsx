@@ -1,7 +1,9 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { usePostModal } from '../hooks/usePostModal';
+import { useScrollLock } from '../hooks/useScrollLock';
 import { VIT_LOCATIONS } from '../constants';
+import SearchableDropdown from './SearchableDropdown';
 
 const groupedLocations = VIT_LOCATIONS.reduce((acc, loc) => {
   if (!acc[loc.category]) acc[loc.category] = [];
@@ -9,7 +11,13 @@ const groupedLocations = VIT_LOCATIONS.reduce((acc, loc) => {
   return acc;
 }, {});
 
-const PostModal = ({ onClose, initialType = 'request' }) => {
+const dropdownOptions = Object.entries(groupedLocations).map(([category, locs]) => ({
+  groupLabel: category,
+  options: locs.map(loc => ({ value: loc.id, label: loc.label }))
+}));
+
+const PostModal = ({ initialType = 'request', onClose }) => {
+  useScrollLock(true);
   const {
     postType,
     setPostType,
@@ -31,7 +39,7 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
 
   return (
     <div className="fixed inset-0 bg-on-background/40 backdrop-blur-sm flex items-center justify-center p-margin-page z-[200] font-body-md animate-in fade-in duration-100">
-      <div className="w-full max-w-lg bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] p-stack-md flex flex-col gap-stack-md relative animate-in zoom-in-95 duration-150">
+      <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] p-stack-md flex flex-col gap-stack-md relative animate-in zoom-in-95 duration-150">
         <div className="flex justify-between items-center border-b-border-width border-on-surface pb-stack-sm mb-2">
           <h2 className="font-headline-lg text-headline-md uppercase tracking-tight text-on-surface">Create a Post</h2>
           <button 
@@ -49,19 +57,12 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
             <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">
               {postType === 'offer' ? 'I Am Going To' : 'Pickup From'}
             </label>
-            <select 
-              value={location} 
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#141414] cursor-pointer"
-            >
-              {Object.entries(groupedLocations).map(([category, locs]) => (
-                <optgroup key={category} label={category} className="font-bold bg-surface-variant">
-                  {locs.map(loc => (
-                    <option key={loc.id} value={loc.id} className="bg-surface-container-lowest font-normal">{loc.label}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+            <SearchableDropdown
+              options={dropdownOptions}
+              value={location}
+              onChange={setLocation}
+              placeholder="Select a location..."
+            />
           </div>
 
           {/* Dropoff Selection */}
@@ -69,19 +70,12 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
             <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">
               {postType === 'offer' ? 'I Will Return To' : 'Drop-off At'}
             </label>
-            <select 
-              value={destination} 
-              onChange={(e) => setDestination(e.target.value)}
-              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#141414] cursor-pointer"
-            >
-              {Object.entries(groupedLocations).map(([category, locs]) => (
-                <optgroup key={category} label={category} className="font-bold bg-surface-variant">
-                  {locs.map(loc => (
-                    <option key={loc.id} value={loc.id} className="bg-surface-container-lowest font-normal">{loc.label}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+            <SearchableDropdown
+              options={dropdownOptions}
+              value={destination}
+              onChange={setDestination}
+              placeholder="Select a destination..."
+            />
           </div>
 
           {/* Urgent Selector (Request Only) */}

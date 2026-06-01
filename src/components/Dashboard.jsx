@@ -198,7 +198,7 @@ const Dashboard = () => {
               }}
               className={`w-full p-stack-md border-border-width border-on-surface font-headline-md text-headline-md font-bold uppercase flex items-center justify-center gap-2 transition-all ${isMaxWallet ? 'bg-surface-variant text-on-surface-variant cursor-not-allowed opacity-75' : 'bg-primary-container shadow-[4px_4px_0px_0px_#141414] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-primary-fixed-dim'}`}
             >
-              <span className="material-symbols-outlined">local_shipping</span> I'm Ready for Pickup
+              <span className="material-symbols-outlined">local_shipping</span> <span className="hidden md:inline">I'm Ready for Pickup</span><span className="md:hidden">Ready for Pickup</span>
             </button>
             {blockedActionId === 'postOffer' && (
               <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface-container-lowest border-2 border-on-surface p-3 shadow-[4px_4px_0px_0px_#141414] text-xs font-bold w-64 z-10 animate-in fade-in slide-in-from-top-2 text-on-surface">

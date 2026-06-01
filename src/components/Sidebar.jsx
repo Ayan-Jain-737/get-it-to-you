@@ -1,11 +1,17 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '../hooks/useSidebar';
 import NotificationBell from './NotificationBell';
 import ConfirmModal from './ConfirmModal';
 
-const Sidebar = ({ onOpenPostModal }) => {
+const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
   const { logout, userProfile, isLogoutModalOpen, setIsLogoutModalOpen, reliabilityScore } = useSidebar();
+  const location = useLocation();
+
+  // We don't hide mobile nav elements from here anymore; 
+  // BottomSheet uses z-index: 100 to overlay the bottom nav, 
+  // and floating back buttons are provided in the views.
+  const isJourneyActive = hideOnMobile || location.pathname.startsWith('/run/');
 
   return (
     <>
@@ -108,8 +114,8 @@ const Sidebar = ({ onOpenPostModal }) => {
         </div>
       </nav>
 
-      {/* TopAppBar (Mobile Only) */}
-      <header className="md:hidden w-full top-0 sticky z-50 flex justify-between items-center px-margin-page py-stack-sm bg-surface-container-lowest border-b-border-width border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      {/* TopAppBar (Mobile Only) — hidden during journey tracking */}
+      <header className={`md:hidden w-full top-0 sticky z-50 flex justify-between items-center px-margin-page py-stack-sm bg-surface-container-lowest border-b-border-width border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${isJourneyActive ? 'hidden' : ''}`}>
         <NavLink to="/dashboard" className="font-headline-md text-headline-md font-black italic text-on-surface uppercase">
           GITY
         </NavLink>
@@ -126,20 +132,20 @@ const Sidebar = ({ onOpenPostModal }) => {
       </header>
 
       {/* BottomNavBar (Mobile Only) */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-lowest border-t-border-width border-on-surface z-50">
+      <nav className={`md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-lowest border-t-border-width border-on-surface z-50 ${isJourneyActive ? 'hidden' : ''}`}>
         <NavLink 
           to="/dashboard" 
           className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414]' : 'text-on-surface-variant'}`}
         >
           <span className="material-symbols-outlined">storefront</span>
-          <span className="font-label-mono text-[10px] font-bold mt-1">Gigs</span>
+          <span className="font-label-mono text-[10px] font-bold mt-1">Market</span>
         </NavLink>
         <NavLink 
           to="/active-runs" 
           className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414]' : 'text-on-surface-variant'}`}
         >
           <span className="material-symbols-outlined">assignment_turned_in</span>
-          <span className="font-label-mono text-[10px] font-bold mt-1">My Tasks</span>
+          <span className="font-label-mono text-[10px] font-bold mt-1">Task</span>
         </NavLink>
         <NavLink 
           to="/deliveries" 

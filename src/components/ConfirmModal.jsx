@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const ConfirmModal = ({
   isOpen,
@@ -11,6 +12,8 @@ const ConfirmModal = ({
   cancelText = "Cancel",
   isDestructive = false
 }) => {
+  useScrollLock(isOpen);
+
   if (!isOpen) return null;
 
   return (

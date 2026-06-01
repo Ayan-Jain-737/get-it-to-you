@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAccount } from '../hooks/useAccount';
+import SearchableDropdown from './SearchableDropdown';
 
 const Account = () => {
   const {
@@ -38,7 +39,7 @@ const Account = () => {
         </p>
       </header>
 
-      <div className="bg-surface-container-lowest border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 max-w-3xl">
+      <div className="bg-surface-container-lowest border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 md:p-6 max-w-3xl">
         <div className="flex flex-col md:flex-row gap-8 items-start">
           {/* Left Column: Photo */}
           <div className="flex flex-col items-center gap-4">
@@ -140,47 +141,15 @@ const Account = () => {
                   />
                 </div>
 
-                <div className="flex flex-col gap-1 relative" ref={dropdownRef}>
+                <div className="flex flex-col gap-1 relative">
                   <label className="font-bold text-xs uppercase tracking-wider">Hostel Block</label>
-                  <div 
-                    className={`border-2 border-on-surface bg-surface-container-lowest font-bold focus-within:bg-surface-container transition-colors ${!isJune ? 'bg-surface-container disabled:cursor-not-allowed opacity-70 pointer-events-none' : ''}`}
-                  >
-                    <input 
-                      type="text"
-                      value={editBlock}
-                      onChange={(e) => {
-                        setEditBlock(e.target.value);
-                        setIsDropdownOpen(true);
-                      }}
-                      onFocus={() => setIsDropdownOpen(true)}
-                      placeholder={userProfile?.hostelBlock || "Type to search blocks"}
-                      disabled={!isJune}
-                      className="w-full p-2 bg-transparent focus:outline-none"
-                    />
-                  </div>
-                  
-                  {isDropdownOpen && isJune && (
-                    <div className="absolute top-[100%] left-0 w-full mt-1 bg-surface-container-lowest border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-h-48 overflow-y-auto z-50">
-                      {filteredBlocks.length > 0 ? (
-                        filteredBlocks.map((block) => (
-                          <div
-                            key={block}
-                            className="p-2 font-bold uppercase cursor-pointer hover:bg-primary-container border-b-[1px] border-on-surface/20 last:border-0"
-                            onClick={() => {
-                              setEditBlock(`${block} Block`);
-                              setIsDropdownOpen(false);
-                            }}
-                          >
-                            {block} Block
-                          </div>
-                        ))
-                      ) : (
-                        <div className="p-2 font-bold uppercase text-on-surface-variant">
-                          No match found
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <SearchableDropdown
+                    options={availableBlocks.map(b => ({ value: `${b} Block`, label: `${b} Block` }))}
+                    value={editBlock}
+                    onChange={setEditBlock}
+                    placeholder={userProfile?.hostelBlock || "Type to search blocks"}
+                    disabled={!isJune}
+                  />
                 </div>
 
                 <div className="flex flex-col gap-1 relative">

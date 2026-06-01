@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, CheckCircle, Clock } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 import { useOrderDetailsModal } from '../hooks/useOrderDetailsModal';
 import PublicProfileModal from './PublicProfileModal';
 
@@ -13,6 +14,8 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
     counterpartyName,
     counterpartyUid
   } = useOrderDetailsModal(isOpen, post);
+
+  useScrollLock(isOpen);
 
   if (!isOpen || !post) return null;
 

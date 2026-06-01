@@ -123,6 +123,7 @@ import Dashboard from './components/Dashboard';
 import ActiveJourney from './components/ActiveJourney';
 import Profile from './components/Profile';
 import Account from './components/Account';
+import ScrollToTop from './components/ScrollToTop';
 import ActiveRunsList from './components/ActiveRunsList';
 import MyDeliveries from './components/MyDeliveries';
 import Sidebar from './components/Sidebar';
@@ -257,6 +258,7 @@ function App() {
     <AppProvider>
       <NotificationManager />
       <BrowserRouter>
+        <ScrollToTop />
         <JourneyRedirector />
         <AppRoutes />
       </BrowserRouter>

@@ -1,12 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import ReportModal from './ReportModal';
 import PublicProfileModal from './PublicProfileModal';
+import BottomSheet from './BottomSheet';
 import { useActiveJourney } from '../hooks/useActiveJourney';
 
 const STATUS_STEPS = ['Accepted', 'Ready for Pickup', 'Walking Back', 'Arrived'];
+
+// Short mobile-friendly labels for status steps
+const STATUS_SHORT = ['Accepted', 'Pickup', 'Walking', 'Arrived'];
 
 // Custom pulsing marker for the Runner
 const pulsingMarkerIcon = L.divIcon({
@@ -92,6 +96,15 @@ const ActiveJourney = () => {
     mapLng
   } = useActiveJourney();
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   if (!activeJourney) {
     return (
       <div className="w-full h-[calc(100vh-80px)] flex flex-col items-center justify-center bg-surface-container-lowest gap-4 font-body-md">
@@ -104,7 +117,7 @@ const ActiveJourney = () => {
   const renderCancelModal = () => {
     if (!showCancelModal) return null;
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-sm font-body-md animate-in fade-in duration-100">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-sm font-body-md animate-in fade-in duration-100">
         <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] p-6 w-full max-w-sm flex flex-col gap-4">
           <h3 className="text-xl font-bold text-on-surface font-headline uppercase flex items-center gap-2 border-b-2 border-on-surface pb-2">
             <span className="material-symbols-outlined text-error">warning</span>
@@ -115,7 +128,7 @@ const ActiveJourney = () => {
             <select 
               value={cancelReason} 
               onChange={(e) => setCancelReason(e.target.value)}
-              className="w-full bg-surface-container-lowest border-2 border-on-surface p-3 font-bold focus:outline-none text-sm"
+              className="w-full bg-surface-container-lowest border-2 border-on-surface p-3 font-bold focus:outline-none text-sm cursor-pointer"
             >
               <option value="">Select a reason...</option>
               {isRunner ? (
@@ -165,38 +178,324 @@ const ActiveJourney = () => {
     );
   };
 
+  // ========== MAP (shared between mobile & desktop) ==========
+  const renderMap = () => (
+    <div className="absolute inset-0 z-0">
+      {isMapReady && (
+        <MapContainer 
+          key={JSON.stringify(activeJourney?.runnerLocation)}
+          center={isCoordsValid(activeJourney?.runnerLocation) ? [activeJourney.runnerLocation.lat, activeJourney.runnerLocation.lng] : VALID_CAMPUS_CENTER}
+          zoom={17} 
+          style={{ height: '100%', width: '100%' }}
+          zoomControl={false}
+        >
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            attribution='&copy; <a href="https://carto.com/">Carto</a>'
+          />
+          {isCoordsValid(pickupCoords) && isCoordsValid(destCoords) && (
+            <Polyline positions={[pickupArr, destArr]} pathOptions={{ color: '#626200', dashArray: '5, 10', weight: 4 }} />
+          )}
+          {isCoordsValid(activeJourney?.runnerLocation) && (
+            <Marker 
+              position={[activeJourney.runnerLocation.lat, activeJourney.runnerLocation.lng]} 
+              icon={pulsingMarkerIcon}
+            />
+          )}
+          <MapUpdater lat={mapLat} lng={mapLng} />
+        </MapContainer>
+      )}
+    </div>
+  );
+
+  // ========== PEEK: Compact Status Header ==========
+  const renderPeekContent = () => (
+    <div className="flex items-center gap-3 pb-2">
+      {/* Avatar */}
+      <div className="w-10 h-10 border-2 border-on-surface bg-primary-container flex items-center justify-center text-sm font-black uppercase text-on-surface flex-shrink-0">
+        {isRunner ? requesterName[0].toUpperCase() : runnerName[0].toUpperCase()}
+      </div>
+      {/* Name + Status */}
+      <div className="flex-1 min-w-0">
+        <p 
+          className="font-headline-md text-sm font-black text-on-surface truncate underline cursor-pointer"
+          onClick={() => setProfileTargetUid(isRunner ? activeJourney?.requesterId : activeJourney?.runnerId)}
+        >
+          {isRunner ? requesterName : runnerName}
+        </p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="bg-primary-container border border-on-surface px-1.5 py-0.5 text-[9px] font-black uppercase">
+            {STATUS_SHORT[currentStepIndex]}
+          </span>
+          <span className="text-[10px] font-bold text-on-surface-variant truncate">
+            {isRunner ? `→ ${postInfo.location}` : `→ ${postInfo.destination || 'you'}`}
+          </span>
+        </div>
+      </div>
+      {/* Reward Pill */}
+      <div className="flex-shrink-0 bg-[#ffc5aa]/30 border-2 border-on-surface px-2 py-1 text-center">
+        <span className="text-[9px] font-black uppercase text-[#9b3f00] block leading-none">Reward</span>
+        <span className="text-xs font-black text-[#9b3f00]">{postInfo.runnerReward || 50} GC</span>
+      </div>
+      {/* Sim Toggle (Runner only) */}
+      {isRunner && (
+        <button 
+          onClick={() => setIsSimulating(!isSimulating)}
+          className={`p-1.5 border-2 border-on-surface flex-shrink-0 ${isSimulating ? 'bg-tertiary text-on-tertiary' : 'bg-surface-container text-on-surface'}`}
+        >
+          <span className="material-symbols-outlined text-[14px]">
+            {isSimulating ? 'stop_circle' : 'play_circle'}
+          </span>
+        </button>
+      )}
+    </div>
+  );
+
+  // ========== HALF: Progress Timeline + Action Button ==========
+  const renderHalfContent = () => (
+    <div className="flex flex-col gap-3 pt-2">
+      {/* Compact Progress Timeline */}
+      <div className="bg-surface-container-low border-2 border-on-surface p-3 relative">
+        <div className="flex items-center justify-between gap-1 relative z-10">
+          {STATUS_SHORT.map((step, idx) => {
+            const isCompleted = currentStepIndex >= idx;
+            const isCurrent = currentStepIndex === idx;
+            return (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                <div 
+                  className={`w-6 h-6 border-2 border-on-surface rounded-full flex items-center justify-center ${isCompleted ? 'bg-primary-container' : 'bg-surface-container-lowest'}`}
+                >
+                  {isCompleted && !isCurrent && (
+                    <span className="material-symbols-outlined text-[10px] font-black">check</span>
+                  )}
+                  {isCurrent && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-on-surface animate-pulse"></span>
+                  )}
+                </div>
+                <span className={`text-[8px] font-black uppercase text-center leading-tight ${isCurrent ? 'text-primary' : 'text-on-surface-variant'}`}>
+                  {step}
+                </span>
+                {idx < STATUS_SHORT.length - 1 && (
+                  <div className={`absolute h-0.5 ${isCompleted ? 'bg-on-surface' : 'bg-surface-variant'}`} 
+                    style={{ display: 'none' }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {/* Connecting line */}
+        <div className="flex px-6 absolute top-[23px] left-0 right-0 z-0">
+          {STATUS_SHORT.map((_, idx) => {
+            if (idx === STATUS_SHORT.length - 1) return null;
+            return (
+              <div 
+                key={`line-${idx}`}
+                className={`flex-1 h-0.5 ${currentStepIndex > idx ? 'bg-on-surface' : 'bg-surface-variant'}`}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Advance Status Button (Runner Only) */}
+      {isRunner && currentStepIndex < STATUS_STEPS.length - 1 && (
+        <button 
+          onClick={handleNextStatus} 
+          disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
+          className="w-full font-headline-md text-sm font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            boxShadow: (isTooFar && !isSimulating) ? 'none' : '4px 4px 0px #141414',
+            background: (isTooFar && !isSimulating) ? '#e2e2e2' : 'var(--primary-container)',
+            color: '#141414'
+          }}
+        >
+          {isUpdatingStatus ? (
+            <><span className="material-symbols-outlined animate-spin text-[16px]">refresh</span> Processing...</>
+          ) : isTooFar && !isSimulating ? (
+            <><span className="material-symbols-outlined text-[16px]">lock</span> Too Far</>
+          ) : (
+            <><span className="material-symbols-outlined text-[16px]">where_to_vote</span> Next: {STATUS_SHORT[currentStepIndex + 1]}</>
+          )}
+        </button>
+      )}
+
+      {/* OTP Section */}
+      {activeJourney.status === 'Arrived' ? (
+        <div className="bg-secondary-container border-2 border-on-surface p-3 text-center shadow-[3px_3px_0px_0px_#141414]">
+          <p className="text-[9px] font-black uppercase text-on-surface-variant mb-1">Runner Arrived</p>
+          {isRunner ? (
+            <>
+              <p className="text-on-surface font-bold text-[10px] mb-2">ENTER OTP TO COMPLETE</p>
+              <div className="flex gap-2 items-center justify-center">
+                <input 
+                  type="text" 
+                  maxLength="4" 
+                  value={enteredOTP} 
+                  onChange={(e) => handleOtpInput(e.target.value)}
+                  className="bg-surface-container-lowest text-center text-lg font-black tracking-[0.4em] py-2 border-2 border-on-surface w-full max-w-[120px] focus:outline-none focus:bg-primary-container"
+                  placeholder="0000"
+                />
+                <button 
+                  onClick={handleVerifyOTP}
+                  disabled={enteredOTP.length !== 4 || isVerifying}
+                  className="py-2 px-3 bg-surface-container-lowest text-on-surface font-bold border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none uppercase text-xs"
+                >
+                  {isVerifying ? '...' : 'OK'}
+                </button>
+              </div>
+              {errorMessage && (
+                <p className="text-error font-bold text-[10px] mt-1">{errorMessage}</p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-on-surface font-bold text-[10px] mb-2">SHARE WITH RUNNER</p>
+              <div className="text-3xl font-black tracking-[0.25em] text-on-surface font-headline bg-surface-container-lowest py-1.5 border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] inline-block px-4">
+                {activeJourney.otpCode || '----'}
+              </div>
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="w-full py-2 bg-surface-container/50 border-2 border-on-surface border-dashed text-on-surface-variant font-bold text-[10px] flex items-center justify-center gap-1.5">
+          <span className="material-symbols-outlined text-[14px]">lock</span>
+          OTP UNLOCKS ON ARRIVAL
+        </div>
+      )}
+    </div>
+  );
+
+  // ========== FULL: Chat + Controls ==========
+  const renderFullContent = () => (
+    <div className="flex flex-col gap-3 pt-2">
+      {/* Chat Panel */}
+      <div className="bg-surface-container border-2 border-on-surface p-3 flex flex-col">
+        <h3 className="font-headline-md text-[10px] font-black mb-2 border-b-2 border-on-surface pb-1 uppercase tracking-wide">Live Chat</h3>
+        <div className="h-28 overflow-y-auto mb-2 space-y-1.5 bg-surface-container-lowest p-2 border border-on-surface">
+          {messages.map(msg => {
+            if (msg.type === 'system') {
+              return (
+                <div key={msg.id} className="flex justify-center my-1">
+                  <div className="bg-surface-container-highest px-2 py-0.5 border border-on-surface text-[8px] font-bold text-on-surface-variant uppercase tracking-wide">
+                    {msg.text}
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`px-2.5 py-1 border-2 border-on-surface max-w-[80%] text-[11px] font-bold ${msg.sender === 'me' ? 'bg-primary-container text-on-surface shadow-[1px_1px_0px_0px_#141414]' : 'bg-surface-container-lowest text-on-surface'}`}>
+                  {msg.text}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        {/* Quick Reply Suggestions */}
+        <div className="flex gap-1 overflow-x-auto pb-1.5 no-scrollbar">
+          {(isRunner ? ['2 min away', 'Waiting', 'On my way', 'Almost!'] : ['Thanks!', 'Take time', 'Where?', 'I am here']).map((reply, i) => (
+            <button
+              type="button"
+              key={i}
+              onClick={() => sendQuickMessage(reply)}
+              className="whitespace-nowrap bg-surface-container-lowest hover:bg-surface-variant border border-on-surface px-2 py-0.5 text-[8px] font-bold uppercase transition-colors flex-shrink-0"
+            >
+              {reply}
+            </button>
+          ))}
+        </div>
+        
+        {/* Message Input */}
+        <form onSubmit={handleSendMessage} className="flex gap-1.5 mt-1">
+          <input 
+            type="text" 
+            className="flex-1 bg-surface-container-lowest border-2 border-on-surface px-2.5 py-1.5 text-[11px] focus:outline-none" 
+            placeholder="Type message..." 
+            value={newMessage} 
+            onChange={e => setNewMessage(e.target.value)} 
+          />
+          <button 
+            type="submit" 
+            className="bg-primary-container text-on-surface border-2 border-on-surface px-2.5 flex items-center justify-center shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          >
+            <span className="material-symbols-outlined text-[14px] font-black">send</span>
+          </button>
+        </form>
+      </div>
+
+      {/* Report & Cancel */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setShowReportModal(true)}
+          className="flex-1 py-2 border-2 border-on-surface bg-surface-container-lowest text-on-surface shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-[10px] flex items-center justify-center gap-1.5"
+        >
+          <span className="material-symbols-outlined text-[14px]">flag</span> Report
+        </button>
+        <button
+          onClick={() => setShowCancelModal(true)}
+          disabled={activeJourney.status === 'Arrived' || isAtDestination}
+          className="flex-1 py-2 border-2 border-on-surface bg-surface-container-lowest text-error shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-[10px] flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none"
+        >
+          <span className="material-symbols-outlined text-[14px]">cancel</span> Cancel
+        </button>
+      </div>
+    </div>
+  );
+
+  // ========== MOBILE LAYOUT ==========
+  if (isMobile) {
+    return (
+      <main className="relative w-full h-[calc(100vh-60px)] overflow-hidden bg-surface-container-lowest font-body-md">
+        {renderMap()}
+        
+        <BottomSheet initialSnap="half">
+          {({ snapLabel, expandToFull }) => (
+            <div className="flex flex-col h-full gap-4">
+              {/* PEEK — always visible */}
+              {renderPeekContent()}
+              
+              {/* HALF — content below peek */}
+              <div>
+                {renderHalfContent()}
+              </div>
+              
+              {/* FULL — content at bottom */}
+              <div>
+                {renderFullContent()}
+              </div>
+            </div>
+          )}
+        </BottomSheet>
+
+        {renderCancelModal()}
+        
+        <ReportModal 
+          isOpen={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          reportedUserId={isRunner ? activeJourney.requesterId : activeJourney.runnerId}
+          journeyId={activeJourney.id}
+          reporterRole={isRunner ? 'runner' : 'requester'}
+        />
+
+        <PublicProfileModal 
+          isOpen={!!profileTargetUid}
+          onClose={() => setProfileTargetUid(null)}
+          targetUid={profileTargetUid}
+        />
+      </main>
+    );
+  }
+
+  // ========== DESKTOP LAYOUT (unchanged) ==========
   return (
     <main className="relative w-full h-[calc(100vh-80px)] overflow-hidden bg-surface-container-lowest flex flex-col md:flex-row font-body-md selection:bg-primary-container selection:text-on-surface">
       
       {/* 1. Full Bleed Background Map */}
-      <div className="absolute inset-0 z-0">
-        {isMapReady && (
-          <MapContainer 
-            key={JSON.stringify(activeJourney?.runnerLocation)}
-            center={isCoordsValid(activeJourney?.runnerLocation) ? [activeJourney.runnerLocation.lat, activeJourney.runnerLocation.lng] : VALID_CAMPUS_CENTER}
-            zoom={17} 
-            style={{ height: '100%', width: '100%' }}
-            zoomControl={false}
-          >
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://carto.com/">Carto</a>'
-            />
-            {isCoordsValid(pickupCoords) && isCoordsValid(destCoords) && (
-              <Polyline positions={[pickupArr, destArr]} pathOptions={{ color: '#626200', dashArray: '5, 10', weight: 4 }} />
-            )}
-            {isCoordsValid(activeJourney?.runnerLocation) && (
-              <Marker 
-                position={[activeJourney.runnerLocation.lat, activeJourney.runnerLocation.lng]} 
-                icon={pulsingMarkerIcon}
-              />
-            )}
-            <MapUpdater lat={mapLat} lng={mapLng} />
-          </MapContainer>
-        )}
-      </div>
+      {renderMap()}
 
-      {/* 2. Floating UI Bottom Sheet */}
+      {/* 2. Floating UI Side Panel */}
       <div className="absolute bottom-0 left-0 w-full md:w-[460px] md:left-auto md:right-8 md:top-8 md:bottom-8 z-10 pointer-events-none flex flex-col justify-end">
         <div className="bg-surface-container-lowest border-t-4 md:border-4 border-on-surface p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[90vh] md:max-h-full overflow-y-auto flex flex-col gap-5 pointer-events-auto">
           
@@ -352,7 +651,7 @@ const ActiveJourney = () => {
               ) : isTooFar && !isSimulating ? (
                 <>
                   <span className="material-symbols-outlined">lock</span>
-                  Locked ({Math.round(distanceToTarget || 0)}m away)
+                  Locked — Too Far
                 </>
               ) : (
                 <>

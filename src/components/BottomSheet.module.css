@@ -1,0 +1,112 @@
+.sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 92vh; /* Matches SNAP_FULL */
+  z-index: 100;
+  background: var(--surface-container-lowest);
+  border-top: 4px solid var(--on-surface);
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet.dragging {
+  transition: none;
+}
+
+.handleBar {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 6px;
+  cursor: grab;
+  flex-shrink: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.handleBar:active {
+  cursor: grabbing;
+}
+
+.handleNub {
+  width: 40px;
+  height: 5px;
+  background: var(--on-surface);
+  border-radius: 0;
+}
+
+.sheetBody {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 16px 16px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* When in peek mode, hide the scrollbar & disable scroll */
+.sheetBody.noScroll {
+  overflow: hidden;
+}
+
+/* Section visibility helpers */
+.sectionPeek {
+  /* Always visible */
+}
+
+.sectionHalf {
+  display: none;
+}
+
+.sectionFull {
+  display: none;
+}
+
+.sheet.half .sectionHalf,
+.sheet.full .sectionHalf {
+  display: block;
+}
+
+.sheet.full .sectionFull {
+  display: block;
+}
+
+/* Expand hint arrow */
+.expandHint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0 0;
+  flex-shrink: 0;
+}
+
+.expandHint .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--on-surface-variant);
+  transition: transform 0.3s ease;
+}
+
+.sheet.full .expandHint .material-symbols-outlined {
+  transform: rotate(180deg);
+}
+
+/* Backdrop when sheet is fully expanded */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.2);
+  z-index: 99;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}

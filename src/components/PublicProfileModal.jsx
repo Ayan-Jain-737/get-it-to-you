@@ -1,8 +1,10 @@
 import React from 'react';
 import { X, Award, Star } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 import { usePublicProfileModal } from '../hooks/usePublicProfileModal';
 
 const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
+  useScrollLock(isOpen);
   const { profileData, loading } = usePublicProfileModal(isOpen, targetUid);
 
   if (!isOpen) return null;

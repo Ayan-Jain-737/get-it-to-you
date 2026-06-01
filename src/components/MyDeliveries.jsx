@@ -27,10 +27,11 @@ const MyDeliveries = () => {
       <div className="relative w-full h-[calc(100vh-80px)] bg-surface-container-low">
         <button 
           onClick={() => setShowMap(false)}
-          className="absolute top-4 left-4 z-[9999] bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_#141414] px-4 py-2 font-headline-md text-body-md font-bold flex items-center gap-2 hover:-translate-y-1 transition-transform cursor-pointer active:translate-y-0 active:shadow-none"
+          className="absolute top-4 left-4 z-[9999] bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_#141414] px-3 md:px-4 py-2 font-headline-md text-body-md font-bold flex items-center gap-2 hover:-translate-y-1 transition-transform cursor-pointer active:translate-y-0 active:shadow-none"
         >
           <span className="material-symbols-outlined">arrow_back</span>
-          Back to Requests List
+          <span className="hidden md:inline">Back to Requests List</span>
+          <span className="md:hidden">Back</span>
         </button>
         <ActiveJourney />
       </div>

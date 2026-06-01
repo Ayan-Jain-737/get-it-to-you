@@ -1,6 +1,7 @@
 import React from 'react';
 import { useReportModal } from '../hooks/useReportModal';
 import { X } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const REQUESTER_REASONS = [
   "Runner never arrived",
@@ -20,6 +21,7 @@ const RUNNER_REASONS = [
 ];
 
 const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId, reporterRole }) => {
+  useScrollLock(isOpen);
   const {
     reason,
     setReason,
@@ -62,7 +64,7 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId, reporterRole 
             <select 
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md focus:bg-primary-container outline-none transition-colors"
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md focus:bg-primary-container outline-none transition-colors cursor-pointer"
             >
               {reasonsList.map((r, i) => (
                 <option key={i} value={r}>{r}</option>
