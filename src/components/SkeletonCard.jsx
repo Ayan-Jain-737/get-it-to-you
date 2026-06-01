@@ -2,7 +2,7 @@ import React from 'react';
 
 const SkeletonCard = () => {
   return (
-    <article className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col relative animate-pulse h-[280px]">
+    <article className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] flex flex-col relative animate-pulse h-[280px]">
       <div className="p-stack-md flex-1 flex flex-col gap-stack-md border-b-border-width border-on-surface">
         <div className="flex items-center gap-stack-sm pr-24">
           <div className="w-10 h-10 border-border-width border-on-surface bg-surface-variant flex-shrink-0"></div>

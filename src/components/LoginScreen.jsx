@@ -12,9 +12,9 @@ const LoginScreen = () => {
       </header>
 
       <main className="flex-1 flex items-center justify-center py-12">
-        <div className="w-full max-w-md bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#000000] p-stack-lg flex flex-col gap-stack-md relative">
+        <div className="w-full max-w-md bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] p-stack-lg flex flex-col gap-stack-md relative">
           {/* Decorative yellow stripe */}
-          <div className="absolute top-0 right-0 -mt-[4px] -mr-[4px] bg-primary-fixed text-on-surface font-label-mono text-label-tag px-4 py-2 border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] z-10 uppercase font-black">
+          <div className="absolute top-0 right-0 -mt-[4px] -mr-[4px] bg-primary-fixed text-on-surface font-label-mono text-label-tag px-4 py-2 border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] z-10 uppercase font-black">
             ACCESS GATEWAY
           </div>
 
@@ -35,7 +35,7 @@ const LoginScreen = () => {
             <button
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full bg-primary-container hover:bg-primary-fixed-dim text-on-surface font-headline-md text-body-lg py-4 border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase tracking-wider font-bold"
+              className="w-full bg-primary-container hover:bg-primary-fixed-dim text-on-surface font-headline-md text-body-lg py-4 border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase tracking-wider font-bold"
             >
               Sign In with Google
             </button>

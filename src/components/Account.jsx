@@ -153,7 +153,7 @@ const Account = () => {
                         setIsDropdownOpen(true);
                       }}
                       onFocus={() => setIsDropdownOpen(true)}
-                      placeholder="Type to search blocks"
+                      placeholder={userProfile?.hostelBlock || "Type to search blocks"}
                       disabled={!isJune}
                       className="w-full p-2 bg-transparent focus:outline-none"
                     />
@@ -190,7 +190,7 @@ const Account = () => {
                     value={editRoom}
                     onChange={(e) => setEditRoom(e.target.value)}
                     disabled={!isJune}
-                    placeholder="e.g. 104"
+                    placeholder={userProfile?.privateData?.roomNumber || "e.g. 104"}
                     className="p-2 border-2 border-on-surface bg-surface-container-lowest font-bold focus:outline-none transition-colors disabled:bg-surface-container disabled:cursor-not-allowed"
                   />
                 </div>

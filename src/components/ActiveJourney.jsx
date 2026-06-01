@@ -105,7 +105,7 @@ const ActiveJourney = () => {
     if (!showCancelModal) return null;
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-sm font-body-md animate-in fade-in duration-100">
-        <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#000000] p-6 w-full max-w-sm flex flex-col gap-4">
+        <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] p-6 w-full max-w-sm flex flex-col gap-4">
           <h3 className="text-xl font-bold text-on-surface font-headline uppercase flex items-center gap-2 border-b-2 border-on-surface pb-2">
             <span className="material-symbols-outlined text-error">warning</span>
             Cancel Run
@@ -154,7 +154,7 @@ const ActiveJourney = () => {
               <button 
                 type="submit" 
                 disabled={!cancelReason.trim() || isCancelling}
-                className="flex-1 py-3 bg-tertiary text-on-error border-2 border-on-surface font-bold uppercase text-xs shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                className="flex-1 py-3 bg-tertiary text-on-error border-2 border-on-surface font-bold uppercase text-xs shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
               >
                 {isCancelling ? 'Cancelling...' : 'Confirm'}
               </button>
@@ -235,7 +235,7 @@ const ActiveJourney = () => {
           </div>
 
           {/* Reward & Route Box */}
-          <div className="bg-[#ffc5aa]/20 border-2 border-on-surface p-3 flex items-center justify-between shadow-[2px_2px_0px_0px_#000000] rotate-[0.5deg]">
+          <div className="bg-[#ffc5aa]/20 border-2 border-on-surface p-3 flex items-center justify-between shadow-[2px_2px_0px_0px_#141414] rotate-[0.5deg]">
             <div>
               <p className="font-label-mono text-[9px] font-bold uppercase text-[#9b3f00]">Reward</p>
               <p className="text-[#9b3f00] font-black text-base">
@@ -249,7 +249,7 @@ const ActiveJourney = () => {
           </div>
 
           {/* Progress Timeline */}
-          <div className="bg-surface-container-low border-2 border-on-surface p-4 shadow-[2px_2px_0px_0px_#000000]">
+          <div className="bg-surface-container-low border-2 border-on-surface p-4 shadow-[2px_2px_0px_0px_#141414]">
             <h3 className="font-label-mono text-[10px] font-bold uppercase text-on-surface mb-3 border-b border-on-surface pb-1">Route Status</h3>
             <div className="space-y-3 relative pl-6">
               <div className="absolute left-[9px] top-3 bottom-3 w-1 bg-on-surface"></div>
@@ -259,7 +259,7 @@ const ActiveJourney = () => {
                 return (
                   <div key={idx} className="flex gap-3 relative items-center">
                     <div 
-                      className={`absolute -left-[22px] w-5 h-5 border-2 border-on-surface rounded-full flex items-center justify-center z-10 shadow-[1px_1px_0px_0px_#000000] ${isCompleted ? 'bg-primary-container text-on-surface' : 'bg-surface-container-lowest'}`}
+                      className={`absolute -left-[22px] w-5 h-5 border-2 border-on-surface rounded-full flex items-center justify-center z-10 shadow-[1px_1px_0px_0px_#141414] ${isCompleted ? 'bg-primary-container text-on-surface' : 'bg-surface-container-lowest'}`}
                     >
                       {isCompleted && !isCurrent && (
                         <span className="material-symbols-outlined text-[10px] font-black">check</span>
@@ -278,7 +278,7 @@ const ActiveJourney = () => {
           </div>
 
           {/* Chat Panel */}
-          <div className="bg-surface-container border-2 border-on-surface p-4 shadow-[2px_2px_0px_0px_#000000] flex flex-col">
+          <div className="bg-surface-container border-2 border-on-surface p-4 shadow-[2px_2px_0px_0px_#141414] flex flex-col">
             <h3 className="font-headline-md text-xs font-black mb-3 border-b-2 border-on-surface pb-1 uppercase tracking-wide">Live Chat</h3>
             <div className="h-32 overflow-y-auto mb-3 space-y-2 bg-surface-container-lowest p-3 border border-on-surface">
               {messages.map(msg => {
@@ -293,7 +293,7 @@ const ActiveJourney = () => {
                 }
                 return (
                   <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`px-3 py-1 border-2 border-on-surface max-w-[85%] text-xs font-bold ${msg.sender === 'me' ? 'bg-primary-container text-on-surface shadow-[1px_1px_0px_0px_#000000]' : 'bg-surface-container-lowest text-on-surface'}`}>
+                    <div className={`px-3 py-1 border-2 border-on-surface max-w-[85%] text-xs font-bold ${msg.sender === 'me' ? 'bg-primary-container text-on-surface shadow-[1px_1px_0px_0px_#141414]' : 'bg-surface-container-lowest text-on-surface'}`}>
                       {msg.text}
                     </div>
                   </div>
@@ -326,7 +326,7 @@ const ActiveJourney = () => {
               />
               <button 
                 type="submit" 
-                className="bg-primary-container text-on-surface border-2 border-on-surface px-3 flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                className="bg-primary-container text-on-surface border-2 border-on-surface px-3 flex items-center justify-center shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
               >
                 <span className="material-symbols-outlined text-[16px] font-black">send</span>
               </button>
@@ -340,9 +340,9 @@ const ActiveJourney = () => {
               disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
               className="w-full font-headline-md text-body-lg font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                boxShadow: (isTooFar && !isSimulating) ? 'none' : '4px 4px 0px #000',
+                boxShadow: (isTooFar && !isSimulating) ? 'none' : '4px 4px 0px #141414',
                 background: (isTooFar && !isSimulating) ? '#e2e2e2' : 'var(--primary-container)',
-                color: '#000'
+                color: '#141414'
               }}
             >
               {isUpdatingStatus ? (
@@ -365,7 +365,7 @@ const ActiveJourney = () => {
 
           {/* OTP Handoff Section */}
           {activeJourney.status === 'Arrived' ? (
-            <div className="bg-secondary-container border-2 border-on-surface p-4 text-center shadow-[4px_4px_0px_0px_#000000] rotate-[-1deg]">
+            <div className="bg-secondary-container border-2 border-on-surface p-4 text-center shadow-[4px_4px_0px_0px_#141414] rotate-[-1deg]">
               <p className="text-[10px] font-black uppercase text-on-surface-variant mb-1">Runner Arrived</p>
               {isRunner ? (
                 <>
@@ -382,7 +382,7 @@ const ActiveJourney = () => {
                     <button 
                       onClick={handleVerifyOTP}
                       disabled={enteredOTP.length !== 4 || isVerifying}
-                      className="py-2.5 px-4 bg-surface-container-lowest text-on-surface font-bold border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none uppercase text-xs"
+                      className="py-2.5 px-4 bg-surface-container-lowest text-on-surface font-bold border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none uppercase text-xs"
                     >
                       {isVerifying ? '...' : 'Verify'}
                     </button>
@@ -394,7 +394,7 @@ const ActiveJourney = () => {
               ) : (
                 <>
                   <p className="text-on-surface font-bold text-xs mb-2">SHARE THIS CODE WITH RUNNER TO CONFIRM</p>
-                  <div className="text-4xl font-black tracking-[0.25em] text-on-surface font-headline bg-surface-container-lowest py-2 border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000] inline-block px-6">
+                  <div className="text-4xl font-black tracking-[0.25em] text-on-surface font-headline bg-surface-container-lowest py-2 border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] inline-block px-6">
                     {activeJourney.otpCode || '----'}
                   </div>
                 </>
@@ -411,14 +411,14 @@ const ActiveJourney = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setShowReportModal(true)}
-              className="flex-1 py-2.5 border-2 border-on-surface bg-surface-container-lowest text-on-surface shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-xs flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 border-2 border-on-surface bg-surface-container-lowest text-on-surface shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-xs flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined text-[14px]">flag</span> Report
             </button>
             <button
               onClick={() => setShowCancelModal(true)}
               disabled={activeJourney.status === 'Arrived' || isAtDestination}
-              className="flex-1 py-2.5 border-2 border-on-surface bg-surface-container-lowest text-error shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-xs flex items-center justify-center gap-2 disabled:opacity-40 disabled:pointer-events-none"
+              className="flex-1 py-2.5 border-2 border-on-surface bg-surface-container-lowest text-error shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-xs flex items-center justify-center gap-2 disabled:opacity-40 disabled:pointer-events-none"
             >
               <span className="material-symbols-outlined text-[14px]">cancel</span> Cancel
             </button>

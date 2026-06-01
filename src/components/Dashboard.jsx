@@ -42,14 +42,14 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
         {/* Left Column: Need a Pickup */}
         <section className="flex flex-col gap-stack-md">
-          <div className="flex justify-between items-center bg-primary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] rotate-[-1deg] mb-2">
+          <div className="flex justify-between items-center bg-primary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] rotate-[-1deg] mb-2">
             <h2 className="font-headline-lg text-headline-md font-black uppercase tracking-tight">Need a Pickup</h2>
             <span className="font-label-mono text-label-tag bg-surface-container-lowest border-2 border-on-surface px-2 py-0.5">{pickups.length} ACTIVE</span>
           </div>
 
           <button 
             onClick={() => openModal('request')}
-            className="w-full p-stack-md bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase flex items-center justify-center gap-2 hover:bg-primary-fixed-dim"
+            className="w-full p-stack-md bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase flex items-center justify-center gap-2 hover:bg-primary-fixed-dim"
           >
             <span className="material-symbols-outlined font-black">add_circle</span> Post Request
           </button>
@@ -65,10 +65,10 @@ const Dashboard = () => {
             {!loading && pickups.map(post => (
               <article 
                 key={post.id} 
-                className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000]"
+                className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414]"
               >
                 {post.isUrgent && (
-                  <div className="absolute -top-3 -left-3 bg-tertiary text-on-error border-border-width border-on-surface px-stack-sm py-1 font-label-mono text-label-tag font-black z-20 shadow-[4px_4px_0px_0px_#000000] rotate-3">
+                  <div className="absolute -top-3 -left-3 bg-tertiary text-on-error border-border-width border-on-surface px-stack-sm py-1 font-label-mono text-label-tag font-black z-20 shadow-[4px_4px_0px_0px_#141414] rotate-3">
                     URGENT
                   </div>
                 )}
@@ -126,7 +126,7 @@ const Dashboard = () => {
                   <div className="font-label-mono text-label-tag text-on-surface-variant uppercase">
                     {currentUser && post.requesterId === currentUser.uid ? 'Cost' : 'Reward'}
                   </div>
-                  <div className="font-headline-lg text-body-lg font-black bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] px-stack-sm py-1 -rotate-2">
+                  <div className="font-headline-lg text-body-lg font-black bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] px-stack-sm py-1 -rotate-2">
                     {currentUser && post.requesterId === currentUser.uid ? `75 GC` : `50 GC`}
                   </div>
                 </div>
@@ -153,7 +153,7 @@ const Dashboard = () => {
                       )}
                     </button>
                     {blockedActionId === post.id && (
-                      <div className="absolute bottom-full mb-2 right-0 bg-surface-container-lowest border-2 border-on-surface p-3 shadow-[4px_4px_0px_0px_#000000] text-xs font-bold w-64 z-10 animate-in fade-in slide-in-from-bottom-2 text-on-surface">
+                      <div className="absolute bottom-full mb-2 right-0 bg-surface-container-lowest border-2 border-on-surface p-3 shadow-[4px_4px_0px_0px_#141414] text-xs font-bold w-64 z-10 animate-in fade-in slide-in-from-bottom-2 text-on-surface">
                         <span className="material-symbols-outlined text-error mb-1 block">warning</span>
                         You are already at max Wallet Balance. Sit down and let someone else Handle this time.
                       </div>
@@ -171,7 +171,7 @@ const Dashboard = () => {
             ))}
 
             {!loading && pickups.length === 0 && (
-              <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-lg min-h-[250px] flex flex-col items-center justify-center relative">
+              <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] p-stack-lg min-h-[250px] flex flex-col items-center justify-center relative">
                 <span className="material-symbols-outlined text-5xl text-outline mb-stack-md">assignment</span>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No Active Requests</h3>
                 <p className="font-body-md text-body-md text-on-surface-variant text-center max-w-sm">There are no current pickup requests. Be the first to broadcast a need!</p>
@@ -182,7 +182,7 @@ const Dashboard = () => {
 
         {/* Right Column: Ready for Pickup */}
         <section className="flex flex-col gap-stack-md">
-          <div className="flex justify-between items-center bg-secondary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] rotate-[1deg] mb-2">
+          <div className="flex justify-between items-center bg-secondary-container text-on-surface p-stack-sm border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] rotate-[1deg] mb-2">
             <h2 className="font-headline-lg text-headline-md font-black uppercase tracking-tight">Ready for Pickup</h2>
             <span className="font-label-mono text-label-tag bg-surface-container-lowest border-2 border-on-surface px-2 py-0.5">{offers.length} ACTIVE</span>
           </div>
@@ -196,12 +196,12 @@ const Dashboard = () => {
                 }
                 openModal('offer');
               }}
-              className={`w-full p-stack-md border-border-width border-on-surface font-headline-md text-headline-md font-bold uppercase flex items-center justify-center gap-2 transition-all ${isMaxWallet ? 'bg-surface-variant text-on-surface-variant cursor-not-allowed opacity-75' : 'bg-primary-container shadow-[4px_4px_0px_0px_#000000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-primary-fixed-dim'}`}
+              className={`w-full p-stack-md border-border-width border-on-surface font-headline-md text-headline-md font-bold uppercase flex items-center justify-center gap-2 transition-all ${isMaxWallet ? 'bg-surface-variant text-on-surface-variant cursor-not-allowed opacity-75' : 'bg-primary-container shadow-[4px_4px_0px_0px_#141414] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-primary-fixed-dim'}`}
             >
               <span className="material-symbols-outlined">local_shipping</span> I'm Ready for Pickup
             </button>
             {blockedActionId === 'postOffer' && (
-              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface-container-lowest border-2 border-on-surface p-3 shadow-[4px_4px_0px_0px_#000000] text-xs font-bold w-64 z-10 animate-in fade-in slide-in-from-top-2 text-on-surface">
+              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface-container-lowest border-2 border-on-surface p-3 shadow-[4px_4px_0px_0px_#141414] text-xs font-bold w-64 z-10 animate-in fade-in slide-in-from-top-2 text-on-surface">
                 <span className="material-symbols-outlined text-error mb-1 block">warning</span>
                 You are already at max Wallet Balance. Sit down and let someone else Handle this time.
               </div>
@@ -219,7 +219,7 @@ const Dashboard = () => {
             {!loading && offers.map(post => (
               <article 
                 key={post.id} 
-                className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000]"
+                className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414]"
               >
                 <div className="absolute top-stack-sm right-stack-sm bg-surface-variant border-2 border-on-surface px-2 py-0.5 font-label-tag text-label-tag z-10">
                   {getTimeAgo(post.createdAt)}
@@ -274,7 +274,7 @@ const Dashboard = () => {
                   <div className="font-label-mono text-label-tag text-on-surface-variant uppercase">
                     {currentUser && post.requesterId === currentUser.uid ? 'Reward' : 'Cost'}
                   </div>
-                  <div className="font-headline-lg text-body-lg font-black bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] px-stack-sm py-1 rotate-2">
+                  <div className="font-headline-lg text-body-lg font-black bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] px-stack-sm py-1 rotate-2">
                     {currentUser && post.requesterId === currentUser.uid ? `50 GC` : `75 GC`}
                   </div>
                 </div>
@@ -305,7 +305,7 @@ const Dashboard = () => {
             ))}
 
             {!loading && offers.length === 0 && (
-              <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] p-stack-lg min-h-[250px] flex flex-col items-center justify-center relative">
+              <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] p-stack-lg min-h-[250px] flex flex-col items-center justify-center relative">
                 <span className="material-symbols-outlined text-5xl text-outline mb-stack-md">directions_walk</span>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">No Active Offers</h3>
                 <p className="font-body-md text-body-md text-on-surface-variant text-center max-w-sm">No runners are broadcasting their routes right now. Check back shortly!</p>

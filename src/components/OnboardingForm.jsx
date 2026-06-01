@@ -52,7 +52,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
 
   return (
     <div className="min-h-screen bg-surface p-margin-page font-body-md text-on-surface flex flex-col items-center justify-center py-12">
-      <div className="w-full max-w-2xl bg-surface-container-lowest border-[3px] border-on-surface shadow-[8px_8px_0px_0px_#000000] p-stack-lg">
+      <div className="w-full max-w-2xl bg-surface-container-lowest border-[3px] border-on-surface shadow-[8px_8px_0px_0px_#141414] p-stack-lg">
         <div className="mb-stack-xl border-b-[3px] border-on-surface pb-stack-sm">
           <h1 className="font-headline-xl text-headline-xl font-black uppercase tracking-tighter">ACCOUNT CREATION</h1>
           <p className="font-label-mono text-label-tag uppercase font-bold text-on-surface-variant">Initialize Your Identity Profile</p>
@@ -70,7 +70,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
             <div className="flex items-center gap-4">
               <div 
                 onClick={triggerFileUpload}
-                className="w-40 h-40 border-[3px] border-dashed border-on-surface bg-surface-variant flex flex-col items-center justify-center cursor-pointer hover:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#000000]"
+                className="w-40 h-40 border-[3px] border-dashed border-on-surface bg-surface-variant flex flex-col items-center justify-center cursor-pointer hover:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#141414]"
               >
                 {pfpFile ? (
                   <div className="text-center font-bold font-label-mono p-2 truncate w-full">
@@ -89,7 +89,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                  <p className="font-body-md text-sm font-bold">You can upload a photo to stand out and complete the onboarding quest, or simply skip to use your default initial as your avatar.</p>
                  {!pfpFile && (
                    <div className="flex items-center gap-2 mt-2">
-                     <div className="w-10 h-10 border-2 border-on-surface bg-secondary-container flex items-center justify-center font-headline-md font-bold text-on-surface uppercase shadow-[2px_2px_0px_0px_#000000]">
+                     <div className="w-10 h-10 border-2 border-on-surface bg-secondary-container flex items-center justify-center font-headline-md font-bold text-on-surface uppercase shadow-[2px_2px_0px_0px_#141414]">
                        {fullName ? fullName[0].toUpperCase() : '?'}
                      </div>
                      <span className="font-label-mono text-xs font-bold text-on-surface-variant">Default Initial</span>
@@ -99,7 +99,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                    <button 
                      type="button" 
                      onClick={() => setPfpFile(null)} 
-                     className="px-3 py-1 bg-error text-on-error font-bold font-label-mono uppercase text-[10px] border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000] self-start mt-2"
+                     className="px-3 py-1 bg-error text-on-error font-bold font-label-mono uppercase text-[10px] border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] self-start mt-2"
                    >
                      Remove Photo
                    </button>
@@ -126,7 +126,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Enter legal name"
                 required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors"
+                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
               />
             </div>
 
@@ -141,7 +141,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 value={email}
                 readOnly
                 placeholder="Email locked"
-                className="p-3 border-[3px] border-on-surface bg-surface-container-highest text-on-surface-variant font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] cursor-not-allowed outline-none"
+                className="p-3 border-[3px] border-on-surface bg-surface-container-highest text-on-surface-variant font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] cursor-not-allowed outline-none"
               />
             </div>
 
@@ -153,7 +153,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
                 required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors"
+                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
               />
             </div>
 
@@ -167,7 +167,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors cursor-pointer"
+                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors cursor-pointer"
               >
                 <option value="" disabled>Select Classification</option>
                 <option value="Male">Male (Men's Hostel)</option>
@@ -188,7 +188,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 min={regNumber ? 2000 + parseInt(regNumber.substring(0, 2)) + 3 : 2020} 
                 max={regNumber ? 2000 + parseInt(regNumber.substring(0, 2)) + 5 : 2030}
                 required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors"
+                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
               />
               {regNumber && (
                 <span className="text-xs text-on-surface-variant font-label-mono">
@@ -208,7 +208,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
               <div className="flex flex-col gap-1 relative" ref={dropdownRef}>
                 <label className="font-label-mono font-bold uppercase">Hostel Block</label>
                 <div 
-                  className={`border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus-within:bg-primary-container transition-colors ${!gender ? 'bg-surface-container-highest opacity-50 pointer-events-none' : ''}`}
+                  className={`border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus-within:bg-primary-container transition-colors ${!gender ? 'bg-surface-container-highest opacity-50 pointer-events-none' : ''}`}
                 >
                   <input 
                     type="text"
@@ -226,7 +226,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 </div>
                 
                 {isDropdownOpen && gender && (
-                  <div className="absolute top-[100%] left-0 w-full mt-2 bg-surface-container-lowest border-[3px] border-on-surface shadow-[4px_4px_0px_0px_#000000] max-h-48 overflow-y-auto z-50">
+                  <div className="absolute top-[100%] left-0 w-full mt-2 bg-surface-container-lowest border-[3px] border-on-surface shadow-[4px_4px_0px_0px_#141414] max-h-48 overflow-y-auto z-50">
                     {filteredBlocks.length > 0 ? (
                       filteredBlocks.map((block) => (
                         <div
@@ -258,13 +258,13 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                   onChange={(e) => setRoomNumber(e.target.value)}
                   placeholder="e.g. 404"
                   required
-                  className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#000000] focus:outline-none focus:bg-primary-container transition-colors"
+                  className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
                 />
               </div>
             </div>
             
             {/* SECURITY WARNING */}
-            <div className="mt-stack-md bg-tertiary-container border-[3px] border-on-surface p-stack-sm flex items-start gap-3 shadow-[4px_4px_0px_0px_#000000]">
+            <div className="mt-stack-md bg-tertiary-container border-[3px] border-on-surface p-stack-sm flex items-start gap-3 shadow-[4px_4px_0px_0px_#141414]">
               <span className="material-symbols-outlined text-on-tertiary-container text-3xl shrink-0 mt-0.5">warning</span>
               <p className="font-body-md font-bold uppercase text-on-tertiary-container leading-tight">
                 ATTENTION: Room details are locked for security. You may only update this once per academic year.
@@ -274,7 +274,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
 
           <button 
             type="submit" 
-            className="w-full mt-stack-md bg-primary text-on-primary py-4 border-[3px] border-on-surface font-headline-xl text-headline-sm uppercase tracking-widest font-black shadow-[8px_8px_0px_0px_#000000] hover:translate-y-1 hover:translate-x-1 hover:shadow-[4px_4px_0px_0px_#000000] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
+            className="w-full mt-stack-md bg-primary text-on-primary py-4 border-[3px] border-on-surface font-headline-xl text-headline-sm uppercase tracking-widest font-black shadow-[8px_8px_0px_0px_#141414] hover:translate-y-1 hover:translate-x-1 hover:shadow-[4px_4px_0px_0px_#141414] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
           >
             SEAL MY INFORMATION
           </button>

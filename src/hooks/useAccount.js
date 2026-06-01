@@ -9,9 +9,9 @@ export const useAccount = () => {
   const [isEditing, setIsEditing] = useState(false);
   
   // State for the edit form
-  const [editDob, setEditDob] = useState(userProfile?.privateData?.dob || '');
-  const [editBlock, setEditBlock] = useState(userProfile?.hostelBlock || '');
-  const [editRoom, setEditRoom] = useState(userProfile?.privateData?.roomNumber || '');
+  const [editDob, setEditDob] = useState('');
+  const [editBlock, setEditBlock] = useState('');
+  const [editRoom, setEditRoom] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -30,6 +30,14 @@ export const useAccount = () => {
   const filteredBlocks = availableBlocks.filter(block => 
     (block + " Block").toLowerCase().includes(editBlock.toLowerCase())
   );
+
+  useEffect(() => {
+    if (isEditing && userProfile) {
+      setEditDob(userProfile.privateData?.dob || '');
+      setEditBlock(userProfile.hostelBlock || '');
+      setEditRoom(userProfile.privateData?.roomNumber || '');
+    }
+  }, [isEditing, userProfile]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -89,25 +97,28 @@ export const useAccount = () => {
     e.preventDefault();
     if (!currentUser) return;
     
+    const finalBlock = editBlock.trim() ? editBlock.trim() : (userProfile?.hostelBlock || '');
+    const finalRoom = editRoom.trim() ? editRoom : (userProfile?.privateData?.roomNumber || '');
+
     try {
       const userRef = doc(db, 'users', currentUser.uid);
       const updates = {};
       updates['privateData.dob'] = editDob;
       
       if (isJune) {
-        updates['publicData.zone'] = editBlock;
-        updates['privateData.roomNumber'] = editRoom;
+        updates['publicData.zone'] = finalBlock;
+        updates['privateData.roomNumber'] = finalRoom;
       }
       
       await updateDoc(userRef, updates);
       
       setUserProfile(prev => ({
         ...prev,
-        hostelBlock: isJune ? editBlock : prev.hostelBlock,
+        hostelBlock: isJune ? finalBlock : prev.hostelBlock,
         privateData: {
           ...prev.privateData,
           dob: editDob,
-          roomNumber: isJune ? editRoom : prev.privateData?.roomNumber
+          roomNumber: isJune ? finalRoom : prev.privateData?.roomNumber
         }
       }));
       

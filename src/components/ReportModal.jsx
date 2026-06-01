@@ -40,7 +40,7 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId, reporterRole 
         onClick={onClose}
       ></div>
       
-      <div className="bg-surface-container-lowest w-full max-w-md border-border-width border-on-surface shadow-[8px_8px_0px_0px_#000000] relative z-10 overflow-hidden animate-in zoom-in-95 duration-150 p-6 flex flex-col gap-4">
+      <div className="bg-surface-container-lowest w-full max-w-md border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] relative z-10 overflow-hidden animate-in zoom-in-95 duration-150 p-6 flex flex-col gap-4">
         <div className="flex justify-between items-center border-b-2 border-on-surface pb-3">
           <div>
             <h2 className="font-headline-lg text-headline-md uppercase tracking-tight text-error leading-none">
@@ -85,7 +85,7 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, journeyId, reporterRole 
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="w-full py-3 bg-tertiary hover:bg-red-700 text-on-error border-2 border-on-surface shadow-[4px_4px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-xs flex justify-center items-center gap-2 disabled:opacity-50"
+              className="w-full py-3 bg-tertiary hover:bg-red-700 text-on-error border-2 border-on-surface shadow-[4px_4px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none font-bold uppercase text-xs flex justify-center items-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
                 'Submitting...'

@@ -52,8 +52,8 @@ const Profile = () => {
         <section className="lg:col-span-5 flex flex-col gap-stack-md">
           {/* Main Wallet Cap display */}
           <div className="bg-surface-container-lowest border-border-width border-on-surface neo-shadow p-stack-lg relative overflow-hidden group">
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]"></div>
-            <div className="bg-surface-container-lowest border-[3px] border-on-surface shadow-[6px_6px_0px_0px_#000000] p-6 mb-6">
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#141414_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div className="bg-surface-container-lowest border-[3px] border-on-surface shadow-[6px_6px_0px_0px_#141414] p-6 mb-6">
               <div className="font-label-mono text-body-md uppercase mb-2 tracking-widest text-on-surface-variant">GITY Coins (GC) Available</div>
               <div className="font-headline-xl text-headline-xl font-black text-on-surface mb-2">
                 {userProfile?.gcBalance || 0} <span className="text-[24px] text-surface-tint">/ 300</span>
@@ -162,7 +162,7 @@ const Profile = () => {
                     }
                   }}
                   disabled={(userProfile?.gcBalance || 0) >= 300 || isWithdrawing || !withdrawAmount || parseInt(withdrawAmount) <= 0 || parseInt(withdrawAmount) > (userProfile?.overflowBalance || 0) || (userProfile?.gcBalance || 0) + parseInt(withdrawAmount) > 300}
-                  className="bg-surface-container-lowest text-on-surface border-2 border-on-surface font-bold px-4 py-2 hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:pointer-events-none uppercase text-xs shadow-[2px_2px_0px_0px_#000000]"
+                  className="bg-surface-container-lowest text-on-surface border-2 border-on-surface font-bold px-4 py-2 hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:pointer-events-none uppercase text-xs shadow-[2px_2px_0px_0px_#141414]"
                 >
                   {isWithdrawing ? '...' : 'Withdraw'}
                 </button>
@@ -233,10 +233,10 @@ const Profile = () => {
 
                   return (
                     <div 
-                      className={`p-4 border-2 border-on-surface flex flex-col justify-center transition-all mb-4 relative overflow-hidden ${isCompletedUnclaimed || onClick ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#000000]' : ''} ${claimingQuestId ? 'opacity-75 pointer-events-none' : ''}`}
+                      className={`p-4 border-2 border-on-surface flex flex-col justify-center transition-all mb-4 relative overflow-hidden ${isCompletedUnclaimed || onClick ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#141414]' : ''} ${claimingQuestId ? 'opacity-75 pointer-events-none' : ''}`}
                       onClick={handleAction}
                       style={{ 
-                        boxShadow: isClaimed ? 'none' : '4px 4px 0px 0px #000000', 
+                        boxShadow: isClaimed ? 'none' : '4px 4px 0px 0px #141414', 
                         background: isClaimed ? '#e2e2e2' : (isCompletedUnclaimed ? '#d4f5d4' : bg) 
                       }}
                     >
@@ -260,7 +260,7 @@ const Profile = () => {
                         </div>
                         <div className="text-right flex flex-col items-end justify-center">
                           {isClaimed ? null : isCompletedUnclaimed ? (
-                            <button disabled={isLoading} className="font-black text-on-surface uppercase bg-primary-container px-3 py-1 border-2 border-on-surface shadow-[2px_2px_0px_0px_#000000] text-xs flex items-center justify-center gap-1 disabled:opacity-50 disabled:shadow-[2px_2px_0px_0px_#000000]">
+                            <button disabled={isLoading} className="font-black text-on-surface uppercase bg-primary-container px-3 py-1 border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] text-xs flex items-center justify-center gap-1 disabled:opacity-50 disabled:shadow-[2px_2px_0px_0px_#141414]">
                               {isLoading ? <><span className="material-symbols-outlined text-[14px] animate-spin">refresh</span>...</> : `Claim ${reward} GC`}
                             </button>
                           ) : (
@@ -293,7 +293,7 @@ const Profile = () => {
                   return (
                     <button
                       onClick={() => setActiveTab(id)}
-                      className={`relative flex-1 py-2 text-center font-bold uppercase tracking-widest text-[11px] transition-all border-2 border-on-surface ${isActive ? 'bg-primary-container text-on-surface shadow-none translate-x-[2px] translate-y-[2px]' : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low shadow-[3px_3px_0px_0px_#000000]'}`}
+                      className={`relative flex-1 py-2 text-center font-bold uppercase tracking-widest text-[11px] transition-all border-2 border-on-surface ${isActive ? 'bg-primary-container text-on-surface shadow-none translate-x-[2px] translate-y-[2px]' : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low shadow-[3px_3px_0px_0px_#141414]'}`}
                     >
                       {label}
                       {hasClaimable && (

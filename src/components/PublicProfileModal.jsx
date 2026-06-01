@@ -56,7 +56,7 @@ const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
               </div>
 
               {/* Stats Card */}
-              <div className="grid grid-cols-2 gap-4 border-2 border-on-surface p-3 shadow-[3px_3px_0px_0px_#000000] bg-surface-container w-full mt-4">
+              <div className="grid grid-cols-2 gap-4 border-2 border-on-surface p-3 shadow-[3px_3px_0px_0px_#141414] bg-surface-container w-full mt-4">
                 <div className="text-center border-r-2 border-on-surface border-dashed">
                   <p className="font-label-mono text-[9px] uppercase text-on-surface-variant font-bold">Completed Runs</p>
                   <p className="font-headline-md text-lg font-black mt-1">
@@ -72,7 +72,7 @@ const PublicProfileModal = ({ isOpen, onClose, targetUid }) => {
               </div>
 
               {/* Extra Details */}
-              <div className="grid grid-cols-2 gap-4 border-2 border-on-surface p-3 shadow-[3px_3px_0px_0px_#000000] bg-surface-container w-full mt-2">
+              <div className="grid grid-cols-2 gap-4 border-2 border-on-surface p-3 shadow-[3px_3px_0px_0px_#141414] bg-surface-container w-full mt-2">
                 <div className="text-center border-r-2 border-on-surface border-dashed">
                   <p className="font-label-mono text-[9px] uppercase text-on-surface-variant font-bold">Grad Year</p>
                   <p className="font-headline-md text-sm font-black mt-1">

@@ -31,12 +31,12 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
 
   return (
     <div className="fixed inset-0 bg-on-background/40 backdrop-blur-sm flex items-center justify-center p-margin-page z-[200] font-body-md animate-in fade-in duration-100">
-      <div className="w-full max-w-lg bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#000000] p-stack-md flex flex-col gap-stack-md relative animate-in zoom-in-95 duration-150">
+      <div className="w-full max-w-lg bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] p-stack-md flex flex-col gap-stack-md relative animate-in zoom-in-95 duration-150">
         <div className="flex justify-between items-center border-b-border-width border-on-surface pb-stack-sm mb-2">
           <h2 className="font-headline-lg text-headline-md uppercase tracking-tight text-on-surface">Create a Post</h2>
           <button 
             onClick={onClose}
-            className="border-2 border-on-surface p-1 shadow-[2px_2px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:bg-primary-container bg-surface-container-lowest transition-all flex items-center justify-center"
+            className="border-2 border-on-surface p-1 shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:bg-primary-container bg-surface-container-lowest transition-all flex items-center justify-center"
           >
             <X size={20} />
           </button>
@@ -52,7 +52,7 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
             <select 
               value={location} 
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#141414] cursor-pointer"
             >
               {Object.entries(groupedLocations).map(([category, locs]) => (
                 <optgroup key={category} label={category} className="font-bold bg-surface-variant">
@@ -72,7 +72,7 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
             <select 
               value={destination} 
               onChange={(e) => setDestination(e.target.value)}
-              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#141414] cursor-pointer"
             >
               {Object.entries(groupedLocations).map(([category, locs]) => (
                 <optgroup key={category} label={category} className="font-bold bg-surface-variant">
@@ -105,13 +105,13 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
               placeholder={postType === 'request' ? "e.g. Swiggy order arriving in 10 mins..." : "e.g. Can carry small packages, meeting near main entrance..."}
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#000000] resize-none"
+              className="w-full p-3 border-2 border-on-surface bg-surface-container-lowest font-body-md text-body-md outline-none focus:bg-primary-container transition-colors shadow-[2px_2px_0px_0px_#141414] resize-none"
               required
             />
           </div>
 
           {/* Cost breakdown */}
-          <div className="p-stack-sm bg-surface-container-highest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] flex flex-col items-center justify-center">
+          <div className="p-stack-sm bg-surface-container-highest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] flex flex-col items-center justify-center">
             <span className="font-headline-md text-body-lg font-black text-on-surface">
               {postType === 'request' ? `Cost: ${dynamicCost} GC` : `Reward: ${runnerReward} GC`}
             </span>
@@ -131,7 +131,7 @@ const PostModal = ({ onClose, initialType = 'request' }) => {
           <button 
             type="submit" 
             disabled={isSubmitting || (postType === 'request' && (userProfile?.gcBalance < dynamicCost))}
-            className="w-full p-stack-sm bg-primary-container hover:bg-primary-fixed-dim text-on-surface border-border-width border-on-surface shadow-[4px_4px_0px_0px_#000000] font-headline-md text-body-lg font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full p-stack-sm bg-primary-container hover:bg-primary-fixed-dim text-on-surface border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] font-headline-md text-body-lg font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
               <>
