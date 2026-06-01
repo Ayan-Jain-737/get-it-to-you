@@ -56,6 +56,21 @@ export const useProfile = () => {
         const data = await getUserStats(currentUser.uid);
         setStats(data);
         setIsLoadingStats(false);
+
+        const getWeekStr = (d) => {
+          const date = new Date(d.getTime());
+          date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
+          const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+          const weekNo = Math.ceil(( ( (date - yearStart) / 86400000) + 1)/7);
+          return `${date.getUTCFullYear()}-W${weekNo}`;
+        };
+        const currentWeekStr = getWeekStr(new Date());
+        const weeklyCount = data.pastRuns?.filter(r => r.status === 'Completed' && r.createdAt && getWeekStr(new Date(r.createdAt.seconds * 1000)) === currentWeekStr).length || 0;
+        
+        const questState = userProfile?.questState || {};
+        if (weeklyCount >= 5 && questState.weekendWarrior === undefined) {
+           updateProfile({ questState: { ...questState, weekendWarrior: true } });
+        }
       }
     };
     fetchStats();

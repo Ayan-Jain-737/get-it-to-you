@@ -75,9 +75,13 @@ const Sidebar = ({ onOpenPostModal }) => {
           >
             <span className="material-symbols-outlined font-black">person</span>
             <span>Profile</span>
-            {(Object.values(userProfile?.questState || {}).includes(true) || (!!userProfile?.avatar && userProfile?.questState?.photogenic !== 'claimed')) && (
-              <span className="absolute top-2 right-2 w-3 h-3 bg-error rounded-full animate-pulse border-2 border-on-surface"></span>
-            )}
+            {(() => {
+              const claimableQuests = ['daily', 'sprinter', 'rescuer', 'lastorder', 'weekendWarrior', 'ironStreakCompleted', 'icebreaker', 'trustFall', 'ambassador', 'milestone25', 'milestone50', 'milestone75', 'milestone100'];
+              const hasClaimable = claimableQuests.some(q => userProfile?.questState?.[q] === true) || (!!userProfile?.avatar && userProfile?.questState?.photogenic !== 'claimed');
+              return hasClaimable && (
+                <span className="absolute top-2 right-2 w-3 h-3 bg-error rounded-full animate-pulse border-2 border-on-surface"></span>
+              );
+            })()}
           </NavLink>
 
           <NotificationBell isDesktopMenu={true} />
@@ -142,9 +146,13 @@ const Sidebar = ({ onOpenPostModal }) => {
         >
           <span className="material-symbols-outlined">person</span>
           <span className="font-label-mono text-[10px] font-bold mt-1">Profile</span>
-          {(Object.values(userProfile?.questState || {}).includes(true) || (!!userProfile?.avatar && userProfile?.questState?.photogenic !== 'claimed')) && (
-            <span className="absolute top-1 right-2 w-2 h-2 bg-error rounded-full animate-pulse border border-on-surface"></span>
-          )}
+          {(() => {
+            const claimableQuests = ['daily', 'sprinter', 'rescuer', 'lastorder', 'weekendWarrior', 'ironStreakCompleted', 'icebreaker', 'trustFall', 'ambassador', 'milestone25', 'milestone50', 'milestone75', 'milestone100'];
+            const hasClaimable = claimableQuests.some(q => userProfile?.questState?.[q] === true) || (!!userProfile?.avatar && userProfile?.questState?.photogenic !== 'claimed');
+            return hasClaimable && (
+              <span className="absolute top-1 right-2 w-2 h-2 bg-error rounded-full animate-pulse border border-on-surface"></span>
+            );
+          })()}
         </NavLink>
       </nav>
 

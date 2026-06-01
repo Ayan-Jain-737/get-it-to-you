@@ -336,7 +336,7 @@ const Profile = () => {
                           </span>
                         </div>
                         <QuestCard id="weekendWarrior" title="Weekend Warrior" desc="Complete 5 deliveries this week." reward="15" icon="workspace_premium" bg="#f5fffa" accent="#006e20" completed={isWeekendWarriorDone || questState.weekendWarrior === true || questState.weekendWarrior === 'claimed'} progress={weeklyCount || userProfile?.stats?.weeklyTasksCompleted || 0} total={5} />
-                        <QuestCard id="ironStreak" title="The Iron Streak" desc="Hit 5 concurrent weekly active streaks." reward="15" icon="local_fire_department" bg="#fff9f5" accent="#c00100" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
+                        <QuestCard id="ironStreakCompleted" title="The Iron Streak" desc="Hit 5 concurrent weekly active streaks." reward="15" icon="local_fire_department" bg="#fff9f5" accent="#c00100" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
                       </div>
                     )}
 

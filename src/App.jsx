@@ -9,7 +9,7 @@ const QuestToastContent = ({ runs, prevRuns, visible }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimatedRuns(runs);
-    }, 100);
+    }, 600);
     return () => clearTimeout(timer);
   }, [runs]);
 
@@ -31,7 +31,7 @@ const QuestToastContent = ({ runs, prevRuns, visible }) => {
             <span>{currentWeekend} / {weekendTarget}</span>
           </div>
           <div className="w-full h-3 border-2 border-on-surface bg-surface-container relative overflow-hidden">
-            <div className="absolute top-0 left-0 h-full bg-primary transition-all duration-1000 ease-out" style={{ width: `${(currentWeekend / weekendTarget) * 100}%` }}></div>
+            <div className="absolute top-0 left-0 h-full bg-primary transition-all duration-[2500ms] ease-out" style={{ width: `${(currentWeekend / weekendTarget) * 100}%` }}></div>
           </div>
         </div>
         
@@ -41,7 +41,7 @@ const QuestToastContent = ({ runs, prevRuns, visible }) => {
             <span>{animatedRuns} / {milestoneTarget}</span>
           </div>
           <div className="w-full h-3 border-2 border-on-surface bg-surface-container relative overflow-hidden">
-            <div className="absolute top-0 left-0 h-full bg-tertiary transition-all duration-1000 ease-out" style={{ width: `${(animatedRuns / milestoneTarget) * 100}%` }}></div>
+            <div className="absolute top-0 left-0 h-full bg-tertiary transition-all duration-[2500ms] ease-out" style={{ width: `${(animatedRuns / milestoneTarget) * 100}%` }}></div>
           </div>
         </div>
       </div>
@@ -59,19 +59,7 @@ const NotificationManager = () => {
       const status = activeJourney.status;
       if (['Accepted', 'At Gate', 'Walking Back', 'Arrived'].includes(status)) {
         toast(`Journey Update: ${status}`, {
-          icon: '✨',
-          style: {
-            background: 'rgba(255, 255, 255, 0.7)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid var(--outline-variant)',
-            color: 'var(--primary)',
-            borderRadius: 'var(--radius-md)',
-            boxShadow: 'var(--shadow-ambient)',
-            fontWeight: '600',
-            fontFamily: "'Inter', sans-serif",
-            padding: '12px 20px'
-          }
+          icon: '✨'
         });
       }
       prevStatusRef.current = status;
@@ -97,7 +85,38 @@ const NotificationManager = () => {
     prevTasksRef.current = currentTasks;
   }, [userProfile?.stats?.lifetimeTasksCompleted, currentUser]);
 
-  return <Toaster position="top-center" />;
+  return (
+    <Toaster 
+      position="top-center" 
+      toastOptions={{
+        className: 'z-[9999]',
+        style: {
+          background: 'var(--surface-container-lowest)',
+          color: 'var(--on-surface)',
+          borderRadius: '0px',
+          border: '4px solid var(--on-surface)',
+          boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
+          fontWeight: '900',
+          fontFamily: "'Inter', sans-serif",
+          padding: '16px 24px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        },
+        success: {
+          iconTheme: {
+            primary: 'var(--primary)',
+            secondary: 'var(--on-primary)',
+          },
+        },
+        error: {
+          iconTheme: {
+            primary: 'var(--error)',
+            secondary: 'var(--on-error)',
+          },
+        },
+      }} 
+    />
+  );
 };
 import LoginScreen from './components/LoginScreen';
 import Dashboard from './components/Dashboard';
@@ -127,10 +146,6 @@ const PublicRoute = ({ children }) => {
   
   return children;
 };
-
-export function useModal() {
-  return useOutletContext();
-}
 
 const SharedLayout = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

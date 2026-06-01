@@ -49,10 +49,11 @@ export const AppProvider = ({ children }) => {
           if (profileSnap.exists()) {
             const data = profileSnap.data();
             let updated = false;
-            if (data.gcBalance === undefined) { data.gcBalance = 100; updated = true; }
-            if (!data.stats) { data.stats = { lifetimeRequests: 0, lifetimeTasksCompleted: 0, flawlessTasksCount: 0 }; updated = true; }
-            if (!data.questState) { data.questState = { lastTaskDate: null }; updated = true; }
-            if (!data.claimInbox) { data.claimInbox = []; updated = true; }
+            const updates = {};
+            if (data.gcBalance === undefined) { data.gcBalance = 100; updates['gcBalance'] = 100; updated = true; }
+            if (!data.stats) { data.stats = { lifetimeRequests: 0, lifetimeTasksCompleted: 0, flawlessTasksCount: 0 }; updates['stats'] = data.stats; updated = true; }
+            if (!data.questState) { data.questState = { lastTaskDate: null }; updates['questState'] = data.questState; updated = true; }
+            if (!data.claimInbox) { data.claimInbox = []; updates['claimInbox'] = []; updated = true; }
             
             const now = new Date();
             const currentDateString = now.toDateString();
@@ -66,6 +67,12 @@ export const AppProvider = ({ children }) => {
             const currentWeekString = getWeekStr(now);
             
             if (data.questState.lastDailyReset !== currentDateString) {
+               updates['questState.daily'] = deleteField();
+               updates['questState.sprinter'] = deleteField();
+               updates['questState.rescuer'] = deleteField();
+               updates['questState.lastorder'] = deleteField();
+               updates['questState.lastDailyReset'] = currentDateString;
+               
                delete data.questState.daily;
                delete data.questState.sprinter;
                delete data.questState.rescuer;
@@ -75,6 +82,11 @@ export const AppProvider = ({ children }) => {
             }
             
             if (data.questState.lastWeeklyReset !== currentWeekString) {
+               updates['questState.weekendWarrior'] = deleteField();
+               updates['questState.ironStreakCompleted'] = deleteField();
+               updates['questState.lastWeeklyReset'] = currentWeekString;
+               updates['stats.weeklyTasksCompleted'] = 0;
+               
                delete data.questState.weekendWarrior;
                delete data.questState.ironStreakCompleted;
                data.questState.lastWeeklyReset = currentWeekString;
@@ -83,7 +95,9 @@ export const AppProvider = ({ children }) => {
             }
             
             if (updated) {
-              await setDoc(profileRef, data, { merge: true });
+              if (Object.keys(updates).length > 0) {
+                 await updateDoc(profileRef, updates);
+              }
             }
             
             // Format current user profile correctly
@@ -150,13 +164,7 @@ export const AppProvider = ({ children }) => {
               
               if (currentUser && newPost.requesterId !== currentUser.uid && postTime >= sessionStartTime.current) {
                 toast(`New ${newPost.type} available!`, {
-                  icon: '📣',
-                  style: {
-                    background: 'var(--surface-container-highest)',
-                    color: 'var(--on-surface)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--outline-variant)'
-                  }
+                  icon: '🔔'
                 });
               }
             }
