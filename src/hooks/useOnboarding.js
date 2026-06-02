@@ -146,8 +146,10 @@ export const useOnboarding = (authUser, onComplete) => {
           lastRoomUpdate: new Date().toISOString()
         },
         onboardingComplete: true,
-        walletBalance: 0,
-        overflowBalance: 0
+        gcBalance: 90,
+        overflowBalance: 0,
+        tutorialComplete: false,
+        tutorialStep: 0
       }, { merge: true });
 
       // 4. Trigger callback

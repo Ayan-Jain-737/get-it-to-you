@@ -1,0 +1,228 @@
+/* ===== Tutorial Overlay Styles ===== */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+}
+
+.backdropDark {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9997;
+  transition: opacity 0.3s ease;
+}
+
+/* Spotlight cutout — a transparent hole in the dark overlay */
+.spotlightCutout {
+  position: fixed;
+  z-index: 9998;
+  border-radius: 6px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.72);
+  transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.spotlightPulse {
+  animation: spotlightPulseAnim 2s ease-in-out infinite;
+}
+
+@keyframes spotlightPulseAnim {
+  0%, 100% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.72), 0 0 0 4px rgba(98, 98, 0, 0.5); }
+  50% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.72), 0 0 0 8px rgba(98, 98, 0, 0.3); }
+}
+
+/* Tooltip card */
+.tooltip {
+  position: fixed;
+  z-index: 9999;
+  max-width: min(420px, 90vw);
+  min-width: 280px;
+  background: var(--surface-container-lowest, #fff);
+  border: 4px solid var(--on-surface, #141414);
+  box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+}
+
+.tooltipTitle {
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--on-surface, #141414);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.tooltipText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface-variant, #444);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.tooltipText strong {
+  color: var(--on-surface, #141414);
+  font-weight: 800;
+}
+
+.tooltipBtn {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--primary-container, #e5e200);
+  color: var(--on-surface, #141414);
+  border: 3px solid var(--on-surface, #141414);
+  box-shadow: 4px 4px 0px 0px #141414;
+  font-weight: 900;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.tooltipBtn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #141414;
+}
+
+.tooltipBtn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+/* Skip button */
+.skipBtn {
+  display: block;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: var(--on-surface-variant, #666);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  text-align: center;
+  padding: 4px;
+}
+
+.skipBtn:hover {
+  color: var(--on-surface, #141414);
+}
+
+/* Progress bar */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: var(--surface-container, #e6e6e6);
+  border: 1px solid var(--on-surface, #141414);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--primary, #626200);
+  transition: width 0.4s ease-out;
+}
+
+/* Step counter */
+.stepCounter {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--on-surface-variant, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+}
+
+/* Entrance animation */
+.tooltipEnter {
+  animation: tooltipSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes tooltipSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Center modal style (no spotlight) */
+.centerModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  max-width: min(440px, 90vw);
+  min-width: 300px;
+  background: var(--surface-container-lowest, #fff);
+  border: 4px solid var(--on-surface, #141414);
+  box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+  padding: 28px;
+  pointer-events: auto;
+  animation: centerModalIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes centerModalIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Waiting dots animation */
+.waitingDots::after {
+  content: '';
+  animation: dots 1.5s steps(3) infinite;
+}
+
+@keyframes dots {
+  0% { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  100% { content: '...'; }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .tooltip {
+    max-width: 90vw;
+    min-width: unset;
+    padding: 16px;
+  }
+
+  .tooltipTitle {
+    font-size: 14px;
+  }
+
+  .tooltipText {
+    font-size: 12px;
+  }
+
+  .centerModal {
+    max-width: 90vw;
+    min-width: unset;
+    padding: 20px;
+  }
+}

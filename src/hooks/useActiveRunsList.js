@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 
 export const useActiveRunsList = () => {
-  const { activeJourney, currentUser, feedData, trackJourney, loading } = useAppContext();
+  const { activeJourney, currentUser, feedData, trackJourney, loading, userProfile } = useAppContext();
   const [selectedPost, setSelectedPost] = useState(null);
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(() => {
+    return userProfile?.tutorialComplete === false;
+  });
 
   const handleTrack = async (postId) => {
     await trackJourney(postId);

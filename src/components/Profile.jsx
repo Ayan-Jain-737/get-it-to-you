@@ -51,7 +51,7 @@ const Profile = () => {
         {/* Left Column: Wallet, Reserve, Preferences */}
         <section className="lg:col-span-5 flex flex-col gap-stack-md">
           {/* Main Wallet Cap display */}
-          <div className="bg-surface-container-lowest border-border-width border-on-surface neo-shadow p-stack-lg relative overflow-hidden group">
+          <div className="bg-surface-container-lowest border-border-width border-on-surface neo-shadow p-stack-lg relative overflow-hidden group" data-tutorial="wallet-card">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#141414_1px,transparent_1px)] [background-size:16px_16px]"></div>
             <div className="bg-surface-container-lowest border-[3px] border-on-surface shadow-[6px_6px_0px_0px_#141414] p-6 mb-6">
               <div className="font-label-mono text-body-md uppercase mb-2 tracking-widest text-on-surface-variant">GITY Coins (GC) Available</div>
@@ -124,7 +124,7 @@ const Profile = () => {
           </div>
 
           {/* Reserve Bank / Overflow Tank */}
-          <div className="bg-primary-container p-6 border-border-width border-on-surface neo-shadow flex flex-col relative overflow-hidden">
+          <div className="bg-primary-container p-6 border-border-width border-on-surface neo-shadow flex flex-col relative overflow-hidden" data-tutorial="reserve-vault">
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-2">
                 <span className="material-symbols-outlined text-on-surface text-2xl">account_balance</span>
@@ -179,7 +179,7 @@ const Profile = () => {
         {/* Right Column: Quest Board */}
         <section className="lg:col-span-7">
           <div className="bg-surface-container-lowest p-6 border-border-width border-on-surface neo-shadow min-h-full">
-            <div className="flex flex-col mb-6">
+            <div className="flex flex-col mb-6" data-tutorial="quest-board">
               <h2 className="text-xl font-bold text-on-surface font-headline flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">local_fire_department</span>
                 Available Quests
@@ -260,7 +260,7 @@ const Profile = () => {
                         </div>
                         <div className="text-right flex flex-col items-end justify-center">
                           {isClaimed ? null : isCompletedUnclaimed ? (
-                            <button disabled={isLoading} className="font-black text-on-surface uppercase bg-primary-container px-3 py-1 border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] text-xs flex items-center justify-center gap-1 disabled:opacity-50 disabled:shadow-[2px_2px_0px_0px_#141414]">
+                            <button data-tutorial={`${id}-claim-btn`} disabled={isLoading} className="font-black text-on-surface uppercase bg-primary-container px-3 py-1 border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] text-xs flex items-center justify-center gap-1 disabled:opacity-50 disabled:shadow-[2px_2px_0px_0px_#141414]">
                               {isLoading ? <><span className="material-symbols-outlined text-[14px] animate-spin">refresh</span>...</> : `Claim ${reward} GC`}
                             </button>
                           ) : (
@@ -293,6 +293,7 @@ const Profile = () => {
                   return (
                     <button
                       onClick={() => setActiveTab(id)}
+                      data-tutorial={`quest-tab-${id}`}
                       className={`relative flex-1 py-2 text-center font-bold uppercase tracking-widest text-[11px] transition-all border-2 border-on-surface ${isActive ? 'bg-primary-container text-on-surface shadow-none translate-x-[2px] translate-y-[2px]' : 'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low shadow-[3px_3px_0px_0px_#141414]'}`}
                     >
                       {label}
@@ -346,6 +347,9 @@ const Profile = () => {
                           <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Onboarding</h3>
                         </div>
                         <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="25" icon="sports_martial_arts" bg="#fffdf5" accent="#626200" completed={questState.icebreaker} progress={runs} total={1} />
+                        <div data-tutorial="quest-rookie">
+                          <QuestCard id="rookieTraining" title="Rookie Training Complete" desc="Complete the GITY tutorial to unlock the platform." reward="10" icon="school" bg="#f0f8ff" accent="#4F46E5" completed={questState.rookieTraining === true || questState.rookieTraining === 'claimed'} progress={questState.rookieTraining ? 1 : 0} total={1} />
+                        </div>
                         <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture" reward="15" icon="verified_user" bg="#f5fffa" accent="#006e20" completed={questState.trustFall} />
                         <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile" reward="20" icon="share" bg="#f5faff" accent="#006e20" completed={questState.ambassador} />
                         <QuestCard id="photogenic" title="Photogenic" desc="Upload a profile photo to stand out." reward="25" icon="add_a_photo" bg="#f4f0ef" accent="#9c4146" completed={!!userProfile?.avatar || questState.photogenic === 'claimed'} progress={userProfile?.avatar ? 1 : 0} total={1} />

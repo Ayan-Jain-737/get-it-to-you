@@ -93,7 +93,8 @@ const ActiveJourney = () => {
     pickupCoords,
     destCoords,
     mapLat,
-    mapLng
+    mapLng,
+    userProfile
   } = useActiveJourney();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -180,7 +181,7 @@ const ActiveJourney = () => {
 
   // ========== MAP (shared between mobile & desktop) ==========
   const renderMap = () => (
-    <div className="absolute inset-0 z-0">
+    <div className="absolute inset-0 z-0" data-tutorial="journey-map">
       {isMapReady && (
         <MapContainer 
           key={JSON.stringify(activeJourney?.runnerLocation)}
@@ -210,7 +211,7 @@ const ActiveJourney = () => {
 
   // ========== PEEK: Compact Status Header ==========
   const renderPeekContent = () => (
-    <div className="flex items-center gap-3 pb-2">
+    <div className="flex items-center gap-3 pb-2" data-tutorial={isRunner ? 'journey-requester-info' : 'journey-runner-info'}>
       {/* Avatar */}
       <div className="w-10 h-10 border-2 border-on-surface bg-primary-container flex items-center justify-center text-sm font-black uppercase text-on-surface flex-shrink-0">
         {isRunner ? requesterName[0].toUpperCase() : runnerName[0].toUpperCase()}
@@ -219,7 +220,7 @@ const ActiveJourney = () => {
       <div className="flex-1 min-w-0">
         <p 
           className="font-headline-md text-sm font-black text-on-surface truncate underline cursor-pointer"
-          onClick={() => setProfileTargetUid(isRunner ? activeJourney?.requesterId : activeJourney?.runnerId)}
+          onClick={() => userProfile?.tutorialComplete === false ? null : setProfileTargetUid(isRunner ? activeJourney?.requesterId : activeJourney?.runnerId)}
         >
           {isRunner ? requesterName : runnerName}
         </p>
@@ -302,6 +303,7 @@ const ActiveJourney = () => {
       {isRunner && currentStepIndex < STATUS_STEPS.length - 1 && (
         <button 
           onClick={handleNextStatus} 
+          data-tutorial="journey-status-btns"
           disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
           className="w-full font-headline-md text-sm font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
@@ -322,7 +324,7 @@ const ActiveJourney = () => {
 
       {/* OTP Section */}
       {activeJourney.status === 'Arrived' ? (
-        <div className="bg-secondary-container border-2 border-on-surface p-3 text-center shadow-[3px_3px_0px_0px_#141414]">
+        <div className="bg-secondary-container border-2 border-on-surface p-3 text-center shadow-[3px_3px_0px_0px_#141414]" data-tutorial="journey-otp">
           <p className="text-[9px] font-black uppercase text-on-surface-variant mb-1">Runner Arrived</p>
           {isRunner ? (
             <>
@@ -330,6 +332,7 @@ const ActiveJourney = () => {
               <div className="flex gap-2 items-center justify-center">
                 <input 
                   type="text" 
+                  data-tutorial="journey-otp-input"
                   maxLength="4" 
                   value={enteredOTP} 
                   onChange={(e) => handleOtpInput(e.target.value)}
@@ -370,7 +373,7 @@ const ActiveJourney = () => {
   const renderFullContent = () => (
     <div className="flex flex-col gap-3 pt-2">
       {/* Chat Panel */}
-      <div className="bg-surface-container border-2 border-on-surface p-3 flex flex-col">
+      <div className="bg-surface-container border-2 border-on-surface p-3 flex flex-col" data-tutorial="journey-chat">
         <h3 className="font-headline-md text-[10px] font-black mb-2 border-b-2 border-on-surface pb-1 uppercase tracking-wide">Live Chat</h3>
         <div className="h-28 overflow-y-auto mb-2 space-y-1.5 bg-surface-container-lowest p-2 border border-on-surface">
           {messages.map(msg => {
@@ -501,7 +504,7 @@ const ActiveJourney = () => {
           
           {/* Header */}
           <div className="flex items-center justify-between border-b-2 border-on-surface pb-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3" data-tutorial={isRunner ? 'journey-requester-info' : 'journey-runner-info'}>
               <div className="w-12 h-12 border-2 border-on-surface bg-primary-container flex items-center justify-center text-lg font-black uppercase text-on-surface flex-shrink-0">
                 {isRunner ? requesterName[0].toUpperCase() : runnerName[0].toUpperCase()}
               </div>
@@ -509,7 +512,7 @@ const ActiveJourney = () => {
                 <p className="font-label-mono text-[9px] text-on-surface-variant uppercase font-bold">{isRunner ? 'Requester' : 'Your Runner'}</p>
                 <h2 
                   className="font-headline-md text-body-lg font-black text-on-surface truncate underline cursor-pointer hover:text-primary transition-all"
-                  onClick={() => setProfileTargetUid(isRunner ? activeJourney?.requesterId : activeJourney?.runnerId)}
+                  onClick={() => userProfile?.tutorialComplete === false ? null : setProfileTargetUid(isRunner ? activeJourney?.requesterId : activeJourney?.runnerId)}
                 >
                   {isRunner ? requesterName : runnerName}
                 </h2>
@@ -577,7 +580,7 @@ const ActiveJourney = () => {
           </div>
 
           {/* Chat Panel */}
-          <div className="bg-surface-container border-2 border-on-surface p-4 shadow-[2px_2px_0px_0px_#141414] flex flex-col">
+          <div className="bg-surface-container border-2 border-on-surface p-4 shadow-[2px_2px_0px_0px_#141414] flex flex-col" data-tutorial="journey-chat">
             <h3 className="font-headline-md text-xs font-black mb-3 border-b-2 border-on-surface pb-1 uppercase tracking-wide">Live Chat</h3>
             <div className="h-32 overflow-y-auto mb-3 space-y-2 bg-surface-container-lowest p-3 border border-on-surface">
               {messages.map(msg => {
@@ -636,6 +639,7 @@ const ActiveJourney = () => {
           {isRunner && currentStepIndex < STATUS_STEPS.length - 1 && (
             <button 
               onClick={handleNextStatus} 
+              data-tutorial="journey-status-btns" 
               disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
               className="w-full font-headline-md text-body-lg font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
@@ -664,7 +668,7 @@ const ActiveJourney = () => {
 
           {/* OTP Handoff Section */}
           {activeJourney.status === 'Arrived' ? (
-            <div className="bg-secondary-container border-2 border-on-surface p-4 text-center shadow-[4px_4px_0px_0px_#141414] rotate-[-1deg]">
+            <div className="bg-secondary-container border-2 border-on-surface p-4 text-center shadow-[4px_4px_0px_0px_#141414] rotate-[-1deg]" data-tutorial="journey-otp">
               <p className="text-[10px] font-black uppercase text-on-surface-variant mb-1">Runner Arrived</p>
               {isRunner ? (
                 <>
@@ -672,6 +676,7 @@ const ActiveJourney = () => {
                   <div className="flex gap-2 items-center justify-center">
                     <input 
                       type="text" 
+                      data-tutorial="journey-otp-input"
                       maxLength="4" 
                       value={enteredOTP} 
                       onChange={(e) => handleOtpInput(e.target.value)}

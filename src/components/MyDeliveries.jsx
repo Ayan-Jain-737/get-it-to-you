@@ -132,9 +132,10 @@ const MyDeliveries = () => {
               {feedData.filter(p => p.requesterId === currentUser?.uid && p.status === 'completed').length === 0 ? (
                 <p className="text-sm text-on-surface-variant italic text-center py-8">No past history found.</p>
               ) : (
-                feedData.filter(p => p.requesterId === currentUser?.uid && p.status === 'completed').map(post => (
+                feedData.filter(p => p.requesterId === currentUser?.uid && p.status === 'completed').map((post, idx) => (
                   <div 
                     key={post.id} 
+                    data-tutorial={idx === 0 ? "history-card-0" : undefined}
                     className="flex flex-col border-2 border-on-surface p-3 bg-surface-container shadow-[2px_2px_0px_0px_#141414] hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#141414] transition-all cursor-pointer" 
                     onClick={() => setSelectedPost(post)}
                   >

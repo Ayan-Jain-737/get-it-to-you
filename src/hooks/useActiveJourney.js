@@ -28,7 +28,7 @@ const getDistanceFromLatLonInM = (lat1, lon1, lat2, lon2) => {
 };
 
 export const useActiveJourney = () => {
-  const { activeJourney, updateJourneyStatus, currentUser, feedData, cancelJourney, generateHandoffOTP, verifyOTPAndComplete, updateRunnerLocation } = useAppContext();
+  const { activeJourney, updateJourneyStatus, currentUser, userProfile, feedData, cancelJourney, generateHandoffOTP, verifyOTPAndComplete, updateRunnerLocation } = useAppContext();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -304,6 +304,7 @@ export const useActiveJourney = () => {
     pickupCoords,
     destCoords,
     mapLat,
-    mapLng
+    mapLng,
+    userProfile
   };
 };

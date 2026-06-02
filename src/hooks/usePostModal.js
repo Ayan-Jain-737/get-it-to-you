@@ -5,8 +5,8 @@ import { VIT_LOCATIONS, getHaversineDistance } from '../constants';
 export const usePostModal = (initialType, onClose) => {
   const { createPost, userProfile } = useAppContext();
   const [postType, setPostType] = useState(initialType);
-  const [location, setLocation] = useState(VIT_LOCATIONS[0].id);
-  const [destination, setDestination] = useState(VIT_LOCATIONS[5].id);
+  const [location, setLocation] = useState('');
+  const [destination, setDestination] = useState('');
   const [details, setDetails] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,7 +18,7 @@ export const usePostModal = (initialType, onClose) => {
   let dynamicCost = 75;
   let runnerReward = 50;
   let zoneText = "Zone 2";
-  
+
   if (locObj && destObj) {
     distance = getHaversineDistance(locObj.lat, locObj.lng, destObj.lat, destObj.lng);
     if (distance < 500) {
@@ -30,6 +30,10 @@ export const usePostModal = (initialType, onClose) => {
       runnerReward = 70;
       zoneText = "Zone 3";
     }
+  }
+
+  if (userProfile?.tutorialComplete === false) {
+    dynamicCost = 0;
   }
 
   const handleSubmit = async (e) => {

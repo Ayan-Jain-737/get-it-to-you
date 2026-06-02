@@ -12,7 +12,7 @@ const NotificationBell = ({ isDesktopMenu = false }) => {
   } = useNotificationBell();
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef} data-tutorial="notification-bell">
       {isDesktopMenu ? (
         <button 
           className={`flex w-full items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#141414] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#141414] text-left relative ${isOpen ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}

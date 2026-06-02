@@ -130,6 +130,7 @@ import Sidebar from './components/Sidebar';
 import PostModal from './components/PostModal';
 import ProtectedRoute from './components/ProtectedRoute';
 import OnboardingForm from './components/OnboardingForm';
+import TutorialOverlay from './components/Tutorial/TutorialOverlay';
 import './App.css';
 
 const LoadingSpinner = () => (
@@ -150,6 +151,7 @@ const PublicRoute = ({ children }) => {
 };
 
 const SharedLayout = () => {
+  const { userProfile } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('request');
 
@@ -157,6 +159,8 @@ const SharedLayout = () => {
     setModalType(type);
     setIsModalOpen(true);
   };
+
+  const showTutorial = userProfile && userProfile.tutorialComplete === false;
 
   // Route wrapper that provides Navigation and handles PostModal
   return (
@@ -166,6 +170,7 @@ const SharedLayout = () => {
         <Outlet context={{ openModal }} />
       </div>
       {isModalOpen && <PostModal initialType={modalType} onClose={() => setIsModalOpen(false)} />}
+      {showTutorial && <TutorialOverlay />}
     </div>
   );
 };

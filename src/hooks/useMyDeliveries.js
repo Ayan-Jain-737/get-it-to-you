@@ -3,13 +3,15 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 export const useMyDeliveries = () => {
-  const { feedData, currentUser, trackJourney, activeJourney, loading } = useAppContext();
+  const { feedData, currentUser, trackJourney, activeJourney, loading, userProfile } = useAppContext();
   const navigate = useNavigate();
   const { openModal } = useOutletContext();
   const [reportData, setReportData] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
 
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(() => {
+    return userProfile?.tutorialComplete === false;
+  });
 
   const handleTrack = async (postId) => {
     await trackJourney(postId);

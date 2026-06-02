@@ -60,7 +60,7 @@ export const AppProvider = ({ children }) => {
             const data = profileSnap.data();
             let updated = false;
             const updates = {};
-            if (data.gcBalance === undefined) { data.gcBalance = 100; updates['gcBalance'] = 100; updated = true; }
+            if (data.gcBalance === undefined) { data.gcBalance = 90; updates['gcBalance'] = 90; updated = true; }
             if (!data.stats) { data.stats = { lifetimeRequests: 0, lifetimeTasksCompleted: 0, flawlessTasksCount: 0 }; updates['stats'] = data.stats; updated = true; }
             if (!data.questState) { data.questState = { lastTaskDate: null }; updates['questState'] = data.questState; updated = true; }
             if (!data.claimInbox) { data.claimInbox = []; updates['claimInbox'] = []; updated = true; }
@@ -125,17 +125,19 @@ export const AppProvider = ({ children }) => {
               phone: user.phoneNumber || null, 
               name: user.displayName || 'Student', 
               dorm: 'Main Gate',
-              gcBalance: 100,
+              gcBalance: 90,
               stats: { lifetimeRequests: 0, lifetimeTasksCompleted: 0, flawlessTasksCount: 0 },
               questState: { lastTaskDate: null },
-              claimInbox: []
+              claimInbox: [],
+              tutorialComplete: false,
+              tutorialStep: 0
             };
             await setDoc(profileRef, newProfile);
             setUserProfile(newProfile);
           }
         } catch (err) {
           console.error("Firestore Rules blocking Profile fetch:", err);
-          setUserProfile({ name: user.displayName || 'Student', dorm: 'Locked Database', gcBalance: 100, claimInbox: [] });
+          setUserProfile({ name: user.displayName || 'Student', dorm: 'Locked Database', gcBalance: 90, claimInbox: [] });
         }
       } else {
         setUserProfile(null);
@@ -322,6 +324,10 @@ export const AppProvider = ({ children }) => {
             dynamicCost = 100;
             runnerReward = 70;
           }
+        }
+
+        if (userData?.tutorialComplete === false) {
+          dynamicCost = 0;
         }
         
         if (postData.type === 'request') {
@@ -1093,12 +1099,90 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  let effectiveFeedData = feedData;
+  let effectiveActiveJourney = activeJourney;
+  let effectiveUserProfile = userProfile;
+  if (userProfile && userProfile.tutorialComplete === false) {
+    const step = userProfile.tutorialStep || 0;
+    if (step >= 36) {
+      effectiveUserProfile = {
+        ...userProfile,
+        questState: {
+          ...userProfile.questState,
+          rookieTraining: userProfile.questState?.rookieTraining || true
+        }
+      };
+    }
+
+    const mockPost1 = {
+      id: 'mock-post-1', type: 'request', status: 'open',
+      creatorId: 'mock-user-1', requesterName: 'Alex M.',
+      location: 'Library', destination: 'SJT', details: 'Need a charger',
+      runnerReward: 15, createdAt: new Date()
+    };
+    const mockPost2 = {
+      id: 'mock-post-2', type: 'request', status: 'open',
+      creatorId: 'mock-user-2', requesterName: 'Sam T.',
+      location: 'Food Court', destination: 'Main Gate', details: 'Grab my lunch box',
+      runnerReward: 25, createdAt: new Date()
+    };
+    const mockHistoryReq = {
+      id: 'mock-history-1', type: 'request', status: 'completed',
+      creatorId: currentUser?.uid, requesterId: currentUser?.uid, requesterName: userProfile.name,
+      runnerId: 'mock-runner-2', runnerName: 'Chris P.',
+      location: 'SJT', destination: 'Main Gate', details: 'Library books',
+      runnerReward: 20, createdAt: new Date(Date.now() - 86400000)
+    };
+    const mockHistoryRun = {
+      id: 'mock-history-2', type: 'request', status: 'completed',
+      creatorId: 'mock-user-3', requesterId: 'mock-user-3', requesterName: 'Priya K.',
+      runnerId: currentUser?.uid, runnerName: userProfile.name,
+      location: 'TT', destination: 'Food Court', details: 'Printouts',
+      runnerReward: 30, createdAt: new Date(Date.now() - 40000000)
+    };
+
+    if (step >= 6 && step < 21) {
+      effectiveFeedData = [mockPost1, mockHistoryReq, mockHistoryRun, ...feedData];
+    } else if (step >= 21 && step <= 29) {
+      effectiveFeedData = [mockPost2, mockHistoryReq, mockHistoryRun, ...feedData];
+    }
+
+    if (step >= 14 && step <= 18) {
+      effectiveActiveJourney = {
+        id: 'mock-journey-1', status: step >= 17 ? 'Arrived' : 'Accepted',
+        requesterId: currentUser?.uid, runnerId: 'mock-runner',
+        requesterName: userProfile.name, runnerName: 'Alex M.',
+        postRef: { id: 'mock-post-1' },
+        otpCode: '1234',
+        runnerLocation: { lat: 12.9716, lng: 79.1591 }
+      };
+    } else if (step >= 23 && step <= 29) {
+      effectiveActiveJourney = {
+        id: 'mock-journey-2', status: step >= 27 ? 'Arrived' : (step >= 26 ? 'Walking Back' : 'Accepted'),
+        requesterId: 'mock-user-2', runnerId: currentUser?.uid,
+        requesterName: 'Sam T.', runnerName: userProfile.name,
+        postRef: { id: 'mock-post-2' },
+        otpCode: '5678',
+        runnerLocation: { lat: 12.9716, lng: 79.1591 }
+      };
+    }
+  }
+
+  const mockNotification = {
+    id: 'mock-notif-1', title: 'Order Accepted!', message: 'Alex M. is on the way',
+    type: 'journey_update', journeyId: 'mock-journey-1', read: false, createdAt: new Date()
+  };
+
+  const effectiveUnreadNotifications = (userProfile?.tutorialComplete === false && (userProfile?.tutorialStep || 0) === 13)
+    ? [mockNotification]
+    : unreadNotifications;
+
   const value = {
     currentUser,
-    userProfile,
+    userProfile: effectiveUserProfile,
     setUserProfile,
-    feedData,
-    activeJourney,
+    feedData: effectiveFeedData,
+    activeJourney: effectiveActiveJourney,
     loading,
     signInWithGoogle,
     logout,
@@ -1114,7 +1198,7 @@ export const AppProvider = ({ children }) => {
     cancelJourney,
     updateRunnerLocation,
     createNotification,
-    unreadNotifications,
+    unreadNotifications: effectiveUnreadNotifications,
     markAsRead,
     submitReport,
     getUserStats,

@@ -33,7 +33,7 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
         </div>
 
         {/* Main Receipt Body */}
-        <div className="bg-surface-container-lowest border-l-border-width border-r-border-width border-on-surface shadow-[6px_6px_0px_0px_#141414] flex flex-col p-6 overflow-y-auto no-scrollbar relative z-10">
+        <div className="bg-surface-container-lowest border-l-border-width border-r-border-width border-on-surface shadow-[6px_6px_0px_0px_#141414] flex flex-col p-6 overflow-y-auto no-scrollbar relative z-10" data-tutorial="order-receipt-modal">
           {/* Header */}
           <div className="flex items-center justify-between border-b-2 border-dashed border-on-surface pb-3 mb-4">
             <h2 className="font-label-mono text-sm font-black uppercase tracking-widest text-on-surface">
@@ -41,6 +41,7 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
             </h2>
             <button 
               onClick={onClose} 
+              data-tutorial="receipt-close-btn"
               className="p-1 hover:bg-surface-variant border border-on-surface transition-all flex items-center justify-center"
             >
               <X size={18} />

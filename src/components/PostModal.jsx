@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { usePostModal } from '../hooks/usePostModal';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -16,8 +16,11 @@ const dropdownOptions = Object.entries(groupedLocations).map(([category, locs]) 
   options: locs.map(loc => ({ value: loc.id, label: loc.label }))
 }));
 
+import { useTutorial } from './Tutorial/useTutorial';
+
 const PostModal = ({ initialType = 'request', onClose }) => {
   useScrollLock(true);
+  const { step, advanceStep, isActive } = useTutorial();
   const {
     postType,
     setPostType,
@@ -37,9 +40,16 @@ const PostModal = ({ initialType = 'request', onClose }) => {
     isSubmitting
   } = usePostModal(initialType, onClose);
 
+  // Auto-advance tutorial when fields are filled
+  useEffect(() => {
+    if (!isActive) return;
+    if (step === 8 && location) advanceStep(); // step 8: post-pickup
+    if (step === 9 && destination) advanceStep(); // step 9: post-dropoff
+  }, [isActive, step, location, destination, advanceStep]);
+
   return (
     <div className="fixed inset-0 bg-on-background/40 backdrop-blur-sm flex items-center justify-center p-margin-page z-[200] font-body-md animate-in fade-in duration-100">
-      <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] p-stack-md flex flex-col gap-stack-md relative animate-in zoom-in-95 duration-150">
+      <div data-tutorial="post-modal" className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-surface-container-lowest border-border-width border-on-surface shadow-[8px_8px_0px_0px_#141414] p-stack-md flex flex-col gap-stack-md relative animate-in zoom-in-95 duration-150">
         <div className="flex justify-between items-center border-b-border-width border-on-surface pb-stack-sm mb-2">
           <h2 className="font-headline-lg text-headline-md uppercase tracking-tight text-on-surface">Create a Post</h2>
           <button 
@@ -53,7 +63,7 @@ const PostModal = ({ initialType = 'request', onClose }) => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-stack-md">
 
           {/* Pickup Selection */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1" data-tutorial="post-pickup">
             <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">
               {postType === 'offer' ? 'I Am Going To' : 'Pickup From'}
             </label>
@@ -66,7 +76,7 @@ const PostModal = ({ initialType = 'request', onClose }) => {
           </div>
 
           {/* Dropoff Selection */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1" data-tutorial="post-dropoff">
             <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">
               {postType === 'offer' ? 'I Will Return To' : 'Drop-off At'}
             </label>
@@ -92,7 +102,7 @@ const PostModal = ({ initialType = 'request', onClose }) => {
           )}
 
           {/* Specific Details */}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1" data-tutorial="post-details">
             <label className="font-label-mono text-label-tag uppercase text-on-surface-variant font-bold">Specific Details</label>
             <textarea
               rows="2"
@@ -124,7 +134,8 @@ const PostModal = ({ initialType = 'request', onClose }) => {
           {/* Submit Button */}
           <button 
             type="submit" 
-            disabled={isSubmitting || (postType === 'request' && (userProfile?.gcBalance < dynamicCost))}
+            data-tutorial="post-submit" 
+            disabled={isSubmitting || (postType === 'request' && (userProfile?.gcBalance < dynamicCost)) || !location || !destination || !details.trim()}
             className="w-full p-stack-sm bg-primary-container hover:bg-primary-fixed-dim text-on-surface border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] font-headline-md text-body-lg font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting ? (

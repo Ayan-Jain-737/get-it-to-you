@@ -107,7 +107,7 @@ const ActiveRunsList = () => {
         </section>
 
         {/* Right Column: History */}
-        <aside className="w-full lg:w-[400px] flex-shrink-0">
+        <aside className="w-full lg:w-[400px] flex-shrink-0" data-tutorial="history-tab">
           <div className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] p-6 min-h-full">
             <div className="flex items-center justify-between border-b-2 border-on-surface pb-3 mb-6">
               <h2 className="font-headline-lg text-headline-md font-black uppercase text-on-surface">Tasks History</h2>

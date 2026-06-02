@@ -49,6 +49,7 @@ const Dashboard = () => {
 
           <button 
             onClick={() => openModal('request')}
+            data-tutorial="post-request-btn"
             className="w-full p-stack-md bg-primary-container border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] font-headline-md text-headline-md font-bold active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase flex items-center justify-center gap-2 hover:bg-primary-fixed-dim"
           >
             <span className="material-symbols-outlined font-black">add_circle</span> Post Request
@@ -62,9 +63,10 @@ const Dashboard = () => {
               </>
             )}
             
-            {!loading && pickups.map(post => (
+            {!loading && pickups.map((post, idx) => (
               <article 
                 key={post.id} 
+                data-tutorial={idx === 0 ? 'feed-card-0' : undefined}
                 className="bg-surface-container-lowest border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] flex flex-col relative group transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414]"
               >
                 {post.isUrgent && (

@@ -56,6 +56,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
         <div className="flex-1 flex flex-col gap-stack-sm">
           <NavLink 
             to="/dashboard" 
+            data-tutorial="nav-marketplace" 
             className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#141414] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#141414] ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
           >
             <span className="material-symbols-outlined font-black">dashboard</span>
@@ -63,6 +64,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
           </NavLink>
           <NavLink 
             to="/active-runs" 
+            data-tutorial="nav-tasks" 
             className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#141414] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#141414] ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
           >
             <span className="material-symbols-outlined font-bold">local_shipping</span>
@@ -70,6 +72,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
           </NavLink>
           <NavLink 
             to="/deliveries" 
+            data-tutorial="nav-requests" 
             className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#141414] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#141414] ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
           >
             <span className="material-symbols-outlined font-bold">package_2</span>
@@ -77,6 +80,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
           </NavLink>
           <NavLink 
             to="/economy" 
+            data-tutorial="nav-economy" 
             className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#141414] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#141414] relative ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
           >
             <span className="material-symbols-outlined font-black">account_balance_wallet</span>
@@ -92,6 +96,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
           
           <NavLink 
             to="/account" 
+            data-tutorial="nav-profile" 
             className={({ isActive }) => `flex items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#141414] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#141414] relative ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}
           >
             <span className="material-symbols-outlined font-black">person</span>
@@ -135,6 +140,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
       <nav className={`md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-lowest border-t-border-width border-on-surface z-50 ${isJourneyActive ? 'hidden' : ''}`}>
         <NavLink 
           to="/dashboard" 
+          data-tutorial="nav-marketplace-mobile" 
           className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414]' : 'text-on-surface-variant'}`}
         >
           <span className="material-symbols-outlined">storefront</span>
@@ -142,6 +148,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
         </NavLink>
         <NavLink 
           to="/active-runs" 
+          data-tutorial="nav-tasks-mobile" 
           className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414]' : 'text-on-surface-variant'}`}
         >
           <span className="material-symbols-outlined">assignment_turned_in</span>
@@ -149,6 +156,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
         </NavLink>
         <NavLink 
           to="/deliveries" 
+          data-tutorial="nav-requests-mobile" 
           className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414]' : 'text-on-surface-variant'}`}
         >
           <span className="material-symbols-outlined">package_2</span>
@@ -156,6 +164,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
         </NavLink>
         <NavLink 
           to="/economy" 
+          data-tutorial="nav-economy-mobile" 
           className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform relative ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414]' : 'text-on-surface-variant'}`}
         >
           <span className="material-symbols-outlined">account_balance_wallet</span>
@@ -171,6 +180,7 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
 
         <NavLink 
           to="/account" 
+          data-tutorial="nav-profile-mobile" 
           className={({ isActive }) => `flex flex-col items-center justify-center p-2 rounded-xl w-16 active:scale-95 transition-transform relative ${isActive ? 'bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414]' : 'text-on-surface-variant'}`}
         >
           <span className="material-symbols-outlined">person</span>

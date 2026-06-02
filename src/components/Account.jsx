@@ -74,6 +74,7 @@ const Account = () => {
             
             <button 
               onClick={() => setIsEditing(!isEditing)}
+              data-tutorial="profile-edit"
               className="w-full bg-secondary-container text-on-secondary-container border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold uppercase py-2 active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
             >
               {isEditing ? 'Cancel Edit' : 'Edit Details'}
@@ -166,6 +167,7 @@ const Account = () => {
 
                 <button 
                   type="submit"
+                  data-tutorial="profile-save-cancel"
                   className="mt-4 bg-primary text-on-primary border-4 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold uppercase py-3 active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
                 >
                   Save Changes

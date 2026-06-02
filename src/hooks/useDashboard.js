@@ -11,6 +11,7 @@ export const useDashboard = () => {
   const [actionLoadingId, setActionLoadingId] = useState(null);
 
   const handleAccept = async (postId, type) => {
+    if (userProfile?.tutorialComplete === false) return;
     setActionLoadingId(postId);
     await acceptRequest(postId, type);
     setActionLoadingId(null);
