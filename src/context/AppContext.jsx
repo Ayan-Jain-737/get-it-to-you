@@ -286,6 +286,21 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const restartTutorial = async () => {
+    if (!currentUser) return;
+    try {
+      await setDoc(doc(db, 'users', currentUser.uid), {
+        tutorialComplete: false,
+        tutorialStep: 0
+      }, { merge: true });
+      setUserProfile(prev => ({ ...prev, tutorialComplete: false, tutorialStep: 0 }));
+      // The page will automatically reload or the tutorial overlay will re-mount since showTutorial becomes true
+      window.location.href = '/dashboard';
+    } catch (err) {
+      console.error("Error restarting tutorial:", err);
+    }
+  };
+
   // Create post
   const createPost = async (postData) => {
     try {
@@ -396,7 +411,7 @@ export const AppProvider = ({ children }) => {
              const userData = userSnap.data();
              let currentBalance = userData.gcBalance || 0;
              let overflowBalance = userData.overflowBalance || 0;
-             const refundAmount = postData.cost || 50;
+             const refundAmount = postData.cost !== undefined ? postData.cost : 50;
              
              actualRefund = refundAmount; // Pass total refund amount
              let projectedBalance = currentBalance + refundAmount;
@@ -1141,24 +1156,24 @@ export const AppProvider = ({ children }) => {
       runnerReward: 30, createdAt: new Date(Date.now() - 40000000)
     };
 
-    if (step >= 6 && step < 21) {
+    if (step >= 6 && step <= 19) {
       effectiveFeedData = [mockPost1, mockHistoryReq, mockHistoryRun, ...feedData];
-    } else if (step >= 21 && step <= 29) {
+    } else if (step >= 20 && step <= 27) {
       effectiveFeedData = [mockPost2, mockHistoryReq, mockHistoryRun, ...feedData];
     }
 
-    if (step >= 14 && step <= 18) {
+    if (step >= 12 && step <= 16) {
       effectiveActiveJourney = {
-        id: 'mock-journey-1', status: step >= 17 ? 'Arrived' : 'Accepted',
+        id: 'mock-journey-1', status: step >= 15 ? 'Arrived' : 'Accepted',
         requesterId: currentUser?.uid, runnerId: 'mock-runner',
         requesterName: userProfile.name, runnerName: 'Alex M.',
         postRef: { id: 'mock-post-1' },
         otpCode: '1234',
         runnerLocation: { lat: 12.9716, lng: 79.1591 }
       };
-    } else if (step >= 23 && step <= 29) {
+    } else if (step >= 21 && step <= 27) {
       effectiveActiveJourney = {
-        id: 'mock-journey-2', status: step >= 27 ? 'Arrived' : (step >= 26 ? 'Walking Back' : 'Accepted'),
+        id: 'mock-journey-2', status: step >= 26 ? 'Arrived' : (step >= 25 ? 'Walking Back' : 'Accepted'),
         requesterId: 'mock-user-2', runnerId: currentUser?.uid,
         requesterName: 'Sam T.', runnerName: userProfile.name,
         postRef: { id: 'mock-post-2' },
@@ -1173,7 +1188,7 @@ export const AppProvider = ({ children }) => {
     type: 'journey_update', journeyId: 'mock-journey-1', read: false, createdAt: new Date()
   };
 
-  const effectiveUnreadNotifications = (userProfile?.tutorialComplete === false && (userProfile?.tutorialStep || 0) === 13)
+  const effectiveUnreadNotifications = (userProfile?.tutorialComplete === false && (userProfile?.tutorialStep || 0) === 11)
     ? [mockNotification]
     : unreadNotifications;
 
@@ -1203,6 +1218,7 @@ export const AppProvider = ({ children }) => {
     submitReport,
     getUserStats,
     getJourneyHistory,
+    restartTutorial,
     claimQuestFromBoard,
     withdrawFromOverflow,
     fetchPublicProfile

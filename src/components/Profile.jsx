@@ -31,7 +31,8 @@ const Profile = () => {
     circumference,
     strokeDashoffset,
     claimingQuestId,
-    setClaimingQuestId
+    setClaimingQuestId,
+    restartTutorial
   } = useProfile();
 
   return (
@@ -174,6 +175,27 @@ const Profile = () => {
               )}
             </div>
           </div>
+
+          {/* Help & Support */}
+          <div className="bg-surface-container-lowest p-6 border-border-width border-on-surface neo-shadow flex flex-col mt-6">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="material-symbols-outlined text-on-surface text-2xl">help</span>
+              <h2 className="text-lg font-bold font-headline text-on-surface uppercase">Support</h2>
+            </div>
+            <p className="text-xs font-bold text-on-surface-variant mb-4">
+              Need a refresher on how GITY works?
+            </p>
+            <button
+              onClick={() => {
+                if (window.confirm("Are you sure you want to restart the tutorial? You will be redirected to the Dashboard.")) {
+                  restartTutorial();
+                }
+              }}
+              className="w-full bg-primary-container text-on-surface border-2 border-on-surface font-bold px-4 py-3 hover:bg-primary hover:text-on-primary transition-colors uppercase text-xs shadow-[3px_3px_0px_0px_#141414] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
+            >
+              Watch Tutorial
+            </button>
+          </div>
         </section>
 
         {/* Right Column: Quest Board */}
@@ -284,7 +306,7 @@ const Profile = () => {
                 const hasDailyClaimable = questState.daily === true || questState.sprinter === true || questState.rescuer === true || questState.lastorder === true;
                 const hasWeeklyClaimable = questState.weekendWarrior === true || questState.ironStreakCompleted === true;
                 const hasMilestonesClaimable = [
-                  questState.icebreaker, questState.trustFall, questState.ambassador, 
+                  questState.icebreaker, 
                   questState.milestone25, questState.milestone50, questState.milestone75, questState.milestone100
                 ].includes(true) || (!!userProfile?.avatar && questState.photogenic !== 'claimed');
 
@@ -348,10 +370,9 @@ const Profile = () => {
                         </div>
                         <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="25" icon="sports_martial_arts" bg="#fffdf5" accent="#626200" completed={questState.icebreaker} progress={runs} total={1} />
                         <div data-tutorial="quest-rookie">
-                          <QuestCard id="rookieTraining" title="Rookie Training Complete" desc="Complete the GITY tutorial to unlock the platform." reward="10" icon="school" bg="#f0f8ff" accent="#4F46E5" completed={questState.rookieTraining === true || questState.rookieTraining === 'claimed'} progress={questState.rookieTraining ? 1 : 0} total={1} />
+                          <QuestCard id="rookieTraining" title="Rookie Training Complete" desc="Complete the GITY tutorial to unlock the platform." reward="10" icon="school" bg="#f0f8ff" accent="#4F46E5" completed={questState.rookieTraining === true || questState.rookieTraining === 'claimed'} progress={questState.rookieTraining ? 34 : (userProfile?.tutorialStep || 0)} total={34} />
                         </div>
-                        <QuestCard id="trustFall" title="The Trust Fall" desc="Upload a profile picture" reward="15" icon="verified_user" bg="#f5fffa" accent="#006e20" completed={questState.trustFall} />
-                        <QuestCard id="ambassador" title="The Ambassador" desc="Share your Runner Profile" reward="20" icon="share" bg="#f5faff" accent="#006e20" completed={questState.ambassador} />
+
                         <QuestCard id="photogenic" title="Photogenic" desc="Upload a profile photo to stand out." reward="25" icon="add_a_photo" bg="#f4f0ef" accent="#9c4146" completed={!!userProfile?.avatar || questState.photogenic === 'claimed'} progress={userProfile?.avatar ? 1 : 0} total={1} />
                         
                         <div className="flex justify-between items-center mb-2 pt-4 border-t-2 border-dashed border-on-surface">

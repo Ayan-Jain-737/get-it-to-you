@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Agentation } from 'agentation';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useOutletContext, useNavigate, useLocation } from 'react-router-dom';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { Toaster, toast } from 'react-hot-toast';
@@ -261,6 +262,7 @@ const AppRoutes = () => {
 function App() {
   return (
     <AppProvider>
+      {process.env.NODE_ENV === 'development' && <Agentation />}
       <NotificationManager />
       <BrowserRouter>
         <ScrollToTop />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotificationBell } from '../hooks/useNotificationBell';
 
 const NotificationBell = ({ isDesktopMenu = false }) => {
@@ -11,8 +11,20 @@ const NotificationBell = ({ isDesktopMenu = false }) => {
     handleNotificationClick
   } = useNotificationBell();
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  const tutorialId = (isDesktopMenu && !isMobile) || (!isDesktopMenu && isMobile) 
+    ? "notification-bell" 
+    : undefined;
+
   return (
-    <div className="relative" ref={dropdownRef} data-tutorial="notification-bell">
+    <div className="relative" ref={dropdownRef} data-tutorial={tutorialId}>
       {isDesktopMenu ? (
         <button 
           className={`flex w-full items-center gap-stack-sm p-stack-sm border-border-width border-on-surface font-bold shadow-[4px_4px_0px_0px_#141414] mb-2 font-body-lg text-body-lg transition-all hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#141414] active:translate-x-0 active:translate-y-0 active:shadow-[4px_4px_0px_0px_#141414] text-left relative ${isOpen ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-lowest text-on-surface'}`}

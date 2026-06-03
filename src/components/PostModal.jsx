@@ -21,6 +21,13 @@ import { useTutorial } from './Tutorial/useTutorial';
 const PostModal = ({ initialType = 'request', onClose }) => {
   useScrollLock(true);
   const { step, advanceStep, isActive } = useTutorial();
+  const wrappedOnClose = () => {
+    if (isActive && step === 9) { // step 9: post-form-waiting
+      advanceStep();
+    }
+    onClose();
+  };
+
   const {
     postType,
     setPostType,
@@ -38,14 +45,7 @@ const PostModal = ({ initialType = 'request', onClose }) => {
     handleSubmit,
     userProfile,
     isSubmitting
-  } = usePostModal(initialType, onClose);
-
-  // Auto-advance tutorial when fields are filled
-  useEffect(() => {
-    if (!isActive) return;
-    if (step === 8 && location) advanceStep(); // step 8: post-pickup
-    if (step === 9 && destination) advanceStep(); // step 9: post-dropoff
-  }, [isActive, step, location, destination, advanceStep]);
+  } = usePostModal(initialType, wrappedOnClose);
 
   return (
     <div className="fixed inset-0 bg-on-background/40 backdrop-blur-sm flex items-center justify-center p-margin-page z-[200] font-body-md animate-in fade-in duration-100">

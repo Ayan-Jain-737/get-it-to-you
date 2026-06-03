@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import { useAppContext } from '../context/AppContext';
 
 export const useProfile = () => {
-  const { userProfile, updateProfile, currentUser, getUserStats, claimQuestFromBoard, withdrawFromOverflow } = useAppContext();
+  const { userProfile, updateProfile, currentUser, getUserStats, claimQuestFromBoard, withdrawFromOverflow, restartTutorial } = useAppContext();
   
   const [activeTab, setActiveTab] = useState('daily');
   
@@ -119,6 +119,7 @@ export const useProfile = () => {
     circumference,
     strokeDashoffset,
     claimingQuestId,
-    setClaimingQuestId
+    setClaimingQuestId,
+    restartTutorial
   };
 };

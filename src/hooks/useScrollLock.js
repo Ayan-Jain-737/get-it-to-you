@@ -8,13 +8,25 @@ export const useScrollLock = (isLocked = true) => {
 
     lockCount++;
     if (lockCount === 1) {
-      document.body.classList.add('overflow-hidden');
+      const scrollY = window.scrollY;
+      document.body.dataset.scrollY = scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
     }
 
     return () => {
       lockCount--;
       if (lockCount === 0) {
-        document.body.classList.remove('overflow-hidden');
+        const scrollY = document.body.dataset.scrollY;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        if (scrollY) {
+          window.scrollTo(0, parseInt(scrollY));
+        }
       }
     };
   }, [isLocked]);

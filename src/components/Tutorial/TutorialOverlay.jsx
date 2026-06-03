@@ -101,7 +101,7 @@ const TutorialOverlay = () => {
     setTimeout(() => {
       const el = document.querySelector(selector);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
       }
     }, 150);
   }, [step, currentStepData, getTargetSelector]);
@@ -203,6 +203,10 @@ const TutorialOverlay = () => {
       }
       finalTooltipLeft = Math.max(12, Math.min(targetRect.left + targetRect.width / 2 - tooltipW / 2, window.innerWidth - tooltipW - 12));
     }
+  }
+
+  if (currentStepData?.invisible) {
+    return null;
   }
 
   return (

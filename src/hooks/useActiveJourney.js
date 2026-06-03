@@ -70,7 +70,9 @@ export const useActiveJourney = () => {
         const { latitude, longitude } = position.coords;
         const now = Date.now();
         if (now - lastSyncTime > 10000) {
-          updateRunnerLocation(activeJourney.id, latitude, longitude).catch(err => console.error(err));
+          if (!activeJourney.id.startsWith('mock')) {
+            updateRunnerLocation(activeJourney.id, latitude, longitude).catch(err => console.error(err));
+          }
           lastSyncTime = now;
         }
       },
@@ -105,7 +107,9 @@ export const useActiveJourney = () => {
       
       const now = Date.now();
       if (now - lastSimSync > 5000) {
-        updateRunnerLocation(activeJourney.id, nextLat, nextLng).catch(() => {});
+        if (!activeJourney.id.startsWith('mock')) {
+          updateRunnerLocation(activeJourney.id, nextLat, nextLng).catch(() => {});
+        }
         lastSimSync = now;
       }
     }, 2000);
@@ -196,6 +200,12 @@ export const useActiveJourney = () => {
   };
 
   const handleNextStatus = async () => {
+    if (activeJourney?.id?.startsWith('mock')) {
+      // Tutorial overlay will intercept the click and advance the step.
+      // The AppContext will re-render with the updated mock status based on the new step.
+      return;
+    }
+    
     if (currentStepIndex < STATUS_STEPS.length - 1) {
       setIsUpdatingStatus(true);
       const nextStatus = STATUS_STEPS[currentStepIndex + 1];

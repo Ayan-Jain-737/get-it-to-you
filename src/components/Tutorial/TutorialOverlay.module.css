@@ -78,6 +78,7 @@
   background: var(--primary-container, #e5e200);
   color: var(--on-surface, #141414);
   border: 3px solid var(--on-surface, #141414);
+  white-space: nowrap;
   box-shadow: 4px 4px 0px 0px #141414;
   font-weight: 900;
   font-size: 13px;

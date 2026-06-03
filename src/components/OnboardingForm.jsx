@@ -37,6 +37,10 @@ const OnboardingForm = ({ authUser, onComplete }) => {
     }
   };
 
+  const maxDate = new Date();
+  maxDate.setFullYear(maxDate.getFullYear() - 16);
+  const maxDateString = maxDate.toISOString().split('T')[0];
+
   return (
     <div className="min-h-screen bg-surface p-margin-page font-body-md text-on-surface flex flex-col items-center justify-center py-12">
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface-container-lowest border-[3px] border-on-surface shadow-[8px_8px_0px_0px_#141414] p-4 md:p-stack-lg">
@@ -57,13 +61,20 @@ const OnboardingForm = ({ authUser, onComplete }) => {
             <div className="flex flex-col md:flex-row items-center gap-4">
               <div 
                 onClick={triggerFileUpload}
-                className="w-40 h-40 border-[3px] border-dashed border-on-surface bg-surface-variant flex flex-col items-center justify-center cursor-pointer hover:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#141414]"
+                className="w-40 h-40 border-[3px] border-dashed border-on-surface bg-surface-variant flex flex-col items-center justify-center cursor-pointer hover:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#141414] relative overflow-hidden"
               >
                 {pfpFile ? (
-                  <div className="text-center font-bold font-label-mono p-2 truncate w-full">
-                    <span className="material-symbols-outlined text-4xl block mb-2">check_circle</span>
-                    {pfpFile.name}
-                  </div>
+                  <>
+                    <img 
+                      src={URL.createObjectURL(pfpFile)} 
+                      alt="Preview" 
+                      className="absolute inset-0 w-full h-full object-cover" 
+                    />
+                    <div className="absolute inset-0 bg-surface/80 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                      <span className="material-symbols-outlined text-4xl mb-2 text-on-surface">change_circle</span>
+                      <span className="font-label-mono font-bold uppercase text-[10px] text-on-surface">Change Photo</span>
+                    </div>
+                  </>
                 ) : (
                   <div className="text-center flex flex-col items-center">
                     <span className="material-symbols-outlined text-5xl mb-2">add_photo_alternate</span>
@@ -139,6 +150,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 type="date" 
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
+                max={maxDateString}
                 required
                 className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
               />
@@ -209,7 +221,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 <input 
                   type="text" 
                   value={roomNumber}
-                  onChange={(e) => setRoomNumber(e.target.value)}
+                  onChange={(e) => setRoomNumber(e.target.value.replace(/\D/g, ''))}
                   placeholder="e.g. 404"
                   required
                   className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"

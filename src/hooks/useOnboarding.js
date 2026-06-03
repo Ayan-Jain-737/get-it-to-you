@@ -23,10 +23,12 @@ export const useOnboarding = (authUser, onComplete) => {
     if (authUser) {
       if (authUser.email) setEmail(authUser.email);
       if (authUser.displayName) {
-        setFullName(authUser.displayName.split(' ')[0]);
-        const regNoMatch = authUser.displayName.match(/2[1-9][BM][A-Z]{2}\d{4}/i);
+        const regNoMatch = authUser.displayName.match(/2[1-9][A-Z]{3}\d{4}/i);
         if (regNoMatch) {
           setRegNumber(regNoMatch[0].toUpperCase());
+          setFullName(authUser.displayName.replace(regNoMatch[0], '').trim());
+        } else {
+          setFullName(authUser.displayName);
         }
       }
       if (authUser.dob) setDob(authUser.dob);
