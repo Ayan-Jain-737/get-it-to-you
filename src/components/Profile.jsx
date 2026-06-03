@@ -176,26 +176,7 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Help & Support */}
-          <div className="bg-surface-container-lowest p-6 border-border-width border-on-surface neo-shadow flex flex-col mt-6">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="material-symbols-outlined text-on-surface text-2xl">help</span>
-              <h2 className="text-lg font-bold font-headline text-on-surface uppercase">Support</h2>
-            </div>
-            <p className="text-xs font-bold text-on-surface-variant mb-4">
-              Need a refresher on how GITY works?
-            </p>
-            <button
-              onClick={() => {
-                if (window.confirm("Are you sure you want to restart the tutorial? You will be redirected to the Dashboard.")) {
-                  restartTutorial();
-                }
-              }}
-              className="w-full bg-primary-container text-on-surface border-2 border-on-surface font-bold px-4 py-3 hover:bg-primary hover:text-on-primary transition-colors uppercase text-xs shadow-[3px_3px_0px_0px_#141414] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
-            >
-              Watch Tutorial
-            </button>
-          </div>
+
         </section>
 
         {/* Right Column: Quest Board */}

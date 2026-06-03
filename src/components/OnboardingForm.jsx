@@ -1,7 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { getAuth, signOut } from 'firebase/auth';
 import { useOnboarding } from '../hooks/useOnboarding';
 import SearchableDropdown from './SearchableDropdown';
+import ReactMarkdown from 'react-markdown';
+import { privacyPolicy, termsAndConditions } from '../assets/legalDocs';
 
 const OnboardingForm = ({ authUser, onComplete }) => {
   const {
@@ -16,14 +18,20 @@ const OnboardingForm = ({ authUser, onComplete }) => {
     pfpFile, handlePfpUpload,
     availableBlocks,
     isSubmitting,
-    handleSubmit,
-    errors,
-    setErrors
+    handleSubmit
   } = useOnboarding(authUser, onComplete);
 
   const fileInputRef = useRef(null);
 
-  // We removed inline dropdown state since we are using SearchableDropdown component.
+  const [hasScrolledTerms, setHasScrolledTerms] = useState(false);
+  const [hasScrolledPrivacy, setHasScrolledPrivacy] = useState(false);
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedPrivacy, setAgreedPrivacy] = useState(false);
+
+  const handleScroll = (e, setter) => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 5;
+    if (bottom) setter(true);
+  };
 
   const triggerFileUpload = () => {
     if (fileInputRef.current) {
@@ -120,20 +128,15 @@ const OnboardingForm = ({ authUser, onComplete }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
             {/* FULL NAME */}
             <div className="flex flex-col gap-1">
-              <label className="font-label-mono font-bold uppercase">Full Name</label>
+              <label className="font-label-mono font-bold uppercase">Full Name <span className="text-error">*</span></label>
               <input 
+                id="fullName"
                 type="text" 
                 value={fullName}
-                onChange={(e) => {
-                  setFullName(e.target.value);
-                  if (errors.fullName) setErrors(prev => ({...prev, fullName: false}));
-                }}
+                onChange={(e) => setFullName(e.target.value)}
                 placeholder="Enter legal name"
-                className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors ${errors.fullName ? 'border-error' : 'border-on-surface'}`}
+                className={`p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors`}
               />
-              {errors.fullName && (
-                <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
-              )}
             </div>
 
             {/* EMAIL (Read Only) */}
@@ -153,20 +156,15 @@ const OnboardingForm = ({ authUser, onComplete }) => {
 
             {/* DOB */}
             <div className="flex flex-col gap-1">
-              <label className="font-label-mono font-bold uppercase">Date of Birth</label>
+              <label className="font-label-mono font-bold uppercase">Date of Birth <span className="text-error">*</span></label>
               <input 
+                id="dob"
                 type="date" 
                 value={dob}
-                onChange={(e) => {
-                  setDob(e.target.value);
-                  if (errors.dob) setErrors(prev => ({...prev, dob: false}));
-                }}
+                onChange={(e) => setDob(e.target.value)}
                 max={maxDateString}
-                className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors ${errors.dob ? 'border-error' : 'border-on-surface'}`}
+                className={`p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors`}
               />
-              {errors.dob && (
-                <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
-              )}
             </div>
 
           </div>
@@ -174,44 +172,34 @@ const OnboardingForm = ({ authUser, onComplete }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
             {/* GENDER */}
             <div className="flex flex-col gap-1">
-              <label className="font-label-mono font-bold uppercase">Gender / Hostel Type</label>
+              <label className="font-label-mono font-bold uppercase">Gender / Hostel Type <span className="text-error">*</span></label>
               <select 
+                id="gender"
                 value={gender}
-                onChange={(e) => {
-                  setGender(e.target.value);
-                  if (errors.gender) setErrors(prev => ({...prev, gender: false}));
-                }}
-                className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors cursor-pointer ${errors.gender ? 'border-error' : 'border-on-surface'}`}
+                onChange={(e) => setGender(e.target.value)}
+                className={`p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors cursor-pointer`}
               >
                 <option value="" disabled>Select Classification</option>
                 <option value="Male">Male (Men's Hostel)</option>
                 <option value="Female">Female (Ladies' Hostel - LH)</option>
               </select>
-              {errors.gender && (
-                <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
-              )}
             </div>
 
             {/* REGISTRATION NUMBER (Removed from UI per user request, auto-filled) */}
 
             {/* GRADUATION YEAR */}
             <div className="flex flex-col gap-1">
-              <label className="font-label-mono font-bold uppercase">Graduation Year</label>
+              <label className="font-label-mono font-bold uppercase">Graduation Year <span className="text-error">*</span></label>
               <input 
+                id="gradYear"
                 type="number" 
                 value={gradYear}
-                onChange={(e) => {
-                  setGradYear(e.target.value);
-                  if (errors.gradYear) setErrors(prev => ({...prev, gradYear: false}));
-                }}
+                onChange={(e) => setGradYear(e.target.value)}
                 placeholder="e.g. 2027"
                 min={regNumber ? 2000 + parseInt(regNumber.substring(0, 2)) + 3 : 2020} 
                 max={regNumber ? 2000 + parseInt(regNumber.substring(0, 2)) + 5 : 2030}
-                className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors ${errors.gradYear ? 'border-error' : 'border-on-surface'}`}
+                className={`p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors`}
               />
-              {errors.gradYear && (
-                <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
-              )}
               {regNumber && (
                 <span className="text-xs text-on-surface-variant font-label-mono">
                   Allowed: {2000 + parseInt(regNumber.substring(0, 2)) + 3} - {2000 + parseInt(regNumber.substring(0, 2)) + 5}
@@ -227,42 +215,31 @@ const OnboardingForm = ({ authUser, onComplete }) => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md mt-2">
               {/* HOSTEL BLOCK */}
-              <div className="flex flex-col gap-1 relative">
-                <label className="font-label-mono font-bold uppercase">Hostel Block</label>
-                <div className={errors.hostelBlock ? 'border-4 border-error border-dashed' : ''}>
+              <div className="flex flex-col gap-1 relative" id="hostelBlock">
+                <label className="font-label-mono font-bold uppercase">Hostel Block <span className="text-error">*</span></label>
+                <div>
                   <SearchableDropdown
                     options={availableBlocks.map(b => ({ value: `${b} Block`, label: `${b} Block` }))}
                     value={hostelBlock}
-                    onChange={(val) => {
-                      setHostelBlock(val);
-                      if (errors.hostelBlock) setErrors(prev => ({...prev, hostelBlock: false}));
-                    }}
+                    onChange={setHostelBlock}
                     placeholder={!gender ? 'Select Gender First' : 'Type to search blocks'}
                     disabled={!gender}
                   />
                 </div>
-                {errors.hostelBlock && (
-                  <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface relative z-50">Please fill out this field</div>
-                )}
               </div>
 
               {/* ROOM NUMBER */}
               <div className="flex flex-col gap-1">
-                <label className="font-label-mono font-bold uppercase">Room Number</label>
+                <label className="font-label-mono font-bold uppercase">Room Number <span className="text-error">*</span></label>
                 <input 
+                  id="roomNumber"
                   type="number" 
                   value={roomNumber}
-                  onChange={(e) => {
-                    setRoomNumber(e.target.value.replace(/\D/g, ''));
-                    if (errors.roomNumber) setErrors(prev => ({...prev, roomNumber: false}));
-                  }}
+                  onChange={(e) => setRoomNumber(e.target.value.replace(/\D/g, ''))}
                   placeholder="e.g. 404"
                   min="0"
-                  className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors ${errors.roomNumber ? 'border-error' : 'border-on-surface'}`}
+                  className={`p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors`}
                 />
-                {errors.roomNumber && (
-                  <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
-                )}
               </div>
             </div>
             
@@ -275,11 +252,64 @@ const OnboardingForm = ({ authUser, onComplete }) => {
             </div>
           </div>
 
+          {/* LEGAL AGREEMENTS */}
+          <div className="flex flex-col gap-stack-md mt-4">
+            <h2 className="font-headline-lg font-black uppercase tracking-tighter">Legal Agreements</h2>
+            <p className="font-body-md font-bold text-on-surface-variant">Please review the following documents. You must scroll to the bottom of each to accept them.</p>
+            
+            <div className="flex flex-col gap-2">
+              <label className="font-label-mono font-bold uppercase">Terms and Conditions <span className="text-error">*</span></label>
+              <div 
+                className="h-40 overflow-y-auto bg-surface-container-highest border-[3px] border-on-surface p-4 text-sm font-body-md prose prose-sm max-w-none shadow-[4px_4px_0px_0px_#141414]"
+                onScroll={(e) => handleScroll(e, setHasScrolledTerms)}
+              >
+                <ReactMarkdown>{termsAndConditions}</ReactMarkdown>
+              </div>
+              <label className={`flex items-center gap-3 mt-2 ${!hasScrolledTerms ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                <input 
+                  id="agreedTerms"
+                  type="checkbox" 
+                  checked={agreedTerms}
+                  onChange={(e) => setAgreedTerms(e.target.checked)}
+                  disabled={!hasScrolledTerms}
+                  className="w-5 h-5 accent-primary cursor-pointer border-2 border-on-surface"
+                />
+                <span className="font-bold text-sm">I have read and agree to the Terms and Conditions</span>
+              </label>
+            </div>
+
+            <div className="flex flex-col gap-2 mt-4">
+              <label className="font-label-mono font-bold uppercase">Privacy Policy <span className="text-error">*</span></label>
+              <div 
+                className="h-40 overflow-y-auto bg-surface-container-highest border-[3px] border-on-surface p-4 text-sm font-body-md prose prose-sm max-w-none shadow-[4px_4px_0px_0px_#141414]"
+                onScroll={(e) => handleScroll(e, setHasScrolledPrivacy)}
+              >
+                <ReactMarkdown>{privacyPolicy}</ReactMarkdown>
+              </div>
+              <label className={`flex items-center gap-3 mt-2 ${!hasScrolledPrivacy ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                <input 
+                  id="agreedPrivacy"
+                  type="checkbox" 
+                  checked={agreedPrivacy}
+                  onChange={(e) => setAgreedPrivacy(e.target.checked)}
+                  disabled={!hasScrolledPrivacy}
+                  className="w-5 h-5 accent-primary cursor-pointer border-2 border-on-surface"
+                />
+                <span className="font-bold text-sm">I have read and agree to the Privacy Policy</span>
+              </label>
+            </div>
+          </div>
+
           <button 
             type="submit" 
-            className="w-full mt-stack-md bg-primary text-on-primary py-4 border-[3px] border-on-surface font-headline-xl text-headline-sm uppercase tracking-widest font-black shadow-[8px_8px_0px_0px_#141414] hover:translate-y-1 hover:translate-x-1 hover:shadow-[4px_4px_0px_0px_#141414] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
+            disabled={isSubmitting}
+            className={`w-full mt-stack-md py-4 border-[3px] border-on-surface font-headline-xl text-headline-sm uppercase tracking-widest font-black transition-all ${
+              fullName && dob && gender && gradYear && hostelBlock && roomNumber && agreedTerms && agreedPrivacy && !isSubmitting
+                ? 'bg-primary text-on-primary shadow-[8px_8px_0px_0px_#141414] hover:translate-y-1 hover:translate-x-1 hover:shadow-[4px_4px_0px_0px_#141414] active:translate-y-2 active:translate-x-2 active:shadow-none'
+                : 'bg-surface-variant text-on-surface-variant opacity-70 cursor-pointer'
+            }`}
           >
-            SEAL MY INFORMATION
+            {isSubmitting ? 'SEALING DATA...' : 'SEAL MY INFORMATION'}
           </button>
         </form>
       </div>

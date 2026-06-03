@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
+import ReactMarkdown from 'react-markdown';
+import { privacyPolicy, termsAndConditions } from '../assets/legalDocs';
 import { useAccount } from '../hooks/useAccount';
 import SearchableDropdown from './SearchableDropdown';
 
@@ -27,6 +30,10 @@ const Account = () => {
     handleFileChange,
     handleSave
   } = useAccount();
+
+  const { restartTutorial } = useAppContext();
+  const [legalModal, setLegalModal] = useState(null);
+  const [showTutorialConfirm, setShowTutorialConfirm] = useState(false);
 
   if (!userProfile) return null;
 
@@ -177,6 +184,94 @@ const Account = () => {
           </div>
         </div>
       </div>
+
+      {/* Documentation & Guides Card */}
+      <div className="bg-surface-container-lowest border-4 border-on-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 md:p-6 max-w-3xl mt-8">
+        <div className="flex items-center gap-2 mb-4 border-b-2 border-on-surface pb-2">
+          <span className="material-symbols-outlined text-2xl">menu_book</span>
+          <h2 className="text-xl font-bold font-headline uppercase">Documentation & Guides</h2>
+        </div>
+        <p className="text-sm font-bold text-on-surface-variant mb-6">Access your legal agreements or replay the app tutorial if you need a refresher.</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button
+            onClick={() => setShowTutorialConfirm(true)}
+            className="bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold uppercase py-3 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex flex-col items-center justify-center gap-2 h-24"
+          >
+            <span className="material-symbols-outlined">school</span>
+            <span className="text-xs">Replay Tutorial</span>
+          </button>
+
+          <button
+            onClick={() => setLegalModal('terms')}
+            className="bg-secondary-container text-on-secondary-container border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold uppercase py-3 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex flex-col items-center justify-center gap-2 h-24"
+          >
+            <span className="material-symbols-outlined">gavel</span>
+            <span className="text-xs">Terms & Conditions</span>
+          </button>
+
+          <button
+            onClick={() => setLegalModal('privacy')}
+            className="bg-tertiary-container text-on-tertiary-container border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold uppercase py-3 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex flex-col items-center justify-center gap-2 h-24"
+          >
+            <span className="material-symbols-outlined">policy</span>
+            <span className="text-xs">Privacy Policy</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Legal Modal Overlay */}
+      {legalModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-surface-container-lowest border-[3px] border-on-surface shadow-[8px_8px_0px_0px_#141414] w-full max-w-4xl max-h-[85vh] flex flex-col relative">
+            <button 
+              onClick={() => setLegalModal(null)}
+              className="absolute top-2 right-2 w-10 h-10 bg-error text-on-error border-2 border-on-surface shadow-[2px_2px_0px_0px_#141414] font-black hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all z-10"
+            >
+              X
+            </button>
+            <div className="p-6 border-b-2 border-on-surface bg-surface-variant">
+              <h2 className="font-headline-lg font-black uppercase tracking-tighter">
+                {legalModal === 'terms' ? 'Terms & Conditions' : 'Privacy Policy'}
+              </h2>
+            </div>
+            <div className="p-6 overflow-y-auto prose prose-sm max-w-none">
+              <ReactMarkdown>
+                {legalModal === 'terms' ? termsAndConditions : privacyPolicy}
+              </ReactMarkdown>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Tutorial Confirmation Modal */}
+      {showTutorialConfirm && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-surface-container-lowest border-[3px] border-on-surface shadow-[8px_8px_0px_0px_#141414] w-full max-w-md p-6 flex flex-col gap-6 relative">
+            <div className="flex flex-col gap-2 border-b-2 border-on-surface pb-4">
+              <span className="material-symbols-outlined text-4xl text-primary">school</span>
+              <h2 className="font-headline-lg font-black uppercase tracking-tighter">Replay Tutorial?</h2>
+              <p className="font-body-md font-bold text-on-surface-variant">Are you sure you want to restart the tutorial? You will be redirected to the Dashboard to begin.</p>
+            </div>
+            <div className="flex gap-4 w-full">
+              <button 
+                onClick={() => setShowTutorialConfirm(false)}
+                className="flex-1 bg-surface-variant text-on-surface-variant border-2 border-on-surface shadow-[4px_4px_0px_0px_#141414] font-bold uppercase py-3 hover:translate-y-1 hover:translate-x-1 hover:shadow-none active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  setShowTutorialConfirm(false);
+                  restartTutorial();
+                }}
+                className="flex-1 bg-primary text-on-primary border-2 border-on-surface shadow-[4px_4px_0px_0px_#141414] font-bold uppercase py-3 hover:translate-y-1 hover:translate-x-1 hover:shadow-none active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
+              >
+                Replay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

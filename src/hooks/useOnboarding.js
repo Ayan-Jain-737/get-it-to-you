@@ -15,7 +15,6 @@ export const useOnboarding = (authUser, onComplete) => {
 
   const [availableBlocks, setAvailableBlocks] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState({});
 
   const menBlocks = ['A', 'B', 'C', 'D', 'D Annex', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'M Annex', 'N', 'P', 'Q', 'R', 'T'];
   const womenBlocks = ['A', 'B', 'C', 'D', 'E', 'E Annex', 'F', 'G', 'G Annex', 'H', 'J', 'S', 'RGT'];
@@ -97,21 +96,27 @@ export const useOnboarding = (authUser, onComplete) => {
     e.preventDefault();
     if (!authUser || !authUser.uid) return;
 
-    // Custom UI Validation
-    const newErrors = {};
-    if (!fullName) newErrors.fullName = true;
-    if (!dob) newErrors.dob = true;
-    if (!gender) newErrors.gender = true;
-    if (!gradYear) newErrors.gradYear = true;
-    if (!hostelBlock) newErrors.hostelBlock = true;
-    if (!roomNumber) newErrors.roomNumber = true;
+    // Scroll-to-missing-field Validation
+    const fields = [
+      { id: 'fullName', value: fullName },
+      { id: 'dob', value: dob },
+      { id: 'gender', value: gender },
+      { id: 'gradYear', value: gradYear },
+      { id: 'hostelBlock', value: hostelBlock },
+      { id: 'roomNumber', value: roomNumber },
+      { id: 'agreedTerms', value: document.getElementById('agreedTerms')?.checked },
+      { id: 'agreedPrivacy', value: document.getElementById('agreedPrivacy')?.checked }
+    ];
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      // Optional: scroll to top or alert briefly
-      return;
+    for (let field of fields) {
+      if (!field.value) {
+        const el = document.getElementById(field.id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return; // Stop submission
+      }
     }
-    setErrors({});
 
     setIsSubmitting(true);
 
@@ -194,8 +199,6 @@ export const useOnboarding = (authUser, onComplete) => {
     pfpFile, handlePfpUpload,
     availableBlocks,
     isSubmitting,
-    handleSubmit,
-    errors,
-    setErrors
+    handleSubmit
   };
 };
