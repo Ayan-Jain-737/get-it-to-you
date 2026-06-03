@@ -26,11 +26,3 @@ dist-ssr
 *.sln
 *.sw?
 
-# Agentation / MCP / AI tools
-.codex/
-.cursor/
-.gemini/
-.zed/
-.mcp.json
-config/
-opencode.json

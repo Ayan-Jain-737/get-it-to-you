@@ -15,6 +15,7 @@ export const useOnboarding = (authUser, onComplete) => {
 
   const [availableBlocks, setAvailableBlocks] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const menBlocks = ['A', 'B', 'C', 'D', 'D Annex', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'M Annex', 'N', 'P', 'Q', 'R', 'T'];
   const womenBlocks = ['A', 'B', 'C', 'D', 'E', 'E Annex', 'F', 'G', 'G Annex', 'H', 'J', 'S', 'RGT'];
@@ -26,7 +27,7 @@ export const useOnboarding = (authUser, onComplete) => {
         const regNoMatch = authUser.displayName.match(/2[1-9][A-Z]{3}\d{4}/i);
         if (regNoMatch) {
           setRegNumber(regNoMatch[0].toUpperCase());
-          setFullName(authUser.displayName.replace(regNoMatch[0], '').trim());
+          setFullName(authUser.displayName.replace(regNoMatch[0], '').replace(/[^a-zA-Z\s]/g, '').trim());
         } else {
           setFullName(authUser.displayName);
         }
@@ -95,6 +96,22 @@ export const useOnboarding = (authUser, onComplete) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!authUser || !authUser.uid) return;
+
+    // Custom UI Validation
+    const newErrors = {};
+    if (!fullName) newErrors.fullName = true;
+    if (!dob) newErrors.dob = true;
+    if (!gender) newErrors.gender = true;
+    if (!gradYear) newErrors.gradYear = true;
+    if (!hostelBlock) newErrors.hostelBlock = true;
+    if (!roomNumber) newErrors.roomNumber = true;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      // Optional: scroll to top or alert briefly
+      return;
+    }
+    setErrors({});
 
     setIsSubmitting(true);
 
@@ -177,6 +194,8 @@ export const useOnboarding = (authUser, onComplete) => {
     pfpFile, handlePfpUpload,
     availableBlocks,
     isSubmitting,
-    handleSubmit
+    handleSubmit,
+    errors,
+    setErrors
   };
 };

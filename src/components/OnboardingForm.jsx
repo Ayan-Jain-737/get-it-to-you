@@ -15,7 +15,10 @@ const OnboardingForm = ({ authUser, onComplete }) => {
     regNumber, setRegNumber,
     pfpFile, handlePfpUpload,
     availableBlocks,
-    handleSubmit
+    isSubmitting,
+    handleSubmit,
+    errors,
+    setErrors
   } = useOnboarding(authUser, onComplete);
 
   const fileInputRef = useRef(null);
@@ -49,7 +52,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
           <p className="font-label-mono text-label-tag uppercase font-bold text-on-surface-variant">Initialize Your Identity Profile</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-stack-lg">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-stack-lg">
           
           {/* PFP UPLOAD ZONE */}
           <div className="flex flex-col gap-2">
@@ -68,9 +71,9 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                     <img 
                       src={URL.createObjectURL(pfpFile)} 
                       alt="Preview" 
-                      className="absolute inset-0 w-full h-full object-cover" 
+                      className="absolute inset-0 w-full h-full object-cover z-10" 
                     />
-                    <div className="absolute inset-0 bg-surface/80 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <div className="absolute inset-0 bg-surface/80 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-20">
                       <span className="material-symbols-outlined text-4xl mb-2 text-on-surface">change_circle</span>
                       <span className="font-label-mono font-bold uppercase text-[10px] text-on-surface">Change Photo</span>
                     </div>
@@ -121,11 +124,16 @@ const OnboardingForm = ({ authUser, onComplete }) => {
               <input 
                 type="text" 
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => {
+                  setFullName(e.target.value);
+                  if (errors.fullName) setErrors(prev => ({...prev, fullName: false}));
+                }}
                 placeholder="Enter legal name"
-                required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
+                className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors ${errors.fullName ? 'border-error' : 'border-on-surface'}`}
               />
+              {errors.fullName && (
+                <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
+              )}
             </div>
 
             {/* EMAIL (Read Only) */}
@@ -149,11 +157,16 @@ const OnboardingForm = ({ authUser, onComplete }) => {
               <input 
                 type="date" 
                 value={dob}
-                onChange={(e) => setDob(e.target.value)}
+                onChange={(e) => {
+                  setDob(e.target.value);
+                  if (errors.dob) setErrors(prev => ({...prev, dob: false}));
+                }}
                 max={maxDateString}
-                required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
+                className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors ${errors.dob ? 'border-error' : 'border-on-surface'}`}
               />
+              {errors.dob && (
+                <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
+              )}
             </div>
 
           </div>
@@ -164,14 +177,19 @@ const OnboardingForm = ({ authUser, onComplete }) => {
               <label className="font-label-mono font-bold uppercase">Gender / Hostel Type</label>
               <select 
                 value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors cursor-pointer"
+                onChange={(e) => {
+                  setGender(e.target.value);
+                  if (errors.gender) setErrors(prev => ({...prev, gender: false}));
+                }}
+                className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors cursor-pointer ${errors.gender ? 'border-error' : 'border-on-surface'}`}
               >
                 <option value="" disabled>Select Classification</option>
                 <option value="Male">Male (Men's Hostel)</option>
                 <option value="Female">Female (Ladies' Hostel - LH)</option>
               </select>
+              {errors.gender && (
+                <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
+              )}
             </div>
 
             {/* REGISTRATION NUMBER (Removed from UI per user request, auto-filled) */}
@@ -182,13 +200,18 @@ const OnboardingForm = ({ authUser, onComplete }) => {
               <input 
                 type="number" 
                 value={gradYear}
-                onChange={(e) => setGradYear(e.target.value)}
+                onChange={(e) => {
+                  setGradYear(e.target.value);
+                  if (errors.gradYear) setErrors(prev => ({...prev, gradYear: false}));
+                }}
                 placeholder="e.g. 2027"
                 min={regNumber ? 2000 + parseInt(regNumber.substring(0, 2)) + 3 : 2020} 
                 max={regNumber ? 2000 + parseInt(regNumber.substring(0, 2)) + 5 : 2030}
-                required
-                className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
+                className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors ${errors.gradYear ? 'border-error' : 'border-on-surface'}`}
               />
+              {errors.gradYear && (
+                <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
+              )}
               {regNumber && (
                 <span className="text-xs text-on-surface-variant font-label-mono">
                   Allowed: {2000 + parseInt(regNumber.substring(0, 2)) + 3} - {2000 + parseInt(regNumber.substring(0, 2)) + 5}
@@ -206,26 +229,40 @@ const OnboardingForm = ({ authUser, onComplete }) => {
               {/* HOSTEL BLOCK */}
               <div className="flex flex-col gap-1 relative">
                 <label className="font-label-mono font-bold uppercase">Hostel Block</label>
-                <SearchableDropdown
-                  options={availableBlocks.map(b => ({ value: `${b} Block`, label: `${b} Block` }))}
-                  value={hostelBlock}
-                  onChange={setHostelBlock}
-                  placeholder={!gender ? 'Select Gender First' : 'Type to search blocks'}
-                  disabled={!gender}
-                />
+                <div className={errors.hostelBlock ? 'border-4 border-error border-dashed' : ''}>
+                  <SearchableDropdown
+                    options={availableBlocks.map(b => ({ value: `${b} Block`, label: `${b} Block` }))}
+                    value={hostelBlock}
+                    onChange={(val) => {
+                      setHostelBlock(val);
+                      if (errors.hostelBlock) setErrors(prev => ({...prev, hostelBlock: false}));
+                    }}
+                    placeholder={!gender ? 'Select Gender First' : 'Type to search blocks'}
+                    disabled={!gender}
+                  />
+                </div>
+                {errors.hostelBlock && (
+                  <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface relative z-50">Please fill out this field</div>
+                )}
               </div>
 
               {/* ROOM NUMBER */}
               <div className="flex flex-col gap-1">
                 <label className="font-label-mono font-bold uppercase">Room Number</label>
                 <input 
-                  type="text" 
+                  type="number" 
                   value={roomNumber}
-                  onChange={(e) => setRoomNumber(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => {
+                    setRoomNumber(e.target.value.replace(/\D/g, ''));
+                    if (errors.roomNumber) setErrors(prev => ({...prev, roomNumber: false}));
+                  }}
                   placeholder="e.g. 404"
-                  required
-                  className="p-3 border-[3px] border-on-surface bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors"
+                  min="0"
+                  className={`p-3 border-[3px] bg-surface-container-lowest font-body-lg font-bold shadow-[4px_4px_0px_0px_#141414] focus:outline-none focus:bg-primary-container transition-colors ${errors.roomNumber ? 'border-error' : 'border-on-surface'}`}
                 />
+                {errors.roomNumber && (
+                  <div className="bg-error text-on-error px-2 py-1 text-xs font-bold font-label-mono mt-1 w-max shadow-[2px_2px_0px_0px_#141414] border-2 border-on-surface">Please fill out this field</div>
+                )}
               </div>
             </div>
             
