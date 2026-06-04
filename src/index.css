@@ -82,3 +82,29 @@ h1, h2, h3, h4, h5, h6 {
   cursor: not-allowed;
   transform: none;
 }
+
+/* Custom Neo-Brutalist Scrollbar */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+  border-left: 2px solid var(--outline-variant);
+  border-top: 2px solid var(--outline-variant);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e5e5e5;
+  border: 2px solid var(--outline-variant);
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d4;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--background);
+}

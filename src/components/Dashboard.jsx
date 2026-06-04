@@ -27,7 +27,7 @@ const Dashboard = () => {
   const isMaxWallet = (userProfile?.gcBalance || 0) >= 500;
 
   return (
-    <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-surface-container-low">
+    <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-transparent">
       {/* Header Section */}
       <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-stack-md border-b-border-width border-on-surface pb-stack-sm">
         <div>

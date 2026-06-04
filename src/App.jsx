@@ -138,6 +138,7 @@ import Sidebar from './components/Sidebar';
 import PostModal from './components/PostModal';
 import ProtectedRoute from './components/ProtectedRoute';
 import OnboardingForm from './components/OnboardingForm';
+import InteractiveDotBackground from './components/InteractiveDotBackground';
 import TutorialOverlay from './components/Tutorial/TutorialOverlay';
 import './App.css';
 
@@ -172,7 +173,7 @@ const SharedLayout = () => {
 
   // Route wrapper that provides Navigation and handles PostModal
   return (
-    <div className="min-h-screen bg-surface-container-low text-on-surface flex flex-col md:flex-row">
+    <div className="min-h-screen bg-transparent text-on-surface flex flex-col md:flex-row">
       <Sidebar onOpenPostModal={() => openModal('request')} />
       <div className="flex-1 md:ml-64 min-h-screen">
         <Outlet context={{ openModal }} />
@@ -271,6 +272,7 @@ function App() {
     <AppProvider>
       <NotificationManager />
       <BrowserRouter>
+        <InteractiveDotBackground />
         <ScrollToTop />
         <JourneyRedirector />
         <AppRoutes />

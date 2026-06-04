@@ -38,7 +38,7 @@ const Account = () => {
   if (!userProfile) return null;
 
   return (
-    <div className="bg-surface-container min-h-screen text-on-surface p-margin-page pb-24 md:pb-margin-page overflow-y-auto">
+    <div className="bg-transparent min-h-screen text-on-surface p-margin-page pb-24 md:pb-margin-page overflow-y-auto">
       <header className="mb-8 border-b-4 border-on-surface pb-4">
         <h1 className="font-headline-xl text-headline-lg-mobile md:text-headline-xl font-black uppercase tracking-tighter text-on-surface">Your Profile</h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant mt-2 border-l-border-width border-on-surface pl-stack-sm">

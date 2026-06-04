@@ -38,7 +38,7 @@ const ActiveRunsList = () => {
   }
 
   return (
-    <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-surface-container-low text-on-surface">
+    <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-transparent text-on-surface">
       {/* Header */}
       <header className="flex items-end justify-between border-b-border-width border-on-surface pb-stack-sm mb-4">
         <div>

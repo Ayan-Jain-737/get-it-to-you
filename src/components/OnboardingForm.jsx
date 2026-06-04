@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { getAuth, signOut } from 'firebase/auth';
 import { useOnboarding } from '../hooks/useOnboarding';
 import SearchableDropdown from './SearchableDropdown';
@@ -22,6 +22,24 @@ const OnboardingForm = ({ authUser, onComplete }) => {
   } = useOnboarding(authUser, onComplete);
 
   const fileInputRef = useRef(null);
+
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  useEffect(() => {
+    if (!pfpFile) {
+      setPreviewUrl(null);
+      return;
+    }
+    
+    // Ensure the file is an image to prevent XSS warnings
+    if (pfpFile.type && pfpFile.type.startsWith('image/')) {
+      const objectUrl = URL.createObjectURL(pfpFile);
+      setPreviewUrl(objectUrl);
+      
+      // Free memory when this component unmounts or pfpFile changes
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+  }, [pfpFile]);
 
   const [hasScrolledTerms, setHasScrolledTerms] = useState(false);
   const [hasScrolledPrivacy, setHasScrolledPrivacy] = useState(false);
@@ -53,7 +71,7 @@ const OnboardingForm = ({ authUser, onComplete }) => {
   const maxDateString = maxDate.toISOString().split('T')[0];
 
   return (
-    <div className="min-h-screen bg-surface p-margin-page font-body-md text-on-surface flex flex-col items-center justify-center py-12">
+    <div className="min-h-screen bg-transparent p-margin-page font-body-md text-on-surface flex flex-col items-center justify-center py-12">
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface-container-lowest border-[3px] border-on-surface shadow-[8px_8px_0px_0px_#141414] p-4 md:p-stack-lg">
         <div className="mb-stack-xl border-b-[3px] border-on-surface pb-stack-sm">
           <h1 className="font-headline-xl text-headline-lg-mobile md:text-headline-xl font-black uppercase tracking-tighter">ACCOUNT CREATION</h1>
@@ -74,10 +92,10 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 onClick={triggerFileUpload}
                 className="w-40 h-40 border-[3px] border-dashed border-on-surface bg-surface-variant flex flex-col items-center justify-center cursor-pointer hover:bg-primary-container transition-colors shadow-[4px_4px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_0px_#141414] relative overflow-hidden"
               >
-                {pfpFile ? (
+                {previewUrl ? (
                   <>
                     <img 
-                      src={URL.createObjectURL(pfpFile)} 
+                      src={previewUrl} 
                       alt="Preview" 
                       className="absolute inset-0 w-full h-full object-cover z-10" 
                     />

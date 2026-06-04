@@ -36,7 +36,7 @@ const Profile = () => {
   } = useProfile();
 
   return (
-    <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-surface-container-low text-on-surface">
+    <main className="p-margin-page md:p-stack-lg min-h-screen flex flex-col gap-stack-lg pb-32 md:pb-stack-lg font-body-md bg-transparent text-on-surface">
       {/* Header */}
       <header className="flex items-end justify-between border-b-border-width border-on-surface pb-stack-sm mb-4">
         <div>
@@ -53,7 +53,6 @@ const Profile = () => {
         <section className="lg:col-span-5 flex flex-col gap-stack-md">
           {/* Main Wallet Cap display */}
           <div className="bg-surface-container-lowest border-border-width border-on-surface neo-shadow p-stack-lg relative overflow-hidden group" data-tutorial="wallet-card">
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#141414_1px,transparent_1px)] [background-size:16px_16px]"></div>
             <div className="bg-surface-container-lowest border-[3px] border-on-surface shadow-[6px_6px_0px_0px_#141414] p-6 mb-6">
               <div className="font-label-mono text-body-md uppercase mb-2 tracking-widest text-on-surface-variant">GITY Coins (GC) Available</div>
               <div className="font-headline-xl text-headline-xl font-black text-on-surface mb-2">

@@ -18,8 +18,8 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
       {/* SideNavBar (Web Only) */}
       <nav className="hidden md:flex flex-col h-full w-64 fixed left-0 top-0 p-stack-md bg-surface-container-lowest border-r-border-width border-on-surface shadow-[4px_0px_0px_0px_#141414] z-50">
         <div className="mb-stack-lg">
-          <NavLink to="/dashboard" className="font-headline-lg text-headline-lg font-black text-on-surface italic tracking-tighter">
-            GITY
+          <NavLink to="/dashboard" className="flex items-center">
+            <img src="/navbar_logo.png" alt="GITY Logo" className="h-16 md:h-20 object-contain" />
           </NavLink>
         </div>
 
@@ -121,8 +121,8 @@ const Sidebar = ({ onOpenPostModal, hideOnMobile = false }) => {
 
       {/* TopAppBar (Mobile Only) — hidden during journey tracking */}
       <header className={`md:hidden w-full top-0 sticky z-50 flex justify-between items-center px-margin-page py-stack-sm bg-surface-container-lowest border-b-border-width border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${isJourneyActive ? 'hidden' : ''}`}>
-        <NavLink to="/dashboard" className="font-headline-md text-headline-md font-black italic text-on-surface uppercase">
-          GITY
+        <NavLink to="/dashboard" className="flex items-center">
+          <img src="/navbar_logo.png" alt="GITY Logo" className="h-12 object-contain" />
         </NavLink>
         <div className="flex gap-3 items-center">
           <NotificationBell />
