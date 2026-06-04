@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet, useOutletContext, useNa
 import { AppProvider, useAppContext } from './context/AppContext';
 import { Toaster, toast } from 'react-hot-toast';
 
-const QuestToastContent = ({ runs, prevRuns, visible }) => {
+export const QuestToastContent = ({ runs, prevRuns, visible }) => {
   const [animatedRuns, setAnimatedRuns] = useState(prevRuns);
 
   useEffect(() => {
@@ -68,11 +68,19 @@ const NotificationManager = () => {
     }
   }, [activeJourney]);
 
+  const isInitialLoad = useRef(true);
+
   useEffect(() => {
     if (!userProfile?.stats || !currentUser) return;
     const currentTasks = userProfile.stats.lifetimeTasksCompleted || 0;
     
-    if (currentTasks > prevTasksRef.current && prevTasksRef.current > 0) {
+    if (isInitialLoad.current) {
+      prevTasksRef.current = currentTasks;
+      isInitialLoad.current = false;
+      return;
+    }
+    
+    if (currentTasks > prevTasksRef.current) {
        const runs = currentTasks;
        const prevRuns = prevTasksRef.current;
        

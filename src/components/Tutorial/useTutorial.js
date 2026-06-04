@@ -27,7 +27,7 @@ const TUTORIAL_STEPS = [
   { id: 'journey-runner-info', target: 'journey-runner-info', title: 'Runner Info', text: "This card shows your **Runner's** details — their name, reliability score, and hostel block.", btn: 'Next →', route: null },
   { id: 'journey-chat-req', target: 'journey-chat', title: 'Live Chat', text: "Use the **Chat** to coordinate with your runner in real-time.", btn: 'Next →', route: null },
   // Step 17: Simulated delivery + OTP
-  { id: 'journey-otp-show', target: 'journey-otp', title: 'Handoff OTP', text: "Your runner has arrived! This is your **4-digit OTP code**. Give this code to the runner so they can confirm the handoff.", btn: null, autoAdvanceMs: 4000, route: null },
+  { id: 'journey-otp-show', target: 'journey-otp', title: 'Handoff OTP', text: "Your runner has arrived! This is your **4-digit OTP code**. Give this code to the runner so they can confirm the handoff.", btn: 'Next →', route: null },
   // Step 18: Completion toast
   { id: 'journey-complete-req', target: null, title: '🎉 Delivery Complete!', text: "Your run has been verified. Every completed delivery updates your reputation and quest progress.", btn: 'View History →', route: null },
   // Step 19: History (requester side)

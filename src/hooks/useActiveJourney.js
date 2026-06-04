@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAppContext } from '../context/AppContext';
 import { db } from '../firebase/config';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { QuestToastContent } from '../App';
 
 const STATUS_STEPS = ['Accepted', 'Ready for Pickup', 'Walking Back', 'Arrived'];
 
@@ -228,13 +229,24 @@ export const useActiveJourney = () => {
     setOtpError(false);
     setErrorMessage("");
     try {
+      if (activeJourney?.id?.startsWith('mock')) {
+        if (enteredOTP !== activeJourney.otpCode && enteredOTP !== '1234') {
+          throw new Error("Incorrect OTP for tutorial.");
+        }
+        toast.success("Delivery completed!", { style: { borderRadius: 'var(--radius-md)' } });
+        toast.custom((t) => (
+          React.createElement(QuestToastContent, { runs: 1, prevRuns: 0, visible: t.visible })
+        ), { duration: 6000, position: 'top-center' });
+        return;
+      }
+
       await verifyOTPAndComplete(activeJourney.id, enteredOTP);
       toast.success("Delivery completed!", { style: { borderRadius: 'var(--radius-md)' } });
       navigate('/dashboard');
     } catch (err) {
       setOtpError(true);
-      setErrorMessage("Incorrect OTP. Please try again.");
-      toast.error("Incorrect OTP", { style: { borderRadius: 'var(--radius-md)' } });
+      setErrorMessage(err.message || "Incorrect OTP. Please try again.");
+      toast.error(err.message || "Incorrect OTP", { style: { borderRadius: 'var(--radius-md)' } });
     } finally {
       setIsVerifying(false);
     }

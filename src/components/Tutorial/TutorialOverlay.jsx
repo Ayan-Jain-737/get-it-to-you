@@ -56,10 +56,15 @@ const TutorialOverlay = () => {
       }
 
       // Attach click listener for waitForClick logic
-      if (currentStepData.waitForClick && attachedEl !== el) {
+      let clickEl = el;
+      if (typeof currentStepData.waitForClick === 'string') {
+        clickEl = document.querySelector(`[data-tutorial="${currentStepData.waitForClick}"]`) || el;
+      }
+
+      if (currentStepData.waitForClick && attachedEl !== clickEl) {
         if (attachedEl) attachedEl.removeEventListener('click', handleClick);
-        el.addEventListener('click', handleClick);
-        attachedEl = el;
+        clickEl.addEventListener('click', handleClick);
+        attachedEl = clickEl;
       }
 
       const rect = el.getBoundingClientRect();

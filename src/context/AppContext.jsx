@@ -245,6 +245,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const provider = new GoogleAuthProvider();
+      // Restrict domain
+      provider.setCustomParameters({ hd: 'vitstudent.ac.in' });
       const result = await signInWithPopup(auth, provider);
       const email = result.user.email;
       
@@ -252,13 +254,18 @@ export const AppProvider = ({ children }) => {
       
       if (!isAllowed) {
         await auth.signOut();
-        throw new Error("Please enter with VIT Email only.");
+        throw new Error("Please login with your VIT Email only.");
       }
       
       setCurrentUser(result.user);
       return true;
     } catch (error) {
-      console.error("Error signing in with Google:", error);
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        toast.error("Login cancelled. Please try again.");
+      } else {
+        toast.error(error.message || "Failed to sign in");
+        console.error("Error signing in with Google:", error);
+      }
       throw error;
     }
   };

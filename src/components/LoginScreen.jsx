@@ -22,6 +22,8 @@ const LoginScreen = () => {
             <h2 className="font-headline-xl text-headline-lg-mobile uppercase tracking-tighter leading-none mb-2">Welcome Scholar</h2>
             <p className="font-body-md text-body-md text-on-surface-variant mb-6 border-l-border-width border-on-surface pl-stack-sm">
               Connect to the campus gig network. Run tasks, claim rewards, and build your digital reputation.
+              <br/><br/>
+              <span className="text-error font-bold">Note: Please use your official @vitstudent.ac.in email to sign in.</span>
             </p>
           </div>
 
@@ -37,7 +39,7 @@ const LoginScreen = () => {
               onClick={handleGoogleLogin}
               className="w-full bg-primary-container hover:bg-primary-fixed-dim text-on-surface font-headline-md text-body-lg py-4 border-border-width border-on-surface shadow-[4px_4px_0px_0px_#141414] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase tracking-wider font-bold"
             >
-              Sign In with Google
+              Sign In with VIT Email
             </button>
           </form>
 

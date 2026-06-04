@@ -98,6 +98,7 @@ const ActiveJourney = () => {
   } = useActiveJourney();
 
   const [isMobile, setIsMobile] = useState(false);
+  const messagesEndRef = React.useRef(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -105,6 +106,10 @@ const ActiveJourney = () => {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   if (!activeJourney) {
     return (
@@ -213,8 +218,12 @@ const ActiveJourney = () => {
   const renderPeekContent = () => (
     <div className="flex items-center gap-3 pb-2" data-tutorial={isRunner ? 'journey-requester-info' : 'journey-runner-info'}>
       {/* Avatar */}
-      <div className="w-10 h-10 border-2 border-on-surface bg-primary-container flex items-center justify-center text-sm font-black uppercase text-on-surface flex-shrink-0">
-        {isRunner ? requesterName[0].toUpperCase() : runnerName[0].toUpperCase()}
+      <div className="w-10 h-10 border-2 border-on-surface bg-primary-container flex items-center justify-center text-sm font-black uppercase text-on-surface flex-shrink-0 overflow-hidden">
+        {isRunner ? (
+          postInfo.requesterAvatar ? <img src={postInfo.requesterAvatar} alt="Requester" className="w-full h-full object-cover" /> : requesterName[0].toUpperCase()
+        ) : (
+          (postInfo.runnerAvatar || postInfo.acceptedByAvatar) ? <img src={postInfo.runnerAvatar || postInfo.acceptedByAvatar} alt="Runner" className="w-full h-full object-cover" /> : runnerName[0].toUpperCase()
+        )}
       </div>
       {/* Name + Status */}
       <div className="flex-1 min-w-0">
@@ -394,6 +403,7 @@ const ActiveJourney = () => {
               </div>
             );
           })}
+          <div ref={messagesEndRef} />
         </div>
         
         {/* Quick Reply Suggestions */}
@@ -505,8 +515,12 @@ const ActiveJourney = () => {
           {/* Header */}
           <div className="flex items-center justify-between border-b-2 border-on-surface pb-3">
             <div className="flex items-center gap-3" data-tutorial={isRunner ? 'journey-requester-info' : 'journey-runner-info'}>
-              <div className="w-12 h-12 border-2 border-on-surface bg-primary-container flex items-center justify-center text-lg font-black uppercase text-on-surface flex-shrink-0">
-                {isRunner ? requesterName[0].toUpperCase() : runnerName[0].toUpperCase()}
+              <div className="w-12 h-12 border-2 border-on-surface bg-primary-container flex items-center justify-center text-lg font-black uppercase text-on-surface flex-shrink-0 overflow-hidden">
+                {isRunner ? (
+                  postInfo.requesterAvatar ? <img src={postInfo.requesterAvatar} alt="Requester" className="w-full h-full object-cover" /> : requesterName[0].toUpperCase()
+                ) : (
+                  (postInfo.runnerAvatar || postInfo.acceptedByAvatar) ? <img src={postInfo.runnerAvatar || postInfo.acceptedByAvatar} alt="Runner" className="w-full h-full object-cover" /> : runnerName[0].toUpperCase()
+                )}
               </div>
               <div className="min-w-0">
                 <p className="font-label-mono text-[9px] text-on-surface-variant uppercase font-bold">{isRunner ? 'Requester' : 'Your Runner'}</p>
@@ -601,6 +615,7 @@ const ActiveJourney = () => {
                   </div>
                 );
               })}
+              <div ref={messagesEndRef} />
             </div>
             
             {/* Quick Reply Suggestions */}

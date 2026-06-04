@@ -233,7 +233,8 @@ const OnboardingForm = ({ authUser, onComplete }) => {
                 <label className="font-label-mono font-bold uppercase">Room Number <span className="text-error">*</span></label>
                 <input 
                   id="roomNumber"
-                  type="number" 
+                  type="text" 
+                  inputMode="numeric"
                   value={roomNumber}
                   onChange={(e) => setRoomNumber(e.target.value.replace(/\D/g, ''))}
                   placeholder="e.g. 404"
