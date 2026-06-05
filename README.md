@@ -89,7 +89,7 @@ Students who need help can post delivery requests.
 
 Students who are already heading somewhere can earn rewards by helping others along their route.
 
-Every interaction is secured through escrow, GPS validation, OTP verification, and reputation tracking.
+Every interaction is secured through upfront credit holds, GPS validation, OTP verification, and reputation tracking.
 
 This creates a trusted system where helping others becomes simple, rewarding, and scalable.
 
@@ -106,7 +106,7 @@ When a student needs something delivered, they create a request by specifying:
 * Item description
 * Urgency level
 
-The required GITY Credits (GC) are immediately deducted and placed into escrow.
+The required GITY Credits (GC) are immediately deducted and held in reserve until the delivery is completed.
 
 This guarantees that rewards are already reserved before any runner accepts the task.
 
@@ -140,9 +140,9 @@ A one-time password is generated and shown to the requester.
 
 The requester verbally shares the OTP with the runner upon successful handoff.
 
-### Escrow Release
+### Credits Released
 
-Only after entering the correct OTP is the escrow released and the delivery officially completed.
+Only after the runner enters the correct OTP code are the held credits released and the delivery officially completed.
 
 This prevents fraudulent payouts, fake deliveries, and disputes.
 
@@ -166,8 +166,8 @@ This creates a circular ecosystem where participation fuels future convenience.
 | Wallet Cap       | 300 GC  |
 | Reserve Vault    | Enabled |
 | Real Money       | None    |
-| Escrow System    | Yes     |
-| Atomic Refunds   | Yes     |
+| Credit Hold System | Yes     |
+| Instant Refunds    | Yes     |
 
 To prevent inflation and hoarding, wallets are capped and excess rewards are automatically routed into a reserve vault.
 
@@ -329,12 +329,12 @@ Authentication is handled through Google OAuth and restricted to:
 ### Platform Security Features
 
 * OTP-secured handoffs
-* Escrow-protected rewards
+* Pre-secured rewards (held until delivery is confirmed)
 * Geofenced status progression
 * User reporting system
 * Trust scoring
 * Wallet abuse prevention
-* Atomic Firestore transactions
+* Instant, error-proof transactions
 * Strict Content Security Policies
 
 ---

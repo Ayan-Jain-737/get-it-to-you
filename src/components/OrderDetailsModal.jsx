@@ -157,7 +157,7 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                   {post.type === 'request' ? (
                     post.requesterId === currentUser?.uid ? (
                       <div className="flex justify-between text-error">
-                        <span>Escrow Charge</span>
+                        <span>Credits Charged</span>
                         <span>-75 GC</span>
                       </div>
                     ) : (
@@ -174,7 +174,7 @@ const OrderDetailsModal = ({ isOpen, onClose, post }) => {
                       </div>
                     ) : (
                       <div className="flex justify-between text-error">
-                        <span>Escrow Charge</span>
+                        <span>Credits Charged</span>
                         <span>-75 GC</span>
                       </div>
                     )
