@@ -1,28 +1,5 @@
-
-<div style="display:flex; justify-content:space-evenly;">
-<div style ="display:flex; justify-content:space-evenly;">
-
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-
-</div>
-<div style ="display:flex; justify-content:space-evenly;">
-
-![Platform](https://img.shields.io/badge/Platform-Web-blue)     
-</div>
-<div style ="display:flex; justify-content:space-evenly;">
-
-
-![Community](https://img.shields.io/badge/Community-VIT%20Vellore-red) 
-</div>
-
-<div style ="display:flex; justify-content:space-evenly;">
-
-![Status](https://img.shields.io/badge/Status-Live-green)
-</div>
-
-</div>
-
-
+  
+![Platform](https://img.shields.io/badge/Platform-Web-blue)  ![Community](https://img.shields.io/badge/Community-VIT%20Vellore-red) ![Status](https://img.shields.io/badge/Status-Live-green)
 <div align="center">
 
 # 🚀 GITY - Get It To You
