@@ -1,33 +1,126 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* GITY Neo-Brutalist Theme Colors */
-  --primary: #4F46E5;
-  --primary-dim: #3d30d4;
-  --primary-container: #ffffff;
-  
-  --secondary: #FF6D00;
-  --tertiary: #00C853;
-  --error: #FF3B30;
-  
-  --background: #f4f4f0;
-  --surface-container-lowest: #ffffff;
-  --surface-container-low: #ffffff;
-  --surface-container: #ffffff;
-  --surface-container-high: #ffffff;
-  
-  --on-background: #000000;
-  --on-surface: #000000;
-  --on-surface-variant: #333333;
-  
-  --outline-variant: #000000; /* Solid Black Ghost Border */
-  
-  /* Radii & Shadows */
-  --radius-md: 4px;
-  --radius-xl: 8px;
-  
-  --shadow-ambient: 4px 4px 0px #000;
-  --shadow-lift: 2px 2px 0px #000;
+  /* GITY Neo-Brutalist Theme Colors — Light Mode */
+  --tw-primary: #626200;
+  --tw-primary-dim: #494900;
+  --tw-primary-container: #ffff00;
+  --tw-primary-fixed: #eaea00;
+  --tw-primary-fixed-dim: #cdcd00;
+
+  --tw-secondary: #006e20;
+  --tw-secondary-container: #90f691;
+  --tw-secondary-fixed: #93f993;
+  --tw-secondary-fixed-dim: #77dc7a;
+
+  --tw-tertiary: #c00100;
+  --tw-tertiary-container: #fff5f3;
+
+  --tw-error: #ba1a1a;
+  --tw-error-container: #ffdad6;
+
+  --tw-background: #f9f9f9;
+  --tw-surface: #f9f9f9;
+  --tw-surface-bright: #f9f9f9;
+  --tw-surface-dim: #dadada;
+  --tw-surface-container-lowest: #ffffff;
+  --tw-surface-container-low: #f3f3f3;
+  --tw-surface-container: #eeeeee;
+  --tw-surface-container-high: #e8e8e8;
+  --tw-surface-container-highest: #e2e2e2;
+  --tw-surface-variant: #e2e2e2;
+  --tw-surface-tint: #626200;
+
+  --tw-on-primary: #ffffff;
+  --tw-on-primary-container: #757500;
+  --tw-on-primary-fixed: #1d1d00;
+  --tw-on-primary-fixed-variant: #494900;
+  --tw-on-secondary: #ffffff;
+  --tw-on-secondary-container: #007322;
+  --tw-on-secondary-fixed: #002105;
+  --tw-on-secondary-fixed-variant: #005316;
+  --tw-on-tertiary: #ffffff;
+  --tw-on-tertiary-container: #e40100;
+  --tw-on-tertiary-fixed: #410000;
+  --tw-on-tertiary-fixed-variant: #930100;
+  --tw-on-error: #ffffff;
+  --tw-on-error-container: #93000a;
+  --tw-on-background: #1b1b1b;
+  --tw-on-surface: #1b1b1b;
+  --tw-on-surface-variant: #484831;
+  --tw-inverse-surface: #303030;
+  --tw-inverse-on-surface: #f1f1f1;
+  --tw-inverse-primary: #cdcd00;
+  --tw-outline: #79785f;
+  --tw-outline-variant: #cac8aa;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #e5e5e5;
+  --scrollbar-thumb-hover: #d4d4d4;
+  --scrollbar-track: #f4f4f0;
+  --scrollbar-border: #000000;
+}
+
+/* ===== DARK MODE OVERRIDES ===== */
+html.dark {
+  --tw-background: #1a1a1a;
+  --tw-surface: #1a1a1a;
+  --tw-surface-bright: #2e2e2e;
+  --tw-surface-dim: #141414;
+  --tw-surface-container-lowest: #242424;
+  --tw-surface-container-low: #1e1e1e;
+  --tw-surface-container: #282828;
+  --tw-surface-container-high: #333333;
+  --tw-surface-container-highest: #3a3a3a;
+  --tw-surface-variant: #3a3a3a;
+  --tw-surface-tint: #cdcd00;
+
+  --tw-on-background: #e8e6e3;
+  --tw-on-surface: #e8e6e3;
+  --tw-on-surface-variant: #a8a8a0;
+  --tw-inverse-surface: #e8e6e3;
+  --tw-inverse-on-surface: #303030;
+  --tw-inverse-primary: #626200;
+  --tw-outline: #93917a;
+  --tw-outline-variant: #4a4a3a;
+
+  /* Keep primary/secondary/tertiary vivid for dark mode */
+  --tw-primary: #cdcd00;
+  --tw-primary-dim: #b5b500;
+  --tw-primary-container: #555500;
+  --tw-primary-fixed: #eaea00;
+  --tw-primary-fixed-dim: #cdcd00;
+  --tw-on-primary: #333300;
+  --tw-on-primary-container: #eaea00;
+  --tw-on-primary-fixed: #1d1d00;
+  --tw-on-primary-fixed-variant: #494900;
+
+  --tw-secondary: #77dc7a;
+  --tw-secondary-container: #005316;
+  --tw-secondary-fixed: #93f993;
+  --tw-secondary-fixed-dim: #77dc7a;
+  --tw-on-secondary: #003a0e;
+  --tw-on-secondary-container: #90f691;
+  --tw-on-secondary-fixed: #002105;
+  --tw-on-secondary-fixed-variant: #005316;
+
+  --tw-tertiary: #ffb4a8;
+  --tw-tertiary-container: #930100;
+  --tw-on-tertiary: #690000;
+  --tw-on-tertiary-container: #ffdad4;
+  --tw-on-tertiary-fixed: #410000;
+  --tw-on-tertiary-fixed-variant: #930100;
+
+  --tw-error: #ffb4ab;
+  --tw-error-container: #93000a;
+  --tw-on-error: #690005;
+  --tw-on-error-container: #ffdad6;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #444444;
+  --scrollbar-thumb-hover: #555555;
+  --scrollbar-track: #1a1a1a;
+  --scrollbar-border: #333333;
 }
 
 * {
@@ -38,30 +131,31 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--background);
-  color: var(--on-background);
+  background-color: var(--tw-background);
+  color: var(--tw-on-background);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  color: var(--on-surface);
+  color: var(--tw-on-surface);
 }
 
 /* Neo-Brutalist Base Button */
 .btn-primary {
-  background: var(--primary);
+  background: var(--tw-primary);
   color: #fff;
   border: 2px solid #000;
-  border-radius: var(--radius-xl);
+  border-radius: 8px;
   padding: 14px 24px;
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
-  box-shadow: var(--shadow-ambient);
+  box-shadow: 4px 4px 0px #000;
 }
 
 .btn-primary:hover {
@@ -90,21 +184,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
-  border-left: 2px solid var(--outline-variant);
-  border-top: 2px solid var(--outline-variant);
+  background: var(--scrollbar-track);
+  border-left: 2px solid var(--scrollbar-border);
+  border-top: 2px solid var(--scrollbar-border);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #e5e5e5;
-  border: 2px solid var(--outline-variant);
+  background: var(--scrollbar-thumb);
+  border: 2px solid var(--scrollbar-border);
   border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4d4d4;
+  background: var(--scrollbar-thumb-hover);
 }
 
 ::-webkit-scrollbar-corner {
-  background: var(--background);
+  background: var(--scrollbar-track);
 }

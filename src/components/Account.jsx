@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { privacyPolicy, termsAndConditions } from '../assets/legalDocs';
 import { useAccount } from '../hooks/useAccount';
 import SearchableDropdown from './SearchableDropdown';
+import ThemeToggle from './ThemeToggle';
 
 const Account = () => {
   const {
@@ -193,7 +194,7 @@ const Account = () => {
         </div>
         <p className="text-sm font-bold text-on-surface-variant mb-6">Access your legal agreements or replay the app tutorial if you need a refresher.</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
             onClick={() => setShowTutorialConfirm(true)}
             className="bg-primary-container text-on-primary-container border-2 border-on-surface shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold uppercase py-3 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex flex-col items-center justify-center gap-2 h-24"
@@ -201,6 +202,8 @@ const Account = () => {
             <span className="material-symbols-outlined">school</span>
             <span className="text-xs">Replay Tutorial</span>
           </button>
+
+          <ThemeToggle />
 
           <button
             onClick={() => setLegalModal('terms')}

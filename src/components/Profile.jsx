@@ -205,13 +205,31 @@ const Profile = () => {
                 const weeklyCount = stats.pastRuns?.filter(r => r.status === 'Completed' && r.createdAt && getWeekStr(new Date(r.createdAt.seconds * 1000)) === currentWeekStr).length || 0;
                 const isWeekendWarriorDone = weeklyCount >= 5;
 
-                const QuestCard = ({ id, title, desc, reward, completed, progress, total, icon, bg, accent, onClick }) => {
+                const QuestCard = ({ id, title, desc, reward, completed, progress, total, icon, theme = 'primary', onClick }) => {
                   const isClaimed = questState[id] === 'claimed';
                   const isCompletedUnclaimed = !isClaimed && (completed || (progress !== undefined && progress >= total));
                   const isInProgress = !isClaimed && !isCompletedUnclaimed;
                   
                   const percent = isClaimed || isCompletedUnclaimed ? 100 : progress !== undefined ? (progress / total) * 100 : 0;
                   
+                  // Map semantic theme to correct CSS variables for perfect contrast
+                  const getThemeVars = (t) => {
+                    switch(t) {
+                      case 'primary': return { bg: 'var(--tw-primary-container)', text: 'var(--tw-on-primary-container)', accent: 'var(--tw-primary)' };
+                      case 'secondary': return { bg: 'var(--tw-secondary-container)', text: 'var(--tw-on-secondary-container)', accent: 'var(--tw-secondary)' };
+                      case 'tertiary': return { bg: 'var(--tw-tertiary-container)', text: 'var(--tw-on-tertiary-container)', accent: 'var(--tw-tertiary)' };
+                      case 'error': return { bg: 'var(--tw-error-container)', text: 'var(--tw-on-error-container)', accent: 'var(--tw-error)' };
+                      case 'surface': 
+                      default:
+                        return { bg: 'var(--tw-surface-container-highest)', text: 'var(--tw-on-surface)', accent: 'var(--tw-primary)' };
+                    }
+                  };
+
+                  const themeVars = getThemeVars(theme);
+                  const activeBg = isClaimed ? 'var(--tw-surface-variant)' : (isCompletedUnclaimed ? 'var(--tw-secondary-container)' : themeVars.bg);
+                  const activeText = isClaimed ? 'var(--tw-on-surface-variant)' : (isCompletedUnclaimed ? 'var(--tw-on-secondary-container)' : themeVars.text);
+                  const activeAccent = isClaimed ? 'var(--tw-on-surface-variant)' : (isCompletedUnclaimed ? 'var(--tw-secondary)' : themeVars.accent);
+
                   const handleAction = async () => {
                     if (claimingQuestId) return;
                     if (onClick) {
@@ -238,8 +256,8 @@ const Profile = () => {
                       className={`p-4 border-2 border-on-surface flex flex-col justify-center transition-all mb-4 relative overflow-hidden ${isCompletedUnclaimed || onClick ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#141414]' : ''} ${claimingQuestId ? 'opacity-75 pointer-events-none' : ''}`}
                       onClick={handleAction}
                       style={{ 
-                        boxShadow: isClaimed ? 'none' : '4px 4px 0px 0px #141414', 
-                        background: isClaimed ? '#e2e2e2' : (isCompletedUnclaimed ? '#d4f5d4' : bg) 
+                        boxShadow: isClaimed ? 'none' : '4px 4px 0px 0px #141414',
+                        background: activeBg
                       }}
                     >
                       {isClaimed && (
@@ -253,11 +271,11 @@ const Profile = () => {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 border-2 border-on-surface bg-surface-container-lowest flex items-center justify-center flex-shrink-0">
-                            <span className="material-symbols-outlined" style={{ color: isClaimed ? '#888' : accent }}>{icon}</span>
+                            <span className="material-symbols-outlined" style={{ color: activeAccent }}>{icon}</span>
                           </div>
                           <div>
-                            <h4 className={`font-bold text-sm text-on-surface ${isClaimed ? 'line-through text-on-surface-variant' : ''}`}>{title}</h4>
-                            <p className="text-xs font-bold text-on-surface-variant">{desc}</p>
+                            <h4 className={`font-bold text-sm ${isClaimed ? 'line-through' : ''}`} style={{ color: activeText }}>{title}</h4>
+                            <p className="text-xs font-bold opacity-90" style={{ color: activeText }}>{desc}</p>
                           </div>
                         </div>
                         <div className="text-right flex flex-col items-end justify-center">
@@ -266,7 +284,7 @@ const Profile = () => {
                               {isLoading ? <><span className="material-symbols-outlined text-[14px] animate-spin">refresh</span>...</> : `Claim ${reward} GC`}
                             </button>
                           ) : (
-                            <span className="font-black font-label-mono text-xs" style={{ color: accent }}>{reward} GC</span>
+                            <span className="font-black font-label-mono text-xs" style={{ color: activeAccent }}>{reward} GC</span>
                           )}
                         </div>
                       </div>
@@ -274,9 +292,9 @@ const Profile = () => {
                       {isInProgress && progress !== undefined && (
                         <div className="w-full flex items-center gap-3 mt-2">
                           <div className="flex-1 h-3 bg-surface-container-lowest border-2 border-on-surface relative overflow-hidden">
-                            <div className="absolute top-0 left-0 h-full" style={{ background: accent, width: `${percent}%` }}></div>
+                            <div className="absolute top-0 left-0 h-full" style={{ background: activeAccent, width: `${percent}%` }}></div>
                           </div>
-                          <span className="text-xs font-bold text-on-surface w-10 text-right">{progress}/{total}</span>
+                          <span className="text-xs font-bold w-10 text-right" style={{ color: activeText }}>{progress}/{total}</span>
                         </div>
                       )}
                     </div>
@@ -323,10 +341,10 @@ const Profile = () => {
                             Resets in {dailyTimeLeft || getDailyTimeLeft()}
                           </span>
                         </div>
-                        <QuestCard id="daily" title="The Daily Warmup" desc="Complete 1 delivery today." reward="3" icon="directions_run" bg="#fffdf5" accent="#626200" completed={questState.daily} progress={questState.daily ? 1 : 0} total={1} />
-                        <QuestCard id="sprinter" title="The Sprinter" desc="Complete a run in < 15 minutes." reward="8" icon="timer" bg="#fdf5ff" accent="#626200" completed={questState.sprinter} />
-                        <QuestCard id="rescuer" title="The Rescuer" desc="Accept a request sitting for > 25 minutes." reward="5" icon="healing" bg="#fff5f5" accent="#ba1a1a" completed={questState.rescuer} />
-                        <QuestCard id="lastorder" title="The Last Order" desc="Complete a delivery requested between 6:30 PM - 7:00 PM." reward="5" icon="dark_mode" bg="#f5faff" accent="#006e20" completed={questState.lastorder} />
+                        <QuestCard id="daily" title="The Daily Warmup" desc="Complete 1 delivery today." reward="3" icon="directions_run" theme="primary" completed={questState.daily} progress={questState.daily ? 1 : 0} total={1} />
+                        <QuestCard id="sprinter" title="The Sprinter" desc="Complete a run in < 15 minutes." reward="8" icon="timer" theme="tertiary" completed={questState.sprinter} />
+                        <QuestCard id="rescuer" title="The Rescuer" desc="Accept a request sitting for > 25 minutes." reward="5" icon="healing" theme="error" completed={questState.rescuer} />
+                        <QuestCard id="lastorder" title="The Last Order" desc="Complete a delivery requested between 6:30 PM - 7:00 PM." reward="5" icon="dark_mode" theme="surface" completed={questState.lastorder} />
                       </div>
                     )}
 
@@ -338,8 +356,8 @@ const Profile = () => {
                             Ends in {weeklyTimeLeft || getWeeklyTimeLeft()}
                           </span>
                         </div>
-                        <QuestCard id="weekendWarrior" title="Weekend Warrior" desc="Complete 5 deliveries this week." reward="15" icon="workspace_premium" bg="#f5fffa" accent="#006e20" completed={isWeekendWarriorDone || questState.weekendWarrior === true || questState.weekendWarrior === 'claimed'} progress={weeklyCount || userProfile?.stats?.weeklyTasksCompleted || 0} total={5} />
-                        <QuestCard id="ironStreakCompleted" title="The Iron Streak" desc="Hit 5 concurrent weekly active streaks." reward="15" icon="local_fire_department" bg="#fff9f5" accent="#c00100" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
+                        <QuestCard id="weekendWarrior" title="Weekend Warrior" desc="Complete 5 deliveries this week." reward="15" icon="workspace_premium" theme="secondary" completed={isWeekendWarriorDone || questState.weekendWarrior === true || questState.weekendWarrior === 'claimed'} progress={weeklyCount || userProfile?.stats?.weeklyTasksCompleted || 0} total={5} />
+                        <QuestCard id="ironStreakCompleted" title="The Iron Streak" desc="Hit 5 concurrent weekly active streaks." reward="15" icon="local_fire_department" theme="tertiary" completed={questState.ironStreakCompleted} progress={questState.currentStreak || 0} total={5} />
                       </div>
                     )}
 
@@ -348,20 +366,20 @@ const Profile = () => {
                         <div className="flex justify-between items-center mb-2">
                           <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Onboarding</h3>
                         </div>
-                        <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="25" icon="sports_martial_arts" bg="#fffdf5" accent="#626200" completed={questState.icebreaker} progress={runs} total={1} />
+                        <QuestCard id="icebreaker" title="The Icebreaker" desc="Complete your very first delivery as a Runner." reward="25" icon="sports_martial_arts" theme="primary" completed={questState.icebreaker} progress={runs} total={1} />
                         <div data-tutorial="quest-rookie">
-                          <QuestCard id="rookieTraining" title="Rookie Training Complete" desc="Complete the GITY tutorial to unlock the platform." reward="10" icon="school" bg="#f0f8ff" accent="#4F46E5" completed={questState.rookieTraining === true || questState.rookieTraining === 'claimed'} progress={questState.rookieTraining ? 34 : (userProfile?.tutorialStep || 0)} total={34} />
+                          <QuestCard id="rookieTraining" title="Rookie Training Complete" desc="Complete the GITY tutorial to unlock the platform." reward="10" icon="school" theme="surface" completed={questState.rookieTraining === true || questState.rookieTraining === 'claimed'} progress={questState.rookieTraining ? 34 : (userProfile?.tutorialStep || 0)} total={34} />
                         </div>
 
-                        <QuestCard id="photogenic" title="Photogenic" desc="Upload a profile photo to stand out." reward="25" icon="add_a_photo" bg="#f4f0ef" accent="#9c4146" completed={!!userProfile?.avatar || questState.photogenic === 'claimed'} progress={userProfile?.avatar ? 1 : 0} total={1} />
+                        <QuestCard id="photogenic" title="Photogenic" desc="Upload a profile photo to stand out." reward="25" icon="add_a_photo" theme="tertiary" completed={!!userProfile?.avatar || questState.photogenic === 'claimed'} progress={userProfile?.avatar ? 1 : 0} total={1} />
                         
                         <div className="flex justify-between items-center mb-2 pt-4 border-t-2 border-dashed border-on-surface">
                           <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Lifetime Milestones</h3>
                         </div>
-                        <QuestCard id="milestone25" title="25 Deliveries" desc="Milestone reward" reward="30" icon="military_tech" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone25} progress={runs} total={25} />
-                        <QuestCard id="milestone50" title="50 Deliveries" desc="Milestone reward" reward="50" icon="workspace_premium" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone50} progress={runs} total={50} />
-                        <QuestCard id="milestone75" title="75 Deliveries" desc="Milestone reward" reward="75" icon="diamond" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone75} progress={runs} total={75} />
-                        <QuestCard id="milestone100" title="The Centurion" desc="100 Lifetime Deliveries" reward="100" icon="stars" bg="#fff5fa" accent="#ba1a1a" completed={questState.milestone100} progress={runs} total={100} />
+                        <QuestCard id="milestone25" title="25 Deliveries" desc="Milestone reward" reward="30" icon="military_tech" theme="error" completed={questState.milestone25} progress={runs} total={25} />
+                        <QuestCard id="milestone50" title="50 Deliveries" desc="Milestone reward" reward="50" icon="workspace_premium" theme="error" completed={questState.milestone50} progress={runs} total={50} />
+                        <QuestCard id="milestone75" title="75 Deliveries" desc="Milestone reward" reward="75" icon="diamond" theme="error" completed={questState.milestone75} progress={runs} total={75} />
+                        <QuestCard id="milestone100" title="The Centurion" desc="100 Lifetime Deliveries" reward="100" icon="stars" theme="error" completed={questState.milestone100} progress={runs} total={100} />
                       </div>
                     )}
                   </>

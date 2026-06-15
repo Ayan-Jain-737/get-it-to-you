@@ -18,6 +18,13 @@ const InteractiveDotBackground = () => {
     const springFactor = 0.1; // Speed of return
     
     let mouse = { x: -1000, y: -1000 };
+    let isDarkMode = document.documentElement.classList.contains('dark');
+
+    // Watch for dark mode changes
+    const observer = new MutationObserver(() => {
+      isDarkMode = document.documentElement.classList.contains('dark');
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
     const initDots = () => {
       dots = [];
@@ -64,9 +71,8 @@ const InteractiveDotBackground = () => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Use a subtle color so it doesn't hurt eyes
-      // Using CSS variable for outline-variant or just a semi-transparent black
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      // Dynamic dot color based on theme
+      ctx.fillStyle = isDarkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.15)';
       
       for (let i = 0; i < dots.length; i++) {
         const dot = dots[i];
@@ -103,6 +109,7 @@ const InteractiveDotBackground = () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseleave', onMouseLeave);
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
     };
   }, []);
 

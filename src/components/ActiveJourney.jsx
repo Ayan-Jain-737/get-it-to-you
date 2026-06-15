@@ -243,9 +243,9 @@ const ActiveJourney = () => {
         </div>
       </div>
       {/* Reward Pill */}
-      <div className="flex-shrink-0 bg-[#ffc5aa]/30 border-2 border-on-surface px-2 py-1 text-center">
-        <span className="text-[9px] font-black uppercase text-[#9b3f00] block leading-none">Reward</span>
-        <span className="text-xs font-black text-[#9b3f00]">{postInfo.runnerReward || 50} GC</span>
+      <div className="flex-shrink-0 bg-surface-container-high border-2 border-on-surface px-2 py-1 text-center">
+        <span className="text-[9px] font-black uppercase text-on-surface-variant block leading-none">Reward</span>
+        <span className="text-xs font-black text-on-surface">{postInfo.runnerReward || 50} GC</span>
       </div>
       {/* Sim Toggle (Runner only) */}
       {isRunner && (
@@ -312,14 +312,8 @@ const ActiveJourney = () => {
       {isRunner && currentStepIndex < STATUS_STEPS.length - 1 && (
         <button 
           onClick={handleNextStatus} 
-          data-tutorial="journey-status-btns"
           disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
-          className="w-full font-headline-md text-sm font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            boxShadow: (isTooFar && !isSimulating) ? 'none' : '4px 4px 0px #141414',
-            background: (isTooFar && !isSimulating) ? '#e2e2e2' : 'var(--primary-container)',
-            color: '#141414'
-          }}
+          className={`w-full font-headline-md text-sm font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${(isTooFar && !isSimulating) ? 'bg-surface-variant text-on-surface-variant shadow-none' : 'bg-primary-container text-on-primary-container shadow-[4px_4px_0px_#141414]'}`}
         >
           {isUpdatingStatus ? (
             <><span className="material-symbols-outlined animate-spin text-[16px]">refresh</span> Processing...</>
@@ -551,16 +545,16 @@ const ActiveJourney = () => {
           </div>
 
           {/* Reward & Route Box */}
-          <div className="bg-[#ffc5aa]/20 border-2 border-on-surface p-3 flex items-center justify-between shadow-[2px_2px_0px_0px_#141414] rotate-[0.5deg]">
+          <div className="bg-surface-container-high border-2 border-on-surface p-3 flex items-center justify-between shadow-[2px_2px_0px_0px_#141414] rotate-[0.5deg]">
             <div>
-              <p className="font-label-mono text-[9px] font-bold uppercase text-[#9b3f00]">Reward</p>
-              <p className="text-[#9b3f00] font-black text-base">
+              <p className="font-label-mono text-[9px] font-bold uppercase text-on-surface-variant">Reward</p>
+              <p className="text-on-surface font-black text-base">
                 {`${postInfo.runnerReward || 50} GC`}
               </p>
             </div>
             <div className="text-right">
-              <p className="font-label-mono text-[9px] font-bold uppercase text-[#9b3f00]">Destination</p>
-              <p className="text-[#9b3f00] font-bold text-xs truncate max-w-[150px]">{postInfo.destination}</p>
+              <p className="font-label-mono text-[9px] font-bold uppercase text-on-surface-variant">Destination</p>
+              <p className="text-on-surface font-bold text-xs truncate max-w-[150px]">{postInfo.destination}</p>
             </div>
           </div>
 
@@ -656,12 +650,7 @@ const ActiveJourney = () => {
               onClick={handleNextStatus} 
               data-tutorial="journey-status-btns" 
               disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
-              className="w-full font-headline-md text-body-lg font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                boxShadow: (isTooFar && !isSimulating) ? 'none' : '4px 4px 0px #141414',
-                background: (isTooFar && !isSimulating) ? '#e2e2e2' : 'var(--primary-container)',
-                color: '#141414'
-              }}
+              className={`w-full font-headline-md text-body-lg font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${(isTooFar && !isSimulating) ? 'bg-surface-variant text-on-surface-variant shadow-none' : 'bg-primary-container text-on-primary-container shadow-[4px_4px_0px_#141414]'}`}
             >
               {isUpdatingStatus ? (
                 <>

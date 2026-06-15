@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLoginScreen } from '../hooks/useLoginScreen';
 
 const LoginScreen = () => {
   const { error, handleGoogleLogin } = useLoginScreen();
+
+  const [isDark, setIsDark] = useState(() => {
+    return document.documentElement.classList.contains('dark');
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('gity-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('gity-theme', 'light');
+    }
+  }, [isDark]);
 
   return (
     <div className="bg-transparent min-h-screen text-on-surface flex flex-col justify-between p-margin-page font-body-md selection:bg-primary-container selection:text-on-surface relative overflow-hidden">
@@ -49,7 +63,18 @@ const LoginScreen = () => {
       </main>
 
       <footer className="w-full border-t-border-width border-on-surface py-stack-sm flex flex-col items-center gap-2 font-label-mono text-label-tag text-on-surface-variant uppercase">
-        <div>BUILT BY AYAN JAIN</div>
+        <div className="flex items-center gap-4">
+          <div>BUILT BY AYAN JAIN</div>
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="border-2 border-on-surface p-1.5 shadow-[2px_2px_0px_0px_#141414] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none bg-surface-container-lowest transition-all flex items-center justify-center"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            <span className="material-symbols-outlined text-sm">
+              {isDark ? 'light_mode' : 'dark_mode'}
+            </span>
+          </button>
+        </div>
       </footer>
     </div>
   );
