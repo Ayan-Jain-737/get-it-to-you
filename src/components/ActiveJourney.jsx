@@ -311,6 +311,7 @@ const ActiveJourney = () => {
       {/* Advance Status Button (Runner Only) */}
       {isRunner && currentStepIndex < STATUS_STEPS.length - 1 && (
         <button 
+          data-tutorial="journey-status-btns"
           onClick={handleNextStatus} 
           disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
           className={`w-full font-headline-md text-sm font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${(isTooFar && !isSimulating) ? 'bg-surface-variant text-on-surface-variant shadow-none' : 'bg-primary-container text-on-primary-container shadow-[4px_4px_0px_#141414]'}`}

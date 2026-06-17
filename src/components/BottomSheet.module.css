@@ -5,8 +5,8 @@
   right: 0;
   height: 92vh; /* Matches SNAP_FULL */
   z-index: 100;
-  background: var(--surface-container-lowest);
-  border-top: 4px solid var(--on-surface);
+  background: var(--tw-surface-container-lowest);
+  border-top: 4px solid var(--tw-on-surface);
   box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
   transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   will-change: transform;
@@ -36,7 +36,7 @@
 .handleNub {
   width: 40px;
   height: 5px;
-  background: var(--on-surface);
+  background: var(--tw-on-surface);
   border-radius: 0;
 }
 
@@ -87,7 +87,7 @@
 
 .expandHint .material-symbols-outlined {
   font-size: 18px;
-  color: var(--on-surface-variant);
+  color: var(--tw-on-surface-variant);
   transition: transform 0.3s ease;
 }
 

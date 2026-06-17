@@ -172,16 +172,18 @@ export const useTutorial = () => {
     try {
       await cleanupTutorialPosts();
       const userRef = doc(db, 'users', currentUser.uid);
+      const currentRookieState = userProfile?.questState?.rookieTraining;
+      const newRookieState = currentRookieState === 'claimed' ? 'claimed' : true;
       await updateDoc(userRef, { 
         tutorialComplete: true, 
         tutorialStep: TUTORIAL_STEPS.length,
-        'questState.rookieTraining': true // Mark as completable but unclaimed
+        'questState.rookieTraining': newRookieState
       });
       setUserProfile(prev => ({
         ...prev,
         tutorialComplete: true,
         tutorialStep: TUTORIAL_STEPS.length,
-        questState: { ...prev.questState, rookieTraining: true }
+        questState: { ...prev.questState, rookieTraining: newRookieState }
       }));
       setIsActive(false);
     } catch (err) {
