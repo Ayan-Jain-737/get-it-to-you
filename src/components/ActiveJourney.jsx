@@ -69,8 +69,7 @@ const ActiveJourney = () => {
     isUpdatingStatus,
     showReportModal,
     setShowReportModal,
-    isSimulating,
-    setIsSimulating,
+
     isMapReady,
     profileTargetUid,
     setProfileTargetUid,
@@ -247,17 +246,6 @@ const ActiveJourney = () => {
         <span className="text-[9px] font-black uppercase text-on-surface-variant block leading-none">Reward</span>
         <span className="text-xs font-black text-on-surface">{postInfo.runnerReward || 50} GC</span>
       </div>
-      {/* Sim Toggle (Runner only) */}
-      {isRunner && (
-        <button 
-          onClick={() => setIsSimulating(!isSimulating)}
-          className={`p-1.5 border-2 border-on-surface flex-shrink-0 ${isSimulating ? 'bg-tertiary text-on-tertiary' : 'bg-surface-container text-on-surface'}`}
-        >
-          <span className="material-symbols-outlined text-[14px]">
-            {isSimulating ? 'stop_circle' : 'play_circle'}
-          </span>
-        </button>
-      )}
     </div>
   );
 
@@ -313,12 +301,12 @@ const ActiveJourney = () => {
         <button 
           data-tutorial="journey-status-btns"
           onClick={handleNextStatus} 
-          disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
-          className={`w-full font-headline-md text-sm font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${(isTooFar && !isSimulating) ? 'bg-surface-variant text-on-surface-variant shadow-none' : 'bg-primary-container text-on-primary-container shadow-[4px_4px_0px_#141414]'}`}
+          disabled={isTooFar || isUpdatingStatus}
+          className={`w-full font-headline-md text-sm font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${isTooFar ? 'bg-surface-variant text-on-surface-variant shadow-none' : 'bg-primary-container text-on-primary-container shadow-[4px_4px_0px_#141414]'}`}
         >
           {isUpdatingStatus ? (
             <><span className="material-symbols-outlined animate-spin text-[16px]">refresh</span> Processing...</>
-          ) : isTooFar && !isSimulating ? (
+          ) : isTooFar ? (
             <><span className="material-symbols-outlined text-[16px]">lock</span> Too Far</>
           ) : (
             <><span className="material-symbols-outlined text-[16px]">where_to_vote</span> Next: {STATUS_SHORT[currentStepIndex + 1]}</>
@@ -531,18 +519,6 @@ const ActiveJourney = () => {
               </div>
             </div>
             
-            {/* Dev Simulator Toggle */}
-            {isRunner && (
-              <button 
-                onClick={() => setIsSimulating(!isSimulating)}
-                className={`p-2 border-2 border-on-surface transition-colors flex items-center justify-center ${isSimulating ? 'bg-tertiary text-on-tertiary' : 'bg-surface-container text-on-surface'}`}
-                title="Simulate Movement"
-              >
-                <span className="material-symbols-outlined text-[18px]">
-                  {isSimulating ? 'stop_circle' : 'play_circle'}
-                </span>
-              </button>
-            )}
           </div>
 
           {/* Reward & Route Box */}
@@ -650,14 +626,14 @@ const ActiveJourney = () => {
             <button 
               onClick={handleNextStatus} 
               data-tutorial="journey-status-btns" 
-              disabled={(isTooFar && !isSimulating) || isUpdatingStatus}
-              className={`w-full font-headline-md text-body-lg font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${(isTooFar && !isSimulating) ? 'bg-surface-variant text-on-surface-variant shadow-none' : 'bg-primary-container text-on-primary-container shadow-[4px_4px_0px_#141414]'}`}
+              disabled={isTooFar || isUpdatingStatus}
+              className={`w-full font-headline-md text-body-lg font-black py-3 border-2 border-on-surface transition-all uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${isTooFar ? 'bg-surface-variant text-on-surface-variant shadow-none' : 'bg-primary-container text-on-primary-container shadow-[4px_4px_0px_#141414]'}`}
             >
               {isUpdatingStatus ? (
                 <>
                   <span className="material-symbols-outlined animate-spin">refresh</span> PROCESSING...
                 </>
-              ) : isTooFar && !isSimulating ? (
+              ) : isTooFar ? (
                 <>
                   <span className="material-symbols-outlined">lock</span>
                   Locked — Too Far

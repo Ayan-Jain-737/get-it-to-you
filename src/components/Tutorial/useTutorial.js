@@ -45,7 +45,7 @@ const TUTORIAL_STEPS = [
   // Step 25: Status buttons
   { id: 'journey-status', target: 'journey-status-btns', title: 'Status Updates', text: "As you walk, tap these buttons to update your status. The Requester sees your progress in real-time.", btn: null, waitForClick: 'journey-status-btns', route: '/active-runs' },
   // Step 26: Arrived button
-  { id: 'journey-arrived', target: 'journey-status-btns', title: 'Arrived!', text: "You've reached the destination! Tap **Arrived**. Note: in a real run, this button **only unlocks when you're within 10 meters** of the destination — verified by GPS.", btn: null, waitForClick: 'journey-status-btns', route: '/active-runs' },
+  { id: 'journey-arrived', target: 'journey-status-btns', title: 'Arrived!', text: "You've reached the destination! Tap **Arrived**. Note: in a real run, this button **only unlocks when you're within 50 meters** of the destination — verified by GPS.", btn: null, waitForClick: 'journey-status-btns', route: '/active-runs' },
   // Step 27: OTP input (runner)
   { id: 'journey-otp-input', target: 'journey-otp-input', title: 'Enter OTP', text: "Type the **4-digit OTP** the requester gives you to complete the delivery.", btn: 'Complete Run →', route: '/active-runs' },
   // Step 28: Runner completion + history

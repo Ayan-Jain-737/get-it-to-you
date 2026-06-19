@@ -41,7 +41,7 @@ export const useActiveJourney = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
-  const [isSimulating, setIsSimulating] = useState(false);
+
   const [isMapReady, setIsMapReady] = useState(false);
   const [profileTargetUid, setProfileTargetUid] = useState(null);
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ export const useActiveJourney = () => {
   }, [activeJourney, feedData]);
 
   useEffect(() => {
-    if (!isRunner || !activeJourney?.id || isSimulating) return;
+    if (!isRunner || !activeJourney?.id) return;
     
     let lastSyncTime = 0;
     const watchId = navigator.geolocation.watchPosition(
@@ -81,42 +81,11 @@ export const useActiveJourney = () => {
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [isRunner, activeJourney?.id, isSimulating, updateRunnerLocation]);
+  }, [isRunner, activeJourney?.id, updateRunnerLocation]);
 
   const postInfo = feedData.find(p => p.id === activeJourney?.postId) || {};
   const requesterName = postInfo.requesterName || 'Requester';
   const runnerName = postInfo.acceptedBy || 'Runner';
-
-  useEffect(() => {
-    if (!isRunner || !activeJourney?.id || !isSimulating) return;
-    
-    const targetArr = getSafeCoords(postInfo.destinationCoords || postInfo.destination);
-    let target = { lat: targetArr[0], lng: targetArr[1] };
-    
-    const currentArr = getSafeCoords(activeJourney.runnerLocation || postInfo.locationCoords || postInfo.location);
-    let current = { lat: currentArr[0], lng: currentArr[1] };
-    
-    let lastSimSync = 0;
-
-    const interval = setInterval(() => {
-      let nextLat = current.lat + (target.lat - current.lat) * 0.05;
-      let nextLng = current.lng + (target.lng - current.lng) * 0.05;
-      
-      if (isNaN(nextLat) || isNaN(nextLng) || typeof nextLat !== 'number' || typeof nextLng !== 'number') return;
-
-      current = { lat: nextLat, lng: nextLng };
-      
-      const now = Date.now();
-      if (now - lastSimSync > 5000) {
-        if (!activeJourney.id.startsWith('mock')) {
-          updateRunnerLocation(activeJourney.id, nextLat, nextLng).catch(() => {});
-        }
-        lastSimSync = now;
-      }
-    }, 2000);
-    
-    return () => clearInterval(interval);
-  }, [isRunner, activeJourney?.id, isSimulating]);
 
   useEffect(() => {
     if (!activeJourney || !activeJourney.id) return;
@@ -258,23 +227,6 @@ export const useActiveJourney = () => {
     setEnteredOTP(value.replace(/\D/g, ''));
   };
 
-  let distanceToTarget = null;
-  let isGeofenceDisabled = false;
-
-  if (isRunner) {
-    let targetCoords = null;
-    if (currentStepIndex === 0) targetCoords = postInfo.locationCoords;
-    else if (currentStepIndex === 2) targetCoords = postInfo.destinationCoords;
-
-    if ((currentStepIndex === 0 || currentStepIndex === 2) && (!targetCoords?.lat || !targetCoords?.lng)) {
-      isGeofenceDisabled = true;
-    } else if (targetCoords?.lat && targetCoords?.lng && activeJourney?.runnerLocation?.lat) {
-      distanceToTarget = getDistanceFromLatLonInM(activeJourney.runnerLocation.lat, activeJourney.runnerLocation.lng, targetCoords.lat, targetCoords.lng);
-    }
-  }
-  const isTooFar = distanceToTarget !== null && distanceToTarget > 10;
-  const isAtDestination = currentStepIndex === 2 && distanceToTarget !== null && distanceToTarget <= 10;
-
   const pickupArr = getSafeCoords(postInfo?.locationCoords || postInfo?.location);
   const destArr = getSafeCoords(postInfo?.destinationCoords || postInfo?.destination);
   const pickupCoords = { lat: pickupArr[0], lng: pickupArr[1] };
@@ -283,6 +235,30 @@ export const useActiveJourney = () => {
   const centerCoords = getSafeCoords(activeJourney?.runnerLocation || postInfo?.locationCoords || postInfo?.location);
   const mapLat = centerCoords[0];
   const mapLng = centerCoords[1];
+
+  let distanceToTarget = null;
+  let isGeofenceDisabled = false;
+  let hasTargetCoords = false;
+
+  if (isRunner) {
+    let targetCoords = null;
+    if (currentStepIndex === 0) targetCoords = pickupCoords;
+    else if (currentStepIndex === 2) targetCoords = destCoords;
+
+    if ((currentStepIndex === 0 || currentStepIndex === 2) && (!targetCoords?.lat || !targetCoords?.lng)) {
+      isGeofenceDisabled = true;
+    } else if (targetCoords?.lat && targetCoords?.lng) {
+      hasTargetCoords = true;
+      if (activeJourney?.runnerLocation?.lat) {
+        distanceToTarget = getDistanceFromLatLonInM(activeJourney.runnerLocation.lat, activeJourney.runnerLocation.lng, targetCoords.lat, targetCoords.lng);
+      }
+    }
+  }
+  
+  // Geofence is active if we have target coords and it's not disabled.
+  // If active, we default to locking the button (isTooFar = true) if distance is null (e.g., GPS loading/denied).
+  const isTooFar = !isGeofenceDisabled && hasTargetCoords && (distanceToTarget === null || distanceToTarget > 50);
+  const isAtDestination = currentStepIndex === 2 && distanceToTarget !== null && distanceToTarget <= 50;
 
   return {
     activeJourney,
@@ -302,8 +278,7 @@ export const useActiveJourney = () => {
     isUpdatingStatus,
     showReportModal,
     setShowReportModal,
-    isSimulating,
-    setIsSimulating,
+
     isMapReady,
     profileTargetUid,
     setProfileTargetUid,
