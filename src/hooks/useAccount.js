@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
 
 export const useAccount = () => {
@@ -33,9 +32,9 @@ export const useAccount = () => {
 
   useEffect(() => {
     if (isEditing && userProfile) {
-      setEditDob(userProfile.privateData?.dob || '');
+      setEditDob(userProfile.dob || '');
       setEditBlock(userProfile.hostelBlock || '');
-      setEditRoom(userProfile.privateData?.roomNumber || '');
+      setEditRoom(userProfile.roomNumber || '');
     }
   }, [isEditing, userProfile]);
 
@@ -78,10 +77,9 @@ export const useAccount = () => {
         const base64 = canvas.toDataURL('image/jpeg', 0.6);
         
         try {
-          const userRef = doc(db, 'users', currentUser.uid);
-          await updateDoc(userRef, {
-            'publicData.photoURL': base64
-          });
+          await supabase.from('profiles').update({
+            avatar_url: base64
+          }).eq('id', currentUser.uid);
           setUserProfile(prev => ({ ...prev, avatar: base64 }));
           toast.success("Profile photo updated!");
         } catch (error) {
@@ -101,25 +99,23 @@ export const useAccount = () => {
     const finalRoom = editRoom.trim() ? editRoom : (userProfile?.privateData?.roomNumber || '');
 
     try {
-      const userRef = doc(db, 'users', currentUser.uid);
-      const updates = {};
-      updates['privateData.dob'] = editDob;
-      
-      if (isJune) {
-        updates['publicData.zone'] = finalBlock;
-        updates['privateData.roomNumber'] = finalRoom;
+      if (editDob !== userProfile?.dob) {
+        await supabase.from('profiles').update({ dob: editDob }).eq('id', currentUser.uid);
       }
-      
-      await updateDoc(userRef, updates);
+
+      if (isJune && (finalBlock !== userProfile?.hostelBlock || finalRoom !== userProfile?.roomNumber)) {
+        await supabase.from('user_locations').upsert({
+          user_id: currentUser.uid,
+          hostel_block: finalBlock,
+          room_number: finalRoom
+        }, { onConflict: 'user_id' });
+      }
       
       setUserProfile(prev => ({
         ...prev,
+        dob: editDob,
         hostelBlock: isJune ? finalBlock : prev.hostelBlock,
-        privateData: {
-          ...prev.privateData,
-          dob: editDob,
-          roomNumber: isJune ? finalRoom : prev.privateData?.roomNumber
-        }
+        roomNumber: isJune ? finalRoom : prev.roomNumber
       }));
       
       toast.success("Profile updated successfully!");

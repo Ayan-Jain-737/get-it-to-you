@@ -188,34 +188,13 @@ const JourneyRedirector = () => {
   const { activeJourney, currentUser } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectedJourneyIdRef = useRef(null);
 
   useEffect(() => {
-    if (
-      activeJourney &&
-      activeJourney.status === 'Accepted' &&
-      currentUser &&
-      activeJourney.requesterId === currentUser.uid &&
-      location.pathname !== '/deliveries' &&
-      redirectedJourneyIdRef.current !== activeJourney.id
-    ) {
-      redirectedJourneyIdRef.current = activeJourney.id;
-      toast.success('Your request was accepted! Redirecting...', {
-        icon: '🚀',
-        style: {
-          background: 'rgba(255, 255, 255, 0.7)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          border: '1px solid var(--outline-variant)',
-          color: 'var(--primary)',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-ambient)',
-          fontWeight: '600',
-          fontFamily: "'Inter', sans-serif",
-          padding: '12px 20px'
-        }
-      });
-      navigate('/deliveries');
+    if (activeJourney && activeJourney.status === 'Accepted' && currentUser && activeJourney.requesterId === currentUser.uid) {
+      if (location.pathname !== '/deliveries') {
+        toast.success('Your request was accepted! Redirecting...', { style: { borderRadius: 'var(--radius-md)' } });
+        navigate('/deliveries');
+      }
     }
   }, [activeJourney, currentUser, location.pathname, navigate]);
 
@@ -240,13 +219,14 @@ const AppRoutes = () => {
       <Route 
         path="/onboarding" 
         element={
-          currentUser ? <OnboardingForm authUser={currentUser} onComplete={() => window.location.href = '/'} /> : <Navigate to="/login" />
+          currentUser ? <OnboardingForm authUser={currentUser} /> : <Navigate to="/login" />
         } 
       />
       <Route 
         path="/" 
         element={
           <ProtectedRoute user={currentUser} userData={userProfile}>
+            <JourneyRedirector />
             <SharedLayout />
           </ProtectedRoute>
         }

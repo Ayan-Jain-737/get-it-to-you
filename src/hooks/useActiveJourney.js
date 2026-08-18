@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAppContext } from '../context/AppContext';
-import { db } from '../firebase/config';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '../lib/supabase';
 import { QuestToastContent } from '../App';
 
 const STATUS_STEPS = ['Accepted', 'Ready for Pickup', 'Walking Back', 'Arrived'];
@@ -94,21 +93,26 @@ export const useActiveJourney = () => {
        setMessages([{ id: 1, sender: 'system', text: 'Connection established between Runner and Requester.' }]);
        return;
     }
-    const q = query(collection(db, 'journeys', activeJourney.id, 'messages'), orderBy('timestamp', 'asc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          text: data.text,
-          type: data.type || 'user',
-          sender: data.senderId === currentUser?.uid ? 'me' : 'other',
-          timestamp: data.timestamp
-        };
-      });
-      setMessages(msgs);
-    });
-    return () => unsubscribe();
+    const fetchMessages = async () => {
+      const { data } = await supabase.from('messages').select('*').eq('task_id', activeJourney.id).order('created_at', { ascending: true });
+      if (data) {
+        setMessages(data.map(d => ({
+          id: d.id,
+          text: d.message,
+          type: 'user', // simplifications for demo
+          sender: d.sender_id === currentUser?.uid ? 'me' : 'other',
+          timestamp: new Date(d.created_at)
+        })));
+      }
+    };
+    
+    fetchMessages();
+    const sub = supabase.channel(`messages_${activeJourney.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `task_id=eq.${activeJourney.id}` }, () => {
+        fetchMessages();
+      }).subscribe();
+
+    return () => supabase.removeChannel(sub);
   }, [activeJourney?.id, currentUser?.uid]);
 
   const currentStepIndex = STATUS_STEPS.indexOf(activeJourney?.status);
@@ -138,11 +142,10 @@ export const useActiveJourney = () => {
        return;
     }
     try {
-      await addDoc(collection(db, 'journeys', activeJourney.id, 'messages'), {
-        type: 'user',
-        text: newMessage,
-        senderId: currentUser.uid,
-        timestamp: serverTimestamp()
+      await supabase.from('messages').insert({
+        task_id: activeJourney.id,
+        message: newMessage,
+        sender_id: currentUser.uid
       });
       setNewMessage('');
     } catch (err) {
@@ -158,11 +161,10 @@ export const useActiveJourney = () => {
        return;
     }
     try {
-      await addDoc(collection(db, 'journeys', activeJourney.id, 'messages'), {
-        type: 'user',
-        text,
-        senderId: currentUser.uid,
-        timestamp: serverTimestamp()
+      await supabase.from('messages').insert({
+        task_id: activeJourney.id,
+        message: text,
+        sender_id: currentUser.uid
       });
     } catch (err) {
       console.error("Error sending message", err);

@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { db } from '../firebase/config';
-import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
 export const useOnboarding = (authUser, onComplete) => {
+  const navigate = useNavigate();
+  const { setUserProfile } = useAppContext();
   const [fullName, setFullName] = useState('');
   const [dob, setDob] = useState('');
   const [email, setEmail] = useState('');
@@ -121,63 +124,75 @@ export const useOnboarding = (authUser, onComplete) => {
     setIsSubmitting(true);
 
     try {
-      // 0. Enforce Unique Registration Number
-      const upperRegNum = regNumber.toUpperCase();
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('privateData.regNumber', '==', upperRegNum));
-      const querySnapshot = await getDocs(q);
-      
-      if (!querySnapshot.empty) {
-        const isDuplicate = querySnapshot.docs.some(d => d.id !== authUser.uid);
-        if (isDuplicate) {
-          alert("This Registration Number is already linked to another account.");
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
       let photoBase64 = null;
-
-      // 1. Compress Image to Text String (Bypasses Storage entirely)
       if (pfpFile) {
         photoBase64 = await compressImage(pfpFile);
       }
 
-      // 2. Format the Public Display Name
-      const nameParts = fullName.trim().split(' ');
-      const publicDisplayName = nameParts.length > 1
-        ? `${nameParts[0]} ${nameParts[nameParts.length - 1].charAt(0)}.`
-        : nameParts[0];
+      // Write to Supabase profiles
+      const { error: profileError } = await supabase.from('profiles').upsert({
+        id: authUser.uid,
+        full_name: fullName,
+        email: email,
+        avatar_url: photoBase64,
+        dob: dob,
+        gender: gender
+      });
+      if (profileError) throw profileError;
 
-      // 3. Write securely to Firestore using the Base64 string
-      const userRef = doc(db, 'users', authUser.uid);
-      await setDoc(userRef, {
-        publicData: {
-          displayName: publicDisplayName,
-          zone: hostelBlock,
-          gradYear: gradYear,
-          photoURL: photoBase64, // Saves the text string instead of a storage link
-          reliabilityScore: 100,
-          level: 1
-        },
-        privateData: {
-          fullName: fullName,
-          dob: dob,
-          email: email,
-          gender: gender,
-          roomNumber: roomNumber,
-          regNumber: upperRegNum,
-          lastRoomUpdate: new Date().toISOString()
-        },
-        onboardingComplete: true,
-        gcBalance: 90,
-        overflowBalance: 0,
-        tutorialComplete: false,
-        tutorialStep: 0
-      }, { merge: true });
+      // Academics
+      const { error: acadError } = await supabase.from('user_academics').upsert({
+        user_id: authUser.uid,
+        registration_no: regNumber,
+        graduation_year: gradYear
+      }, { onConflict: 'user_id' });
+      if (acadError) throw acadError;
 
-      // 4. Trigger callback
+      // Locations
+      const { error: locError } = await supabase.from('user_locations').upsert({
+        user_id: authUser.uid,
+        hostel_block: hostelBlock,
+        room_number: roomNumber
+      }, { onConflict: 'user_id' });
+      if (locError) throw locError;
+
+      // Wallets
+      const { error: walletError } = await supabase.from('user_wallets').upsert({
+        user_id: authUser.uid,
+        gc_balance: 100,
+        gc_capacity: 300,
+        trust_score: 5.0
+      }, { onConflict: 'user_id' });
+      if (walletError) throw walletError;
+
+      // Stats
+      const { error: statsError } = await supabase.from('user_stats').upsert({
+        user_id: authUser.uid,
+        lifetime_requests: 0,
+        lifetime_tasks_completed: 0,
+        lifetime_cancelled: 0
+      }, { onConflict: 'user_id' });
+      if (statsError) throw statsError;
+
+      console.log("Onboarding complete, redirecting...");
+      setUserProfile(prev => ({
+        ...prev,
+        full_name: fullName,
+        avatar_url: photoBase64,
+        dob: dob,
+        gender: gender,
+        regNumber: regNumber,
+        hostelBlock: hostelBlock,
+        roomNumber: roomNumber,
+        gcBalance: 100,
+        gcCapacity: 300,
+        trustScore: 5.0,
+        onboardingComplete: true
+      }));
+      
+      // 4. Trigger callback (if any) and navigate
       if (onComplete) onComplete();
+      navigate('/');
 
     } catch (error) {
       console.error("Error sealing dossier:", error);

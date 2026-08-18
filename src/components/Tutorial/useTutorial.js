@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { db } from '../../firebase/config';
-import { doc, updateDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { supabase } from '../../lib/supabase';
 import { useAppContext } from '../../context/AppContext';
-
 
 const TUTORIAL_STEPS = [
   // Step 0: Welcome
@@ -76,7 +74,7 @@ export const useTutorial = () => {
   const [isActive, setIsActive] = useState(false);
   const timerRef = useRef(null);
 
-  // Initialize from Firebase-persisted step
+  // Initialize from persisted step
   useEffect(() => {
     if (userProfile && userProfile.tutorialComplete === false) {
       const savedStep = userProfile.tutorialStep || 0;
@@ -87,16 +85,16 @@ export const useTutorial = () => {
     }
   }, [userProfile?.tutorialComplete, userProfile?.tutorialStep]);
 
-  // Persist step to Firebase on every advance
+  // Persist step to Supabase on every advance
   const persistStep = useCallback(async (newStep) => {
     if (!currentUser) return;
     try {
-      const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, { tutorialStep: newStep });
+      const qs = { ...userProfile?.questState, tutorialStep: newStep };
+      localStorage.setItem('gity_quest_state_' + currentUser.uid, JSON.stringify(qs));
     } catch (err) {
       console.error('Error persisting tutorial step:', err);
     }
-  }, [currentUser]);
+  }, [currentUser, userProfile]);
 
   const advanceStep = useCallback(() => {
     const next = step + 1;
@@ -110,7 +108,6 @@ export const useTutorial = () => {
   }, [step, persistStep, setUserProfile]);
 
   // Delete the tutorial post right when the "bot accepts" (step 11 -> 12 transition)
-  // This removes the real Firebase document immediately so it never lingers.
   const tutorialPostDeletedRef = useRef(false);
   useEffect(() => {
     if (!isActive || step !== 11 || !currentUser || tutorialPostDeletedRef.current) return;
@@ -118,22 +115,13 @@ export const useTutorial = () => {
     
     const deleteTutorialPost = async () => {
       try {
-        // Query Firestore for the 0-cost post created by this user during the tutorial
-        const q = query(
-          collection(db, 'posts'),
-          where('requesterId', '==', currentUser.uid)
-        );
-        const snap = await getDocs(q);
-        const deletePromises = [];
-        snap.forEach((docSnap) => {
-          const data = docSnap.data();
-          if (data.cost === 0 || data.cost === undefined) {
-            // Use raw deleteDoc to bypass refund logic — 0 GC was never charged
-            deletePromises.push(deleteDoc(doc(db, 'posts', docSnap.id)));
+        const { data: snap } = await supabase.from('tasks').select('*').eq('requester_id', currentUser.uid).eq('reward_credits', 0);
+        if (snap) {
+          for (const s of snap) {
+            await supabase.from('tasks').delete().eq('id', s.id);
           }
-        });
-        await Promise.all(deletePromises);
-        console.log('[Tutorial] Cleaned up tutorial post(s) from Firebase');
+        }
+        console.log('[Tutorial] Cleaned up tutorial post(s) from Supabase');
       } catch (err) {
         console.warn('[Tutorial] Failed to cleanup tutorial post:', err);
       }
@@ -144,17 +132,12 @@ export const useTutorial = () => {
   const cleanupTutorialPosts = async () => {
     if (!currentUser || !deletePost) return;
     try {
-      // Query Firestore directly to catch any stragglers
-      const q = query(collection(db, 'posts'), where('requesterId', '==', currentUser.uid));
-      const snap = await getDocs(q);
-      const deletePromises = [];
-      snap.forEach((docSnap) => {
-        const data = docSnap.data();
-        if (data.cost === 0 || data.cost === undefined) {
-          deletePromises.push(deleteDoc(doc(db, 'posts', docSnap.id)));
+      const { data: snap } = await supabase.from('tasks').select('*').eq('requester_id', currentUser.uid).eq('reward_credits', 0);
+      if (snap) {
+        for (const s of snap) {
+          await supabase.from('tasks').delete().eq('id', s.id);
         }
-      });
-      await Promise.all(deletePromises);
+      }
       // Also clean local state
       if (feedData) {
         const userPosts = feedData.filter(p => p.requesterId === currentUser.uid && (p.cost === 0 || p.cost === undefined));
@@ -171,19 +154,21 @@ export const useTutorial = () => {
     if (!currentUser) return;
     try {
       await cleanupTutorialPosts();
-      const userRef = doc(db, 'users', currentUser.uid);
       const currentRookieState = userProfile?.questState?.rookieTraining;
       const newRookieState = currentRookieState === 'claimed' ? 'claimed' : true;
-      await updateDoc(userRef, { 
+      const qs = { 
+        ...userProfile?.questState, 
         tutorialComplete: true, 
         tutorialStep: TUTORIAL_STEPS.length,
-        'questState.rookieTraining': newRookieState
-      });
+        rookieTraining: newRookieState
+      };
+      localStorage.setItem('gity_quest_state_' + currentUser.uid, JSON.stringify(qs));
+      
       setUserProfile(prev => ({
         ...prev,
         tutorialComplete: true,
         tutorialStep: TUTORIAL_STEPS.length,
-        questState: { ...prev.questState, rookieTraining: newRookieState }
+        questState: { ...prev.questState, rookieTraining: newRookieState, tutorialComplete: true, tutorialStep: TUTORIAL_STEPS.length }
       }));
       setIsActive(false);
     } catch (err) {
@@ -195,15 +180,14 @@ export const useTutorial = () => {
     if (!currentUser) return;
     try {
       await cleanupTutorialPosts();
-      const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, { 
-        tutorialComplete: true,
-        tutorialStep: TUTORIAL_STEPS.length
-      });
+      const qs = { ...userProfile?.questState, tutorialComplete: true, tutorialStep: TUTORIAL_STEPS.length };
+      localStorage.setItem('gity_quest_state_' + currentUser.uid, JSON.stringify(qs));
+      
       setUserProfile(prev => ({
         ...prev,
         tutorialComplete: true,
-        tutorialStep: TUTORIAL_STEPS.length
+        tutorialStep: TUTORIAL_STEPS.length,
+        questState: { ...prev.questState, tutorialComplete: true, tutorialStep: TUTORIAL_STEPS.length }
       }));
       setIsActive(false);
     } catch (err) {
