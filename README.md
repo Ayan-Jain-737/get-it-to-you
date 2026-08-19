@@ -6,7 +6,7 @@
 
 ### Hyper-Local Peer-to-Peer Campus Logistics Network
 
-*A real-time delivery coordination platform built exclusively for VIT Vellore students.*
+*A real-time delivery coordination platform built for VIT Vellore students.*
 
 **Transforming informal campus favors into a trusted, trackable, and rewarding logistics ecosystem.**
 
@@ -20,7 +20,10 @@
 
 ## 📖 Overview
 
-GITY (**Get It To You**) is a hyper-local peer-to-peer logistics platform designed exclusively for the VIT Vellore campus. It transforms the countless informal favors students perform every day into a structured, secure, and rewarding ecosystem powered by a virtual campus economy.
+Food delivery drivers and outside couriers often struggle to navigate closed college campuses. Security gates, large walking distances, and confusing building names make delivering items a massive hassle. At the same time, students are busy with classes or studying and often lack the time to fetch things themselves (like a forgotten phone charger, a library book, or a quick snack).
+
+
+GITY (**Get It To You**) is a peer-to-peer platform currently designed for the VIT Vellore campus. It transforms the countless informal favors students perform every day into a structured, secure, and rewarding ecosystem powered by a virtual campus economy.
 
 Every day, students need food picked up from the Main Gate, parcels collected from delivery points, books returned to the library, or items fetched from another hostel block. At the same time, hundreds of students are already moving across campus.
 
@@ -48,7 +51,7 @@ This approach creates several problems:
 
 As a result, students either inconvenience themselves or depend entirely on personal networks.
 
-GITY was created to solve this problem.
+#### GITY was created to solve this problem.
 
 ---
 
@@ -62,9 +65,9 @@ It is not a social media platform.
 
 GITY acts as a coordination layer for campus movement.
 
-Students who need help can post delivery requests.
+##### Students who need help can post delivery requests.
 
-Students who are already heading somewhere can earn rewards by helping others along their route.
+##### Students who are already heading somewhere can earn rewards by helping others along their route.
 
 Every interaction is secured through upfront credit holds, GPS validation, OTP verification, and reputation tracking.
 
@@ -107,17 +110,17 @@ Most favor-sharing systems fail because there is no trustworthy way to verify co
 
 GITY solves this through a three-layer verification system.
 
-### Physical Presence
+* ### Physical Presence
 
 The runner must physically enter the destination geofence before completion becomes available.
 
-### OTP Verification
+* ### OTP Verification
 
 A one-time password is generated and shown to the requester.
 
 The requester verbally shares the OTP with the runner upon successful handoff.
 
-### Credits Released
+* ### Credits Released
 
 Only after the runner enters the correct OTP code are the held credits released and the delivery officially completed.
 
@@ -188,7 +191,7 @@ Runner coordinates are continuously updated, creating a transparent and trustwor
 
 # 🛰️ Physical Geofencing
 
-A major challenge in delivery systems is preventing users from faking progress.
+###### <u> A major challenge in delivery systems is preventing users from faking progress. </u>
 
 GITY solves this through real-world location validation.
 
@@ -365,7 +368,7 @@ Supported areas include:
 
 These coordinates power pricing calculations, geofencing, route visualization, and live tracking. 
 
-Addition of more locations will be done in Future based on user responses.
+* ###### Addition of more locations are on their way as you read this
 
 ---
 
@@ -389,13 +392,13 @@ Together, these systems create a logistics network specifically optimized for re
 
 # 🔮 Future Roadmap
 
+* Expansion to other universities
 * Smart route matching
-* AI-powered delivery recommendations
 * Multi-delivery batching
 * Campus analytics dashboard
 * Heatmaps for logistics demand
 * Admin moderation console
-* Expansion to other universities
+
 
 ---
 
